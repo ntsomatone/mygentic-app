@@ -29,7 +29,7 @@
 
 /* 02  Tokens */
 :root {
-  --paper: #FFFFFF; --paper-2: #F7F8FA; --paper-3: #EFF1F4;
+  --paper: #FFFFFF; --paper-2: #FAF7F4; --paper-3: #F0EBE5;
   --card: #FFFFFF;
   --rule: rgba(41, 45, 52, 0.08); --rule-strong: rgba(41, 45, 52, 0.16);
   --ink: #292D34; --ink-soft: #3A3F47; --ink-mute: #6B7280; --ink-faint: #A0A6B0;
