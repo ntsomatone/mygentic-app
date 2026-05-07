@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dashboard · MyGentic</title>
+<link rel="stylesheet" href="app.css" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+
+<style>
+
+  /* Dashboard page makes the content surface white so the hero atmosphere
+     conic gradient reads cleanly. Other pages can keep paper-2. */
+  .app-content { background: var(--paper); padding: 0; }
+
+  /* ── HERO: editorial scale with conic gradient atmosphere ── */
+  .dash-hero {
+    padding: var(--s-9) var(--s-7) var(--s-8);
+    border-bottom: 1px solid var(--rule);
+  }
+  .dash-hero-inner {
+    max-width: var(--w-product);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: var(--s-8);
+    align-items: center;
+  }
+  .dash-hero-eyebrow {
+    color: var(--terra);
+    margin-bottom: var(--s-5);
+  }
+  .dash-hero-greeting {
+    font-family: var(--f-display);
+    font-weight: 400;
+    font-size: clamp(56px, 7vw, 96px);
+    line-height: 0.98;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: var(--s-3);
+  }
+  .dash-hero-greeting em { font-style: italic; }
+  .dash-hero-prompt {
+    font-size: 18px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    max-width: 520px;
+    margin-bottom: var(--s-6);
+  }
+  .dash-hero-prompt strong { color: var(--ink); font-weight: 600; }
+  .dash-hero-actions { display: flex; flex-wrap: wrap; gap: var(--s-3); }
+
+  /* RIGHT: brain hub visualization */
+  .dash-hero-orb-wrap {
+    display: flex; flex-direction: column;
+    align-items: center; gap: var(--s-4);
+  }
+  .dash-orb-stage {
+    width: 100%; max-width: 420px;
+    aspect-ratio: 1;
+    position: relative;
+    cursor: pointer;
+  }
+  .dash-orb-stage svg { width: 100%; height: 100%; display: block; }
+  .dash-orb-caption {
+    font-family: var(--f-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+
+  @media (max-width: 900px) {
+    .dash-hero { padding: var(--s-7) var(--s-5); }
+    .dash-hero-inner { grid-template-columns: 1fr; gap: var(--s-6); }
+    .dash-hero-greeting { font-size: clamp(44px, 9vw, 64px); }
+  }
+
+  /* ── BODY: clean white surface, content sections ── */
+  .dash-body {
+    background: var(--paper);
+    padding: var(--s-8) var(--s-7);
+  }
+  .dash-body-inner {
+    max-width: var(--w-product);
+    margin: 0 auto;
+  }
+  @media (max-width: 900px) { .dash-body { padding: var(--s-6) var(--s-5); } }
+
+  /* Context Depth callout */
+  .depth-callout {
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    padding: var(--s-6);
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: var(--s-7);
+    align-items: center;
+  }
+  @media (max-width: 720px) { .depth-callout { grid-template-columns: 1fr; gap: var(--s-5); } }
+  .depth-callout-tier {
+    font-family: var(--f-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: var(--s-3);
+  }
+  .depth-callout-stage {
+    font-family: var(--f-display);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 64px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--terra);
+  }
+  .depth-callout p {
+    font-size: 16px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    margin-top: var(--s-3);
+  }
+  .depth-callout .depth-bar { height: 8px; margin-top: var(--s-3); }
+  .depth-callout .depth-stages { font-size: 10px; margin-top: 8px; }
+
+  /* Six dimension cards */
+  .cat-card {
+    --c-accent: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    padding: var(--s-5);
+    cursor: pointer;
+    transition: transform var(--t-base) var(--ease), box-shadow var(--t-base), border-color var(--t-base);
+    position: relative; overflow: hidden;
+    color: inherit;
+    display: block;
+  }
+  .cat-card::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 4px;
+    background: var(--c-accent);
+    transition: height var(--t-base);
+  }
+  .cat-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--rule-strong);
+    box-shadow: var(--shadow-pop);
+    color: inherit;
+  }
+  .cat-card:hover::before { height: 6px; }
+  .cat-card .cat-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: var(--s-4); margin-top: 6px;
+  }
+  .cat-card .cat-icon {
+    width: 40px; height: 40px;
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--c-accent) 12%, white);
+    color: var(--c-accent);
+    display: grid; place-items: center; font-size: 20px;
+  }
+  .cat-card .cat-stage {
+    font-family: var(--f-mono); font-size: 11px;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+  .cat-card .cat-name {
+    font-family: var(--f-display);
+    font-weight: 400;
+    font-size: 28px;
+    letter-spacing: -0.01em;
+    line-height: 1.05;
+    margin-bottom: var(--s-2);
+    color: var(--ink);
+  }
+  .cat-card .cat-tier {
+    font-family: var(--f-display);
+    font-style: italic;
+    font-size: 16px;
+    color: var(--c-accent);
+    font-weight: 400;
+    line-height: 1.4;
+  }
+  .cat-card .cat-meta {
+    display: flex; gap: var(--s-3);
+    margin-top: var(--s-4);
+    padding-top: var(--s-3);
+    border-top: 1px solid var(--rule);
+    font-family: var(--f-mono); font-size: 11px;
+    color: var(--ink-mute); letter-spacing: 0.04em;
+  }
+  .cat-card .cat-meta strong { color: var(--ink); font-weight: 600; }
+
+  /* Sage cosmos teaser */
+  .sage-teaser {
+    background: linear-gradient(135deg, var(--cosmos-1) 0%, var(--cosmos-2) 100%);
+    border: 1px solid var(--cosmos-3);
+    border-radius: var(--r-lg);
+    padding: var(--s-6);
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: var(--s-5);
+    align-items: center;
+    position: relative; overflow: hidden;
+    color: var(--sage-bone);
+  }
+  .sage-teaser::before {
+    content: ''; position: absolute; inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.5), transparent 50%),
+      radial-gradient(1px 1px at 80% 70%, rgba(255,255,255,0.4), transparent 50%),
+      radial-gradient(1px 1px at 60% 20%, rgba(255,255,255,0.3), transparent 50%),
+      radial-gradient(1px 1px at 40% 80%, rgba(255,255,255,0.4), transparent 50%);
+    opacity: 0.7; pointer-events: none;
+  }
+  .sage-teaser > * { position: relative; }
+  .sage-teaser-title {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: 28px; line-height: 1.1; letter-spacing: -0.01em;
+    color: #F8F5EF; margin-bottom: 4px;
+  }
+  .sage-teaser-title em { font-style: italic; color: var(--sage-blue); }
+  .sage-teaser p { font-size: 14px; color: rgba(242, 239, 234, 0.72); }
+
+  /* Library teaser */
+  .lib-teaser {
+    background: linear-gradient(135deg, var(--forest-1) 0%, var(--forest-2) 55%, var(--forest-3) 100%);
+    border: 1px solid var(--forest-3);
+    border-radius: var(--r-lg);
+    padding: var(--s-6);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--s-4);
+    align-items: center;
+    color: #E8F3EA;
+    position: relative; overflow: hidden;
+  }
+  .lib-teaser::after {
+    content: ''; position: absolute; inset: 0;
+    background-image: linear-gradient(180deg, transparent 0%, rgba(31, 143, 58, 0.04) 50%, transparent 100%);
+    background-size: 100% 4px; mix-blend-mode: screen;
+    pointer-events: none; opacity: 0.5;
+  }
+  .lib-teaser > * { position: relative; }
+  .lib-teaser-title {
+    font-family: var(--f-display); font-weight: 400; font-size: 24px;
+    line-height: 1.15; letter-spacing: -0.01em;
+    color: #F0F8F2; margin-bottom: 4px;
+  }
+  .lib-teaser-title em { font-style: italic; color: var(--neon-bright); }
+  .lib-teaser p { font-size: 13px; color: rgba(232, 243, 234, 0.72); }
+  @media (max-width: 720px) {
+    .sage-teaser, .lib-teaser { grid-template-columns: 1fr; text-align: left; }
+  }
+
+  /* Recent ingestions panel */
+  .recent-panel {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+  }
+  .recent-panel .panel-head {
+    padding: var(--s-5) var(--s-5);
+    display: flex; align-items: baseline; justify-content: space-between;
+    border-bottom: 1px solid var(--rule);
+    gap: var(--s-3);
+  }
+  .recent-panel .panel-head h3 {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: 28px; letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .recent-panel .panel-head h3 em { font-style: italic; }
+  .recent-panel .panel-foot {
+    padding: var(--s-3) var(--s-5);
+    border-top: 1px solid var(--rule);
+    background: var(--paper-2);
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 13px; color: var(--ink-mute);
+  }
+  .ingestion-row {
+    display: grid;
+    grid-template-columns: 36px 1fr auto auto;
+    gap: var(--s-4);
+    padding: 14px var(--s-5);
+    border-bottom: 1px solid var(--rule);
+    align-items: center;
+    cursor: pointer;
+    transition: background var(--t-fast);
+    color: inherit;
+  }
+  .ingestion-row:hover { background: var(--paper-2); color: inherit; }
+  .ingestion-row:last-child { border-bottom: 0; }
+  .ingestion-row .src-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: var(--paper-2); color: var(--ink-mute);
+    display: grid; place-items: center; font-size: 18px;
+  }
+  .ingestion-row .src-icon.cat-pulled  { background: var(--cat-pulled-tint);  color: var(--cat-pulled-deep); }
+  .ingestion-row .src-icon.cat-mcp     { background: var(--cat-mcp-tint);     color: var(--cat-mcp-deep); }
+  .ingestion-row .src-icon.cat-sage    { background: var(--cat-sage-cat-tint);    color: var(--cat-sage-cat-deep); }
+  .ingestion-row .src-icon.cat-library { background: var(--cat-library-tint); color: var(--cat-library-deep); }
+  .ingestion-row .src-icon.cat-agent   { background: var(--cat-agent-tint);   color: var(--cat-agent-deep); }
+
+  .ingestion-row .row-title { font-size: 14.5px; color: var(--ink); margin-bottom: 2px; }
+  .ingestion-row .row-meta {
+    font-family: var(--f-mono); font-size: 11px;
+    color: var(--ink-mute); letter-spacing: 0.04em;
+  }
+  .ingestion-row .row-dim { font-size: 13px; color: var(--ink-soft); }
+  .ingestion-row .row-time {
+    font-family: var(--f-mono); font-size: 11px;
+    color: var(--ink-mute); letter-spacing: 0.04em;
+  }
+
+  /* Token compaction footer cards */
+  .compact-card {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    padding: var(--s-6);
+    display: block; color: inherit;
+    transition: transform var(--t-base), box-shadow var(--t-base);
+  }
+  .compact-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-pop); color: inherit; }
+  .compact-stat {
+    display: flex; gap: var(--s-3); align-items: baseline;
+    margin-bottom: var(--s-3);
+  }
+  .compact-stat .big {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: 64px; line-height: 1; letter-spacing: -0.02em;
+    color: var(--terra);
+  }
+  .compact-stat .pct {
+    font-family: var(--f-display); font-style: italic;
+    font-size: 28px; color: var(--ink-mute);
+  }
+  .compact-spark {
+    height: 60px; display: flex; align-items: end; gap: 3px;
+    margin: var(--s-4) 0;
+  }
+  .compact-spark .bar {
+    flex: 1; background: var(--terra-soft);
+    border-radius: 2px 2px 0 0;
+  }
+  .compact-spark .bar.recent { background: var(--terra); }
+  .compact-card-export h3 {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: 36px; letter-spacing: -0.015em; line-height: 1.05;
+    margin-bottom: var(--s-3); color: var(--ink);
+  }
+  .compact-card-export h3 em { font-style: italic; }
+  .compact-card-export p { font-size: 15px; color: var(--ink-soft); margin-bottom: var(--s-4); line-height: 1.55; }
+
+  /* Big section heads */
+  .dash-section-head {
+    margin-bottom: var(--s-5);
+    display: flex; align-items: baseline; justify-content: space-between;
+    flex-wrap: wrap; gap: var(--s-3);
+  }
+  .dash-section-head h2 {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: clamp(28px, 3vw, 36px);
+    letter-spacing: -0.01em; line-height: 1.1;
+    color: var(--ink);
+  }
+  .dash-section-head h2 em { font-style: italic; }
+  .dash-section-head .meta {
+    font-family: var(--f-mono); font-size: 11px;
+    color: var(--ink-mute); letter-spacing: 0.08em; text-transform: uppercase;
+  }
+
+  /* Stat row */
+  .dash-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s-4); }
+  @media (max-width: 900px) { .dash-stats { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 540px) { .dash-stats { grid-template-columns: 1fr; } }
+  .dash-stat-card {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    padding: var(--s-5);
+    transition: transform var(--t-base), box-shadow var(--t-base), border-color var(--t-base);
+    color: inherit; display: block;
+  }
+  .dash-stat-card:hover {
+    transform: translateY(-2px); border-color: var(--rule-strong);
+    box-shadow: var(--shadow-pop); color: inherit;
+  }
+  .dash-stat-card .label {
+    font-family: var(--f-mono); font-size: 10px; font-weight: 600;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-mute);
+    margin-bottom: var(--s-2);
+  }
+  .dash-stat-card .value {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: 48px; line-height: 1; letter-spacing: -0.02em;
+    color: var(--ink); margin-bottom: var(--s-2);
+  }
+  .dash-stat-card .value .pct { font-size: 26px; color: var(--ink-mute); font-style: italic; }
+  .dash-stat-card .trend {
+    font-size: 13px; color: var(--ink-mute);
+    display: flex; align-items: center; gap: 4px;
+  }
+  .dash-stat-card .trend.up { color: var(--success); }
+
+</style>
+</head>
+<body class="app-shell dashboard-page">
+<header class="app-topbar">
+  <div class="app-topbar-inner">
+    <label for="navToggle" class="app-burger" aria-label="Open navigation"><i class="ph ph-list"></i></label>
+    <a class="app-brand" href="dashboard.html">My<span class="accent">Gen</span>tic</a>
+    <h1 class="app-page-title">Dashboard</h1>
+    <div class="app-topbar-actions">
+      <div class="app-topbar-search">
+        <i class="ph ph-magnifying-glass"></i>
+        <input type="text" placeholder="Search your context, agents, libraries…" />
+        <kbd>⌘K</kbd>
+      </div>
+      <button class="app-icon-btn" aria-label="Notifications"><i class="ph ph-bell"></i><span class="dot"></span></button>
+      <button class="app-avatar" aria-label="User menu">NA</button>
+    </div>
+  </div>
+</header>
+<div class="app-layout">
+  <input type="checkbox" id="navToggle" class="app-nav-toggle sr-only" />
+<label for="navToggle" class="app-leftnav-backdrop"></label>
+<nav class="app-leftnav" aria-label="Primary">
+  <div class="app-nav-section-label">Workspace</div>
+      <a href="dashboard.html" class="app-nav-item active" data-page="dashboard"><i class="ph ph-gauge"></i><span>Dashboard</span></a>
+      <a href="atlas.html" class="app-nav-item" data-page="atlas"><i class="ph ph-graph"></i><span>Atlas</span></a>
+      <a href="sage.html" class="app-nav-item" data-page="sage"><i class="ph ph-chats-circle"></i><span>Sage</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Context</div>
+      <a href="context.html" class="app-nav-item" data-page="context"><i class="ph ph-stack"></i><span>Context Layers</span></a>
+      <a href="token-compaction.html" class="app-nav-item" data-page="token-compaction"><i class="ph ph-funnel"></i><span>Token Compaction</span></a>
+      <a href="history.html" class="app-nav-item" data-page="history"><i class="ph ph-clock-counter-clockwise"></i><span>History</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Connect</div>
+      <a href="connections.html" class="app-nav-item" data-page="connections"><i class="ph ph-plugs-connected"></i><span>Connections</span></a>
+      <a href="upload-data.html" class="app-nav-item" data-page="upload-data"><i class="ph ph-upload-simple"></i><span>Upload Data</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Build</div>
+      <a href="agents.html" class="app-nav-item" data-page="agents"><i class="ph ph-sparkle"></i><span>Agents</span></a>
+      <a href="marketplace.html" class="app-nav-item" data-page="marketplace"><i class="ph ph-books"></i><span>Expert Libraries</span><span class="nav-badge">New</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Account</div>
+      <a href="export.html" class="app-nav-item" data-page="export"><i class="ph ph-download-simple"></i><span>Export &amp; Data</span></a>
+      <a href="settings.html" class="app-nav-item" data-page="settings"><i class="ph ph-gear-six"></i><span>Settings</span></a>
+</nav>
+  <main class="app-content">
+
+  <!-- ─────────────────────────────────────────────────────────────
+       HERO — editorial scale, conic gradient atmosphere, brain orb
+       ───────────────────────────────────────────────────────────── -->
+  <section class="dash-hero hero-atmosphere">
+    <div class="dash-hero-inner">
+      <div>
+        <div class="t-label-mono dash-hero-eyebrow">Sage · Listening · Solid Context</div>
+        <h2 class="dash-hero-greeting">Welcome back,<br /><em>Nick.</em></h2>
+        <hr class="hero-rule" />
+        <p class="dash-hero-prompt">
+          Your context is <strong>Solid</strong>. Three sources connected this week, 47 new data points, and token compaction is saving you <strong>72%</strong> on AI calls. Want to pick up where we left off?
+        </p>
+        <div class="dash-hero-actions">
+          <a href="sage.html" class="btn btn-primary terra btn-lg"><i class="ph ph-chats-circle"></i> Continue with Sage</a>
+          <a href="atlas.html" class="btn btn-secondary btn-lg"><i class="ph ph-graph"></i> Open Atlas</a>
+        </div>
+      </div>
+
+      <!-- Brain hub orb (matching mygentic.io Sage section orb) -->
+      <a href="sage.html" class="dash-hero-orb-wrap" aria-label="Open Sage">
+        <div class="dash-orb-stage">
+          <svg viewBox="0 0 460 460" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <radialGradient id="orbBody" cx="50%" cy="42%" r="60%">
+                <stop offset="0%"  stop-color="#3A4FB8" stop-opacity="0.95"/>
+                <stop offset="45%" stop-color="#1A1F5C" stop-opacity="0.9"/>
+                <stop offset="85%" stop-color="#0B0E2E" stop-opacity="0.95"/>
+                <stop offset="100%" stop-color="#06081C" stop-opacity="1"/>
+              </radialGradient>
+              <radialGradient id="orbCore" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.85"/>
+                <stop offset="35%" stop-color="#9DD3F5" stop-opacity="0.5"/>
+                <stop offset="100%" stop-color="#9DD3F5" stop-opacity="0"/>
+              </radialGradient>
+              <radialGradient id="orbHalo" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#4AA8E8" stop-opacity="0"/>
+                <stop offset="80%" stop-color="#4AA8E8" stop-opacity="0"/>
+                <stop offset="92%" stop-color="#4AA8E8" stop-opacity="0.18"/>
+                <stop offset="100%" stop-color="#4AA8E8" stop-opacity="0"/>
+              </radialGradient>
+              <filter id="orbGlow" x="-30" y="-30" width="520" height="520" filterUnits="userSpaceOnUse">
+                <feGaussianBlur stdDeviation="4" result="b"/>
+                <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+              <filter id="nodeGlow" x="-100%" y="-100%" width="300%" height="300%">
+                <feGaussianBlur stdDeviation="2" result="b"/>
+                <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+            <!-- Halo + body -->
+            <circle cx="230" cy="230" r="225" fill="url(#orbHalo)"/>
+            <circle cx="230" cy="230" r="190" fill="url(#orbBody)"/>
+            <circle cx="230" cy="230" r="190" fill="none" stroke="rgba(122,184,232,0.55)" stroke-width="0.8"/>
+            <circle cx="230" cy="230" r="186" fill="none" stroke="rgba(122,184,232,0.18)" stroke-width="2"/>
+
+            <!-- Constellation graph: nodes + edges (static positions matching live aesthetic) -->
+            <g filter="url(#nodeGlow)">
+              <!-- Edges -->
+              <line x1="230" y1="230" x2="120" y2="140" stroke="rgba(122,184,232,0.32)" stroke-width="0.6"/>
+              <line x1="230" y1="230" x2="340" y2="120" stroke="rgba(122,184,232,0.32)" stroke-width="0.6"/>
+              <line x1="230" y1="230" x2="360" y2="280" stroke="rgba(122,184,232,0.32)" stroke-width="0.6"/>
+              <line x1="230" y1="230" x2="290" y2="350" stroke="rgba(122,184,232,0.32)" stroke-width="0.6"/>
+              <line x1="230" y1="230" x2="140" y2="320" stroke="rgba(122,184,232,0.32)" stroke-width="0.6"/>
+              <line x1="230" y1="230" x2="100" y2="240" stroke="rgba(122,184,232,0.32)" stroke-width="0.6"/>
+              <line x1="120" y1="140" x2="180" y2="100" stroke="rgba(122,184,232,0.18)" stroke-width="0.5"/>
+              <line x1="340" y1="120" x2="380" y2="180" stroke="rgba(122,184,232,0.18)" stroke-width="0.5"/>
+              <line x1="360" y1="280" x2="290" y2="350" stroke="rgba(122,184,232,0.18)" stroke-width="0.5"/>
+              <line x1="140" y1="320" x2="100" y2="240" stroke="rgba(122,184,232,0.18)" stroke-width="0.5"/>
+              <line x1="180" y1="100" x2="280" y2="80" stroke="rgba(122,184,232,0.18)" stroke-width="0.5"/>
+              <line x1="280" y1="80" x2="340" y2="120" stroke="rgba(122,184,232,0.18)" stroke-width="0.5"/>
+              <line x1="380" y1="180" x2="360" y2="280" stroke="rgba(122,184,232,0.18)" stroke-width="0.5"/>
+              <!-- Glowing nodes (sage blue + a few warm coral for ingestion activity) -->
+              <circle cx="120" cy="140" r="3.5" fill="#4AA8E8"/>
+              <circle cx="340" cy="120" r="3" fill="#4AA8E8"/>
+              <circle cx="360" cy="280" r="3.5" fill="#E8957A"/>
+              <circle cx="290" cy="350" r="2.5" fill="#4AA8E8"/>
+              <circle cx="140" cy="320" r="3" fill="#4AA8E8"/>
+              <circle cx="100" cy="240" r="2.5" fill="#4AA8E8"/>
+              <circle cx="180" cy="100" r="2" fill="#4AA8E8"/>
+              <circle cx="280" cy="80" r="2.5" fill="#E8957A"/>
+              <circle cx="380" cy="180" r="2" fill="#4AA8E8"/>
+              <circle cx="200" cy="380" r="2" fill="#4AA8E8"/>
+              <circle cx="80"  cy="180" r="2" fill="#4AA8E8"/>
+              <circle cx="400" cy="240" r="2" fill="#4AA8E8"/>
+            </g>
+
+            <!-- Inner orbital rings -->
+            <g>
+              <circle cx="230" cy="230" r="80" fill="none" stroke="rgba(120,180,232,0.25)" stroke-width="0.5" stroke-dasharray="3 6"/>
+              <circle cx="230" cy="230" r="55" fill="none" stroke="rgba(120,180,232,0.18)" stroke-width="0.4" stroke-dasharray="1 4"/>
+            </g>
+
+            <!-- Bright cyan core -->
+            <circle cx="230" cy="230" r="50" fill="url(#orbCore)" filter="url(#orbGlow)"/>
+            <circle cx="230" cy="222" r="14" fill="#FFFFFF" opacity="0.85" filter="url(#orbGlow)"/>
+          </svg>
+        </div>
+        <div class="dash-orb-caption">Sage · Tap to talk</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────────────
+       BODY — clean white, content sections
+       ───────────────────────────────────────────────────────────── -->
+  <div class="dash-body">
+    <div class="dash-body-inner">
+
+      <!-- Context Depth callout -->
+      <div class="depth-callout">
+        <div>
+          <div class="depth-callout-tier">Context Depth</div>
+          <div class="depth-callout-stage">Solid.</div>
+          <p>Stage 3 of 6. Two more dimensions filled in and you'll cross into <em class="t-italic-display">Rich</em>.</p>
+        </div>
+        <div>
+          <div class="depth-bar">
+            <span class="seg is-on"></span>
+            <span class="seg is-on"></span>
+            <span class="seg is-on"></span>
+            <span class="seg"></span>
+            <span class="seg"></span>
+            <span class="seg"></span>
+          </div>
+          <div class="depth-stages">
+            <span>Shallow</span>
+            <span>Developing</span>
+            <span class="is-current">Solid</span>
+            <span>Rich</span>
+            <span>Deep</span>
+            <span>Expansive</span>
+          </div>
+          <p style="margin-top: var(--s-4); font-size: 14px; color: var(--ink-soft);">
+            Sage usually deepens one tier every two to three sessions.
+            <a href="sage.html" style="font-weight: 600;">Schedule a session →</a>
+          </p>
+        </div>
+      </div>
+
+      <!-- Stats row -->
+      <section style="margin-top: var(--s-7);">
+        <div class="dash-stats">
+          <a class="dash-stat-card" href="atlas.html?focus=nodes">
+            <div class="label">Total Nodes</div>
+            <div class="value">347</div>
+            <div class="trend up"><i class="ph ph-arrow-up"></i> +12 this week</div>
+          </a>
+          <a class="dash-stat-card" href="connections.html">
+            <div class="label">Sources Connected</div>
+            <div class="value">11</div>
+            <div class="trend">3 added this week</div>
+          </a>
+          <a class="dash-stat-card" href="token-compaction.html">
+            <div class="label">Token Compaction</div>
+            <div class="value">72<span class="pct">%</span></div>
+            <div class="trend up"><i class="ph ph-arrow-up"></i> +4 pts vs last month</div>
+          </a>
+          <a class="dash-stat-card" href="agents.html">
+            <div class="label">Active Agents</div>
+            <div class="value">5</div>
+            <div class="trend">2 ran today</div>
+          </a>
+        </div>
+      </section>
+
+      <!-- Six dimensions -->
+      <section style="margin-top: var(--s-9);">
+        <div class="dash-section-head">
+          <h2>Your context, by <em>dimension.</em></h2>
+          <span class="meta">6 dimensions · 3 layers each</span>
+        </div>
+        <div class="grid-3">
+          <a class="cat-card" style="--c-accent: #7B68EE;" href="context.html?dim=professional">
+            <div class="cat-head">
+              <div class="cat-icon"><i class="ph ph-briefcase"></i></div>
+              <div class="cat-stage">Stage 4 / Rich</div>
+            </div>
+            <h3 class="cat-name">Professional</h3>
+            <div class="cat-tier"><em>Rich</em> &mdash; the layer that briefs every work AI you talk to.</div>
+            <div class="cat-meta">
+              <span><strong>89</strong> nodes</span>
+              <span><strong>6</strong> sources</span>
+              <span><strong>2d</strong> ago</span>
+            </div>
+          </a>
+
+          <a class="cat-card" style="--c-accent: #FD71AF;" href="context.html?dim=work-life">
+            <div class="cat-head">
+              <div class="cat-icon"><i class="ph ph-coffee"></i></div>
+              <div class="cat-stage">Stage 3 / Solid</div>
+            </div>
+            <h3 class="cat-name">Work Life</h3>
+            <div class="cat-tier"><em>Solid</em> &mdash; how you operate, decide, and prioritize.</div>
+            <div class="cat-meta">
+              <span><strong>62</strong> nodes</span>
+              <span><strong>4</strong> sources</span>
+              <span><strong>3d</strong> ago</span>
+            </div>
+          </a>
+
+          <a class="cat-card" style="--c-accent: #49CCF9;" href="context.html?dim=interests">
+            <div class="cat-head">
+              <div class="cat-icon"><i class="ph ph-compass"></i></div>
+              <div class="cat-stage">Stage 4 / Rich</div>
+            </div>
+            <h3 class="cat-name">Interests</h3>
+            <div class="cat-tier"><em>Rich</em> &mdash; the stuff that holds your attention outside work.</div>
+            <div class="cat-meta">
+              <span><strong>71</strong> nodes</span>
+              <span><strong>5</strong> sources</span>
+              <span><strong>1d</strong> ago</span>
+            </div>
+          </a>
+
+          <a class="cat-card" style="--c-accent: #00C9A7;" href="context.html?dim=aesthetic">
+            <div class="cat-head">
+              <div class="cat-icon"><i class="ph ph-palette"></i></div>
+              <div class="cat-stage">Stage 2 / Developing</div>
+            </div>
+            <h3 class="cat-name">Aesthetic</h3>
+            <div class="cat-tier"><em>Developing</em> &mdash; taste, style, and what good looks like.</div>
+            <div class="cat-meta">
+              <span><strong>38</strong> nodes</span>
+              <span><strong>2</strong> sources</span>
+              <span><strong>5d</strong> ago</span>
+            </div>
+          </a>
+
+          <a class="cat-card" style="--c-accent: #FFC800;" href="context.html?dim=consumer">
+            <div class="cat-head">
+              <div class="cat-icon"><i class="ph ph-shopping-cart"></i></div>
+              <div class="cat-stage">Stage 3 / Solid</div>
+            </div>
+            <h3 class="cat-name">Consumer</h3>
+            <div class="cat-tier"><em>Solid</em> &mdash; brands, products, and services you actually use.</div>
+            <div class="cat-meta">
+              <span><strong>54</strong> nodes</span>
+              <span><strong>3</strong> sources</span>
+              <span><strong>2d</strong> ago</span>
+            </div>
+          </a>
+
+          <a class="cat-card" style="--c-accent: #FF8C7A;" href="context.html?dim=relationships">
+            <div class="cat-head">
+              <div class="cat-icon"><i class="ph ph-users-three"></i></div>
+              <div class="cat-stage">Stage 2 / Developing</div>
+            </div>
+            <h3 class="cat-name">Relationships</h3>
+            <div class="cat-tier"><em>Developing</em> &mdash; the people who shape how you think and work.</div>
+            <div class="cat-meta">
+              <span><strong>33</strong> nodes</span>
+              <span><strong>3</strong> sources</span>
+              <span><strong>4d</strong> ago</span>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <!-- Sage + Library teasers -->
+      <section class="grid-2" style="margin-top: var(--s-9); gap: var(--s-5);">
+        <div class="sage-teaser">
+          <svg viewBox="0 0 100 100" width="64" height="64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <radialGradient id="miniOrbBody" cx="50%" cy="42%" r="60%">
+                <stop offset="0%" stop-color="#3A4FB8" stop-opacity="0.95"/>
+                <stop offset="60%" stop-color="#1A1F5C"/>
+                <stop offset="100%" stop-color="#06081C"/>
+              </radialGradient>
+            </defs>
+            <circle cx="50" cy="50" r="42" fill="url(#miniOrbBody)" stroke="rgba(122,184,232,0.4)" stroke-width="0.5"/>
+            <circle cx="50" cy="50" r="14" fill="#9DD3F5" opacity="0.6"/>
+            <circle cx="50" cy="48" r="6" fill="#FFFFFF" opacity="0.85"/>
+            <circle cx="22" cy="38" r="1.5" fill="#4AA8E8"/>
+            <circle cx="78" cy="42" r="1.5" fill="#4AA8E8"/>
+            <circle cx="65" cy="78" r="1.5" fill="#E8957A"/>
+            <circle cx="30" cy="72" r="1.5" fill="#4AA8E8"/>
+          </svg>
+          <div>
+            <div class="sage-teaser-title">Sage has <em>3 follow-ups</em> queued.</div>
+            <p>Last session: aesthetic preferences. Two open threads about workspace and travel.</p>
+          </div>
+          <a href="sage.html" class="btn btn-on-cosmos primary">
+            Resume <i class="ph ph-arrow-right"></i>
+          </a>
+        </div>
+
+        <div class="lib-teaser">
+          <div>
+            <div class="lib-teaser-title">Layer in an <em>Expert Library.</em></div>
+            <p>Industry Rockstar free during beta. <em style="color: var(--neon-bright); font-style: italic;">"I know kung fu."</em></p>
+          </div>
+          <a href="marketplace.html" class="btn" style="background: var(--neon-bright); color: var(--forest-1); border-color: var(--neon-bright); font-weight: 700;">
+            Browse <i class="ph ph-books"></i>
+          </a>
+        </div>
+      </section>
+
+      <!-- Recent ingestions -->
+      <section style="margin-top: var(--s-9);">
+        <div class="dash-section-head">
+          <h2>Recent <em>ingestions.</em></h2>
+          <div class="row">
+            <span class="t-label-mono">Last 24 hours</span>
+            <a class="btn btn-tertiary" href="token-compaction.html">View all <i class="ph ph-arrow-right"></i></a>
+          </div>
+        </div>
+
+        <div class="recent-panel">
+          <a class="ingestion-row" href="token-compaction.html?source=Sage">
+            <div class="src-icon cat-sage"><i class="ph ph-chats-circle"></i></div>
+            <div>
+              <div class="row-title">Workspace setup &mdash; OKR cadence weekly + monthly review</div>
+              <div class="row-meta">SAGE · session_oct31_22 · Beliefs</div>
+            </div>
+            <span class="row-dim">Work Life</span>
+            <span class="row-time">12 min ago</span>
+          </a>
+          <a class="ingestion-row" href="token-compaction.html?source=LinkedIn">
+            <div class="src-icon cat-pulled"><i class="ph ph-linkedin-logo"></i></div>
+            <div>
+              <div class="row-title">Director of CS, AWS Startups (2020&ndash;2024)</div>
+              <div class="row-meta">LINKEDIN · linkedin_role_3 · Facts</div>
+            </div>
+            <span class="row-dim">Professional</span>
+            <span class="row-time">2h ago</span>
+          </a>
+          <a class="ingestion-row" href="token-compaction.html?source=Gmail">
+            <div class="src-icon cat-pulled"><i class="ph ph-envelope-simple"></i></div>
+            <div>
+              <div class="row-title">Email cadence: 7am, 12pm, 5pm. Phone-free Saturdays.</div>
+              <div class="row-meta">GMAIL · gmail_pattern_12 · Preferences</div>
+            </div>
+            <span class="row-dim">Work Life</span>
+            <span class="row-time">3h ago</span>
+          </a>
+          <a class="ingestion-row" href="token-compaction.html?source=Claude">
+            <div class="src-icon cat-mcp"><i class="ph ph-robot"></i></div>
+            <div>
+              <div class="row-title">Prefers concise communication, no excessive flattery, no em-dashes</div>
+              <div class="row-meta">CLAUDE · mcp_claude_style_4 · Preferences</div>
+            </div>
+            <span class="row-dim">Communication</span>
+            <span class="row-time">5h ago</span>
+          </a>
+          <a class="ingestion-row" href="token-compaction.html?source=Resume">
+            <div class="src-icon cat-pulled"><i class="ph ph-file-pdf"></i></div>
+            <div>
+              <div class="row-title">Founded Somatone Interactive · 1,000+ game audio titles · PE exit 2014</div>
+              <div class="row-meta">RESUME · upload_resume_1 · Facts</div>
+            </div>
+            <span class="row-dim">Professional</span>
+            <span class="row-time">8h ago</span>
+          </a>
+          <a class="ingestion-row" href="token-compaction.html?source=Library">
+            <div class="src-icon cat-library"><i class="ph ph-books"></i></div>
+            <div>
+              <div class="row-title">Industry Rockstar Library activated &mdash; sales playbook layered on</div>
+              <div class="row-meta">LIBRARY · library_irl_v2 · Preferences</div>
+            </div>
+            <span class="row-dim">Professional</span>
+            <span class="row-time">11h ago</span>
+          </a>
+          <a class="ingestion-row" href="token-compaction.html?source=Sage">
+            <div class="src-icon cat-sage"><i class="ph ph-microphone"></i></div>
+            <div>
+              <div class="row-title">Goal: ship MyGentic Series A pitch by end of November</div>
+              <div class="row-meta">VOICE · voice_oct30_03 · Beliefs</div>
+            </div>
+            <span class="row-dim">Professional</span>
+            <span class="row-time">1d ago</span>
+          </a>
+          <a class="ingestion-row" href="token-compaction.html?source=Calendar">
+            <div class="src-icon cat-pulled"><i class="ph ph-calendar-blank"></i></div>
+            <div>
+              <div class="row-title">Daily blocks: deep work 9&ndash;12, meetings 1&ndash;4, no calls Fridays</div>
+              <div class="row-meta">CALENDAR · cal_pattern_7 · Preferences</div>
+            </div>
+            <span class="row-dim">Work Life</span>
+            <span class="row-time">1d ago</span>
+          </a>
+
+          <div class="panel-foot">
+            <span>Showing 8 of 47 captures in the last 24 hours</span>
+            <a href="token-compaction.html" class="btn btn-tertiary">Open full feed <i class="ph ph-arrow-right"></i></a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Token compaction + Export -->
+      <section class="grid-2" style="margin-top: var(--s-9); margin-bottom: var(--s-9); gap: var(--s-5);">
+        <a class="compact-card" href="token-compaction.html">
+          <div class="t-label-mono" style="margin-bottom: var(--s-3);">Token Compaction · Last 30 days</div>
+          <div class="compact-stat">
+            <span class="big">72<span class="pct">%</span></span>
+            <span class="t-body" style="margin-bottom: var(--s-2);">avg savings on AI calls</span>
+          </div>
+          <div class="compact-spark">
+            <div class="bar" style="height: 30%"></div>
+            <div class="bar" style="height: 45%"></div>
+            <div class="bar" style="height: 38%"></div>
+            <div class="bar" style="height: 52%"></div>
+            <div class="bar" style="height: 60%"></div>
+            <div class="bar" style="height: 55%"></div>
+            <div class="bar" style="height: 68%"></div>
+            <div class="bar" style="height: 62%"></div>
+            <div class="bar" style="height: 75%"></div>
+            <div class="bar recent" style="height: 72%"></div>
+            <div class="bar recent" style="height: 80%"></div>
+            <div class="bar recent" style="height: 76%"></div>
+            <div class="bar recent" style="height: 88%"></div>
+            <div class="bar recent" style="height: 82%"></div>
+          </div>
+          <p class="t-body-sm">Send only the slice of your context relevant to each prompt. Same depth, fraction of the cost.</p>
+        </a>
+
+        <a class="compact-card compact-card-export" href="export.html">
+          <div class="t-label-mono" style="margin-bottom: var(--s-3);">Your data · Always yours</div>
+          <h3>Export <em>everything</em>, anytime.</h3>
+          <p>347 nodes &middot; 11 sources &middot; 3 layers. JSON, CSV, or human-readable Markdown. Walk away whenever you want.</p>
+          <span class="btn btn-tertiary">Open Export <i class="ph ph-arrow-right"></i></span>
+        </a>
+      </section>
+
+    </div>
+  </div>
+</main>
+</div>
+</body>
+</html>
