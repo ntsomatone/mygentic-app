@@ -65,6 +65,28 @@
   --cat-library: #B7A2C8; --cat-library-deep: #8E76A4;
   --cat-library-soft: #D5C5E0; --cat-library-tint: #E5D9EC;
 
+  /* Six dimensions — warm tonal palette (rust, marigold, terracotta,
+     taupe, ochre, dusty rose). Distinguishable but harmonious;
+     replaces the earlier rainbow accents. */
+  --dim-professional:        #B8552E;
+  --dim-professional-tint:   #F4DDD0;
+  --dim-professional-deep:   #7A3818;
+  --dim-worklife:            #D89534;
+  --dim-worklife-tint:       #F8E5C2;
+  --dim-worklife-deep:       #8C5A18;
+  --dim-interests:           #C97956;
+  --dim-interests-tint:      #F5D9C8;
+  --dim-interests-deep:      #854C2E;
+  --dim-aesthetic:           #A68263;
+  --dim-aesthetic-tint:      #EAD9C9;
+  --dim-aesthetic-deep:      #6E5238;
+  --dim-consumer:            #D4A55C;
+  --dim-consumer-tint:       #F2E2C2;
+  --dim-consumer-deep:       #8C6824;
+  --dim-relationships:       #C46C5C;
+  --dim-relationships-tint:  #F2D5CD;
+  --dim-relationships-deep:  #823829;
+
   --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px;
   --s-5: 24px; --s-6: 32px; --s-7: 48px; --s-8: 64px; --s-9: 96px; --s-10: 128px;
 
