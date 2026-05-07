@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Token Compaction · MyGentic</title>
+<link rel="stylesheet" href="app.css" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+
+<style>
+
+  .app-content { padding: 0; }
+  .token-page {
+    max-width: var(--w-bleed);
+    margin: 0 auto;
+    padding: var(--s-5) var(--s-6) var(--s-9);
+  }
+  @media (max-width: 900px) { .token-page { padding: var(--s-4) var(--s-4) var(--s-7); } }
+
+  /* Breadcrumb (reused) */
+  .atlas-breadcrumb {
+    display: flex; align-items: center; gap: var(--s-2);
+    font-family: var(--f-mono); font-size: 11px;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--ink-mute);
+    padding: var(--s-2) 0 var(--s-4);
+  }
+  .atlas-breadcrumb a { color: var(--ink-mute); }
+  .atlas-breadcrumb a:hover { color: var(--terra); }
+  .atlas-breadcrumb i { font-size: 14px; opacity: 0.6; }
+
+  /* HERO */
+  .token-hero {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: var(--s-6);
+    align-items: stretch;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: var(--s-6);
+    margin-bottom: var(--s-7);
+  }
+  @media (max-width: 1100px) { .token-hero { grid-template-columns: 1fr; } }
+
+  .token-hero-eyebrow {
+    color: var(--terra);
+    margin-bottom: var(--s-3);
+  }
+  .token-hero-title {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: clamp(40px, 5vw, 60px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: var(--s-4);
+  }
+  .token-hero-title em { font-style: italic; }
+  .token-hero-deck {
+    font-size: 17px; line-height: 1.55;
+    color: var(--ink-soft);
+    max-width: 560px;
+  }
+
+  .token-hero-stat {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    padding: var(--s-5) var(--s-5) var(--s-4);
+    border-top: 4px solid var(--terra);
+    display: flex; flex-direction: column; gap: var(--s-2);
+    justify-content: center;
+  }
+  .token-savings-figure {
+    display: flex; align-items: baseline; gap: 8px;
+    margin-top: var(--s-2);
+  }
+  .savings-amount {
+    font-family: var(--f-display);
+    font-size: 64px;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--terra);
+  }
+  .savings-unit {
+    font-size: 18px; color: var(--ink-mute);
+    font-family: var(--f-display); font-style: italic;
+  }
+  .savings-detail {
+    font-size: 14px; color: var(--ink-soft);
+    margin-top: var(--s-2);
+  }
+  .savings-pct, .savings-calls { color: var(--ink); font-weight: 600; }
+  .savings-trend {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--f-mono); font-size: 11px;
+    color: #2A8556;
+    letter-spacing: 0.04em;
+    margin-top: 4px;
+  }
+  .savings-trend i { font-size: 14px; }
+
+  /* TREND CHART */
+  .token-trend {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    padding: var(--s-5);
+    margin-bottom: var(--s-7);
+  }
+  .token-trend-head {
+    display: flex; align-items: end; justify-content: space-between;
+    flex-wrap: wrap; gap: var(--s-4);
+    margin-bottom: var(--s-5);
+  }
+  .token-trend-title {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: clamp(24px, 2.5vw, 30px);
+    line-height: 1.1; letter-spacing: -0.01em;
+    color: var(--ink); margin-bottom: 4px;
+  }
+  .token-trend-title em { font-style: italic; color: var(--terra); }
+  .token-trend-deck { font-size: 14px; color: var(--ink-mute); }
+
+  .token-trend-stats {
+    display: flex; gap: var(--s-5);
+  }
+  .trend-stat { display: flex; flex-direction: column; gap: 2px; align-items: flex-end; }
+  .trend-stat-val {
+    font-family: var(--f-display);
+    font-size: 32px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .trend-stat-val .pct {
+    font-size: 14px;
+    color: var(--ink-mute);
+    margin-left: 1px;
+  }
+
+  .token-spark-wrap { position: relative; }
+  .token-spark {
+    width: 100%; height: 140px;
+    display: block;
+  }
+  .token-spark .spark-bar { fill: var(--terra); fill-opacity: 0.35; }
+  .token-spark .spark-bar-today { fill: var(--terra); }
+
+  .token-spark-axis {
+    display: flex; justify-content: space-between;
+    font-family: var(--f-mono); font-size: 10px;
+    color: var(--ink-mute); letter-spacing: 0.04em;
+    margin-top: var(--s-2);
+    text-transform: uppercase;
+  }
+
+  /* RECENT */
+  .token-recent { margin-bottom: var(--s-7); }
+  .token-section-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: var(--s-4);
+    flex-wrap: wrap; gap: var(--s-3);
+  }
+  .token-section-title {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: clamp(28px, 3vw, 36px);
+    line-height: 1.1; letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .token-section-title em { font-style: italic; }
+  .token-section-deck { font-size: 15px; color: var(--ink-soft); margin-top: var(--s-1); }
+  .token-section-link {
+    font-size: 13px; color: var(--terra);
+    display: inline-flex; align-items: center; gap: 4px;
+    font-weight: 500;
+  }
+  .token-section-link i { font-size: 14px; }
+  .token-section-link:hover { color: var(--terra-deep); }
+
+  .token-table {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+  }
+  .token-table-head, .token-row {
+    display: grid;
+    grid-template-columns: 110px 130px 1fr 130px 80px;
+    gap: var(--s-3);
+    align-items: center;
+    padding: var(--s-3) var(--s-4);
+  }
+  .token-table-head {
+    background: var(--paper-2);
+    border-bottom: 1px solid var(--rule);
+    font-family: var(--f-mono); font-size: 10px;
+    color: var(--ink-mute); letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .token-row {
+    border-bottom: 1px solid var(--rule);
+    font-size: 13px;
+    transition: background var(--t-fast);
+  }
+  .token-row:last-child { border-bottom: 0; }
+  .token-row:hover { background: var(--paper-2); }
+  .token-when {
+    font-family: var(--f-mono); font-size: 11px;
+    color: var(--ink-mute); letter-spacing: 0.04em;
+  }
+  .token-tool {
+    display: inline-flex; align-items: center; gap: 6px;
+    color: var(--ink); font-weight: 500;
+  }
+  .token-tool-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #2A8556;
+    box-shadow: 0 0 0 2px rgba(42, 133, 86, 0.18);
+  }
+  .token-prompt {
+    color: var(--ink-soft);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .token-tokens {
+    font-family: var(--f-mono); font-size: 11px;
+    color: var(--ink-mute); letter-spacing: 0.04em;
+  }
+  .token-saved {
+    font-family: var(--f-display); font-style: italic;
+    font-size: 18px;
+    color: var(--dim-c, var(--terra));
+    text-align: right;
+  }
+
+  /* PILLARS — mirrors marketing site */
+  .token-pillars { margin-bottom: var(--s-7); }
+  .token-pillars-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s-4);
+    margin-top: var(--s-5);
+  }
+  @media (max-width: 1100px) { .token-pillars-grid { grid-template-columns: 1fr; } }
+  .token-pillar {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    padding: var(--s-5);
+    border-top: 4px solid var(--terra);
+  }
+  .pillar-eyebrow { color: var(--terra); margin-bottom: var(--s-3); }
+  .pillar-title {
+    font-family: var(--f-body); font-weight: 600;
+    font-size: 18px; color: var(--ink);
+    margin-bottom: var(--s-2);
+  }
+  .token-pillar p {
+    font-size: 14px; line-height: 1.55; color: var(--ink-soft);
+    margin-bottom: var(--s-2);
+  }
+  .pillar-aside {
+    color: var(--ink-mute) !important;
+    font-size: 13px !important;
+  }
+
+  /* FOOT */
+  .token-foot {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    padding: var(--s-6);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: var(--s-4);
+  }
+  .token-foot-title {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: 26px; letter-spacing: -0.01em; line-height: 1.2;
+    color: var(--ink); margin-bottom: var(--s-2);
+  }
+  .token-foot p {
+    font-size: 15px; color: var(--ink-soft); line-height: 1.5;
+    max-width: 540px;
+  }
+  .token-foot-actions { display: flex; gap: var(--s-3); flex-wrap: wrap; }
+
+</style>
+</head>
+<body class="app-shell token-page-body">
+<header class="app-topbar">
+  <div class="app-topbar-inner">
+    <label for="navToggle" class="app-burger" aria-label="Open navigation"><i class="ph ph-list"></i></label>
+    <a class="app-brand" href="dashboard.html">My<span class="accent">Gen</span>tic</a>
+    <h1 class="app-page-title">Token Compaction</h1>
+    <div class="app-topbar-actions">
+      <div class="app-topbar-search">
+        <i class="ph ph-magnifying-glass"></i>
+        <input type="text" placeholder="Search your context, agents, libraries…" />
+        <kbd>⌘K</kbd>
+      </div>
+      <button class="app-icon-btn" aria-label="Notifications"><i class="ph ph-bell"></i><span class="dot"></span></button>
+      <button class="app-avatar" aria-label="User menu">NA</button>
+    </div>
+  </div>
+</header>
+<div class="app-layout">
+  <input type="checkbox" id="navToggle" class="app-nav-toggle sr-only" />
+<label for="navToggle" class="app-leftnav-backdrop"></label>
+<nav class="app-leftnav" aria-label="Primary">
+  <div class="app-nav-section-label">Workspace</div>
+      <a href="dashboard.html" class="app-nav-item" data-page="dashboard"><i class="ph ph-gauge"></i><span>Dashboard</span></a>
+      <a href="atlas.html" class="app-nav-item" data-page="atlas"><i class="ph ph-graph"></i><span>Atlas</span></a>
+      <a href="sage.html" class="app-nav-item" data-page="sage"><i class="ph ph-chats-circle"></i><span>Sage</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Context</div>
+      <a href="context.html" class="app-nav-item" data-page="context"><i class="ph ph-stack"></i><span>Context Layers</span></a>
+      <a href="token-compaction.html" class="app-nav-item active" data-page="token-compaction"><i class="ph ph-funnel"></i><span>Token Compaction</span></a>
+      <a href="history.html" class="app-nav-item" data-page="history"><i class="ph ph-clock-counter-clockwise"></i><span>History</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Connect</div>
+      <a href="connections.html" class="app-nav-item" data-page="connections"><i class="ph ph-plugs-connected"></i><span>Connections</span></a>
+      <a href="upload-data.html" class="app-nav-item" data-page="upload-data"><i class="ph ph-upload-simple"></i><span>Upload Data</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Build</div>
+      <a href="agents.html" class="app-nav-item" data-page="agents"><i class="ph ph-sparkle"></i><span>Agents</span></a>
+      <a href="marketplace.html" class="app-nav-item" data-page="marketplace"><i class="ph ph-books"></i><span>Expert Libraries</span><span class="nav-badge">New</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Account</div>
+      <a href="export.html" class="app-nav-item" data-page="export"><i class="ph ph-download-simple"></i><span>Export &amp; Data</span></a>
+      <a href="settings.html" class="app-nav-item" data-page="settings"><i class="ph ph-gear-six"></i><span>Settings</span></a>
+</nav>
+  <main class="app-content">
+  <div class="token-page">
+    <div class="atlas-breadcrumb">
+      <a href="dashboard.html">Dashboard</a>
+      <i class="ph ph-caret-right"></i>
+      <span>Token Compaction</span>
+    </div>
+    <header class="token-hero">
+      <div class="token-hero-text">
+        <div class="t-label-mono token-hero-eyebrow">Saves $ · Quietly optimized</div>
+        <h1 class="token-hero-title"><em>Cut</em> your AI bill <em>72%.</em><br />Without losing quality.</h1>
+        <p class="token-hero-deck">
+          Every AI call sends only the context that's relevant to the prompt, not your whole graph.
+          Same depth, fraction of the spend. Quietly optimized in the background, every single call.
+        </p>
+      </div>
+      <div class="token-hero-stat">
+        <div class="t-label-mono">This Month</div>
+        <div class="token-savings-figure">
+          <span class="savings-amount">$284</span>
+          <span class="savings-unit">saved</span>
+        </div>
+        <div class="savings-detail">
+          <span class="savings-pct">72%</span> avg reduction across <span class="savings-calls">2,847</span> calls
+        </div>
+        <div class="savings-trend">
+          <i class="ph ph-trend-up"></i>
+          <span>+9% vs last month</span>
+        </div>
+      </div>
+    </header>
+    <section class="token-trend">
+      <div class="token-trend-head">
+        <div>
+          <h2 class="token-trend-title">Daily savings, <em>last 30 days.</em></h2>
+          <p class="token-trend-deck">Percentage reduction in tokens sent per AI call. Compaction learns over time.</p>
+        </div>
+        <div class="token-trend-stats">
+          <div class="trend-stat">
+            <div class="t-label-mono">Today</div>
+            <div class="trend-stat-val">72<span class="pct">%</span></div>
+          </div>
+          <div class="trend-stat">
+            <div class="t-label-mono">30-day avg</div>
+            <div class="trend-stat-val">73<span class="pct">%</span></div>
+          </div>
+          <div class="trend-stat">
+            <div class="t-label-mono">Best day</div>
+            <div class="trend-stat-val">81<span class="pct">%</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="token-spark-wrap">
+        <svg viewBox="0 0 100 102" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" class="token-spark">
+          <line x1="0" y1="100.5" x2="100" y2="100.5" stroke="var(--rule)" stroke-width="0.3"/>
+          <rect x="0.00" y="27.06" width="2.83" height="72.94" class="spark-bar" rx="0.5"/><rect x="3.33" y="24.71" width="2.83" height="75.29" class="spark-bar" rx="0.5"/><rect x="6.67" y="28.24" width="2.83" height="71.76" class="spark-bar" rx="0.5"/><rect x="10.00" y="23.53" width="2.83" height="76.47" class="spark-bar" rx="0.5"/><rect x="13.33" y="21.18" width="2.83" height="78.82" class="spark-bar" rx="0.5"/><rect x="16.67" y="24.71" width="2.83" height="75.29" class="spark-bar" rx="0.5"/><rect x="20.00" y="22.35" width="2.83" height="77.65" class="spark-bar" rx="0.5"/><rect x="23.33" y="20.00" width="2.83" height="80.00" class="spark-bar" rx="0.5"/><rect x="26.67" y="18.82" width="2.83" height="81.18" class="spark-bar" rx="0.5"/><rect x="30.00" y="16.47" width="2.83" height="83.53" class="spark-bar" rx="0.5"/><rect x="33.33" y="17.65" width="2.83" height="82.35" class="spark-bar" rx="0.5"/><rect x="36.67" y="15.29" width="2.83" height="84.71" class="spark-bar" rx="0.5"/><rect x="40.00" y="12.94" width="2.83" height="87.06" class="spark-bar" rx="0.5"/><rect x="43.33" y="16.47" width="2.83" height="83.53" class="spark-bar" rx="0.5"/><rect x="46.67" y="14.12" width="2.83" height="85.88" class="spark-bar" rx="0.5"/><rect x="50.00" y="15.29" width="2.83" height="84.71" class="spark-bar" rx="0.5"/><rect x="53.33" y="11.76" width="2.83" height="88.24" class="spark-bar" rx="0.5"/><rect x="56.67" y="12.94" width="2.83" height="87.06" class="spark-bar" rx="0.5"/><rect x="60.00" y="9.41" width="2.83" height="90.59" class="spark-bar" rx="0.5"/><rect x="63.33" y="10.59" width="2.83" height="89.41" class="spark-bar" rx="0.5"/><rect x="66.67" y="8.24" width="2.83" height="91.76" class="spark-bar" rx="0.5"/><rect x="70.00" y="11.76" width="2.83" height="88.24" class="spark-bar" rx="0.5"/><rect x="73.33" y="8.24" width="2.83" height="91.76" class="spark-bar" rx="0.5"/><rect x="76.67" y="7.06" width="2.83" height="92.94" class="spark-bar" rx="0.5"/><rect x="80.00" y="9.41" width="2.83" height="90.59" class="spark-bar" rx="0.5"/><rect x="83.33" y="5.88" width="2.83" height="94.12" class="spark-bar" rx="0.5"/><rect x="86.67" y="7.06" width="2.83" height="92.94" class="spark-bar" rx="0.5"/><rect x="90.00" y="4.71" width="2.83" height="95.29" class="spark-bar" rx="0.5"/><rect x="93.33" y="8.24" width="2.83" height="91.76" class="spark-bar" rx="0.5"/><rect x="96.67" y="15.29" width="2.83" height="84.71" class="spark-bar-today" rx="0.5"/>
+        </svg>
+        <div class="token-spark-axis">
+          <span>30d ago</span>
+          <span>21d</span>
+          <span>14d</span>
+          <span>7d</span>
+          <span>Today</span>
+        </div>
+      </div>
+    </section>
+    <section class="token-recent">
+      <div class="token-section-head">
+        <h2 class="token-section-title">Recent <em>compactions.</em></h2>
+        <a href="#" class="token-section-link">View full feed <i class="ph ph-arrow-right"></i></a>
+      </div>
+      <div class="token-table">
+        <div class="token-table-head">
+          <div>When</div>
+          <div>Tool</div>
+          <div>Prompt</div>
+          <div>Tokens</div>
+          <div>Saved</div>
+        </div>
+        <div class="token-row" data-dim="professional">
+          <div class="token-when">14 min ago</div>
+          <div class="token-tool">
+            <span class="token-tool-dot"></span>
+            <span>Claude</span>
+          </div>
+          <div class="token-prompt">Sage interview · workspace setup</div>
+          <div class="token-tokens">4,287 → 1,103</div>
+          <div class="token-saved" style="--dim-c: var(--dim-professional);">74%</div>
+        </div>
+        <div class="token-row" data-dim="professional">
+          <div class="token-when">38 min ago</div>
+          <div class="token-tool">
+            <span class="token-tool-dot"></span>
+            <span>ChatGPT</span>
+          </div>
+          <div class="token-prompt">Drafting Series A pitch deck outline</div>
+          <div class="token-tokens">12,450 → 3,890</div>
+          <div class="token-saved" style="--dim-c: var(--dim-professional);">69%</div>
+        </div>
+        <div class="token-row" data-dim="professional">
+          <div class="token-when">52 min ago</div>
+          <div class="token-tool">
+            <span class="token-tool-dot"></span>
+            <span>Cursor</span>
+          </div>
+          <div class="token-prompt">Code review on auth flow refactor</div>
+          <div class="token-tokens">8,910 → 2,224</div>
+          <div class="token-saved" style="--dim-c: var(--dim-professional);">75%</div>
+        </div>
+        <div class="token-row" data-dim="consumer">
+          <div class="token-when">1h ago</div>
+          <div class="token-tool">
+            <span class="token-tool-dot"></span>
+            <span>Perplexity</span>
+          </div>
+          <div class="token-prompt">Researching EV charging tariffs</div>
+          <div class="token-tokens">3,156 → 712</div>
+          <div class="token-saved" style="--dim-c: var(--dim-consumer);">77%</div>
+        </div>
+        <div class="token-row" data-dim="professional">
+          <div class="token-when">2h ago</div>
+          <div class="token-tool">
+            <span class="token-tool-dot"></span>
+            <span>Claude</span>
+          </div>
+          <div class="token-prompt">Reply to investor thread</div>
+          <div class="token-tokens">5,623 → 1,234</div>
+          <div class="token-saved" style="--dim-c: var(--dim-professional);">78%</div>
+        </div>
+        <div class="token-row" data-dim="interests">
+          <div class="token-when">3h ago</div>
+          <div class="token-tool">
+            <span class="token-tool-dot"></span>
+            <span>Gemini</span>
+          </div>
+          <div class="token-prompt">Trip planning · Iceland fjords</div>
+          <div class="token-tokens">6,401 → 1,920</div>
+          <div class="token-saved" style="--dim-c: var(--dim-interests);">70%</div>
+        </div>
+        <div class="token-row" data-dim="aesthetic">
+          <div class="token-when">4h ago</div>
+          <div class="token-tool">
+            <span class="token-tool-dot"></span>
+            <span>Claude</span>
+          </div>
+          <div class="token-prompt">Sage capture · aesthetic preferences</div>
+          <div class="token-tokens">2,890 → 614</div>
+          <div class="token-saved" style="--dim-c: var(--dim-aesthetic);">79%</div>
+        </div>
+        <div class="token-row" data-dim="interests">
+          <div class="token-when">Yesterday</div>
+          <div class="token-tool">
+            <span class="token-tool-dot"></span>
+            <span>ChatGPT</span>
+          </div>
+          <div class="token-prompt">M2 maintenance schedule lookup</div>
+          <div class="token-tokens">4,523 → 1,178</div>
+          <div class="token-saved" style="--dim-c: var(--dim-interests);">74%</div>
+        </div>
+      </div>
+    </section>
+    <section class="token-pillars">
+      <div class="token-section-head">
+        <h2 class="token-section-title">Smaller payloads. <em>Sharper output.</em></h2>
+        <p class="token-section-deck">Three reasons compaction makes every AI call cheaper without making it worse.</p>
+      </div>
+      <div class="token-pillars-grid">
+        <article class="token-pillar">
+          <div class="t-label-mono pillar-eyebrow">01 · Selection</div>
+          <h3 class="pillar-title">Relevance-aware selection</h3>
+          <p>Compaction reads your prompt and selects only the context dimensions that actually apply.</p>
+          <p class="pillar-aside">Why send your fitness data to a coding agent? Smarter selection means smaller, sharper payloads.</p>
+        </article>
+        <article class="token-pillar">
+          <div class="t-label-mono pillar-eyebrow">02 · Learning</div>
+          <h3 class="pillar-title">Continuous learning</h3>
+          <p>Compaction learns which context dimensions correlate with quality output for each agent.</p>
+          <p class="pillar-aside">The longer you use an agent, the better compaction gets at predicting what it actually needs.</p>
+        </article>
+        <article class="token-pillar">
+          <div class="t-label-mono pillar-eyebrow">03 · Quality</div>
+          <h3 class="pillar-title">No quality regression</h3>
+          <p>Every compaction model is benchmarked against full-context baselines. No quality loss, ever.</p>
+          <p class="pillar-aside">If compaction made answers worse, it wouldn't be saving you money, it'd be costing you results.</p>
+        </article>
+      </div>
+    </section>
+    <section class="token-foot">
+      <div>
+        <h3 class="token-foot-title">Want to see what gets sent?</h3>
+        <p>Click any compaction above to see the exact prompt, the dimensions selected, and what was held back.</p>
+      </div>
+      <div class="token-foot-actions">
+        <a href="atlas.html" class="btn btn-secondary btn-lg"><i class="ph ph-graph"></i> Open Atlas</a>
+        <a href="settings.html" class="btn btn-secondary btn-lg"><i class="ph ph-gear-six"></i> Compaction settings</a>
+      </div>
+    </section>
+  </div>
+</main>
+</div>
+</body>
+</html>
