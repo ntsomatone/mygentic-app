@@ -116,27 +116,23 @@
   .layers-matrix-meta {
     display: flex; align-items: center; gap: var(--s-3);
   }
-  .layers-depth-key {
-    display: inline-flex; align-items: center; gap: 4px;
-    padding: 6px 10px;
-    background: var(--paper);
-    border: 1px solid var(--rule);
-    border-radius: 999px;
+  .layers-depth-diagram {
+    display: flex; align-items: center; gap: var(--s-3);
   }
-  .depth-ring {
-    width: 10px; height: 10px; border-radius: 50%;
-    border: 1.5px solid var(--terra);
-    display: inline-block;
+  .layers-depth-diagram svg {
+    width: 80px; height: 80px;
+    flex-shrink: 0;
   }
-  .depth-ring-1 { opacity: 0.35; }
-  .depth-ring-2 { opacity: 0.65; }
-  .depth-ring-3 { opacity: 1; background: var(--terra); }
-  .depth-key-label {
-    font-family: var(--f-mono); font-size: 10px;
-    color: var(--ink-mute); letter-spacing: 0.06em;
-    text-transform: uppercase;
-    margin-left: 6px;
+  .layers-depth-labels {
+    display: flex; flex-direction: column; gap: 2px;
+    font-family: var(--f-display); font-style: italic;
+    font-size: 13px;
+    color: var(--terra);
+    line-height: 1.2;
   }
+  .layers-depth-labels .dlabel-1 { opacity: 0.55; }
+  .layers-depth-labels .dlabel-2 { opacity: 0.8; }
+  .layers-depth-labels .dlabel-3 { opacity: 1; }
 
   /* The matrix grid itself */
   .layers-matrix {
@@ -349,13 +345,17 @@
           <h2 class="layers-matrix-title">Your <em>matrix.</em></h2>
           <p class="layers-matrix-deck">18 cells. Click any to see what's known.</p>
         </div>
-        <div class="layers-matrix-meta">
-          <span class="t-label-mono">DEPTH</span>
-          <div class="layers-depth-key">
-            <span class="depth-ring depth-ring-1"></span>
-            <span class="depth-ring depth-ring-2"></span>
-            <span class="depth-ring depth-ring-3"></span>
-            <span class="depth-key-label">Surface → Deep</span>
+        <div class="layers-depth-diagram" aria-label="Depth visualization: facts on the surface, preferences at the core">
+          <svg viewBox="0 0 110 110" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="55" cy="55" r="50" fill="none" stroke="var(--terra)" stroke-opacity="0.35" stroke-width="1"/>
+            <circle cx="55" cy="55" r="34" fill="none" stroke="var(--terra)" stroke-opacity="0.65" stroke-width="1"/>
+            <circle cx="55" cy="55" r="18" fill="none" stroke="var(--terra)" stroke-opacity="1" stroke-width="1"/>
+            <circle cx="55" cy="55" r="3" fill="var(--terra)"/>
+          </svg>
+          <div class="layers-depth-labels">
+            <span class="dlabel dlabel-1">Facts</span>
+            <span class="dlabel dlabel-2">Beliefs</span>
+            <span class="dlabel dlabel-3">Prefs</span>
           </div>
         </div>
       </div>
