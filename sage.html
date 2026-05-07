@@ -9,608 +9,400 @@
 
 <style>
 
-  /* SAGE COSMOS ROOM ===================================================
-     Deep navy atmosphere. Sage blue accents. Bone-white text. */
+  /* ─────────────────────────────────────────────
+     SAGE — the cosmos navy room
+     ───────────────────────────────────────────── */
+  .app-content { padding: 0; background: #0A0E1F; min-height: calc(100vh - var(--topbar-h)); }
 
-  body { background: #0A0E1F; }
-  .sage-content {
-    background: transparent;
-    padding: 0;
-    color: #E5E8EE;
-    min-height: calc(100vh - var(--topbar-h));
-    position: relative;
-  }
-
-  /* The cosmos atmosphere: starfield + radial halo behind everything */
+  /* Cosmos atmosphere */
   .cosmos-atmosphere {
     position: absolute; inset: 0;
     pointer-events: none;
-    z-index: 0;
     overflow: hidden;
   }
   .cosmos-stars {
     position: absolute; inset: 0;
-    width: 100%; height: 100%;
+    background-image:
+      radial-gradient(1.2px 1.2px at 20% 30%, rgba(255,255,255,0.5), transparent 50%),
+      radial-gradient(1px 1px at 80% 20%, rgba(157,210,242,0.6), transparent 50%),
+      radial-gradient(1.5px 1.5px at 60% 70%, rgba(255,255,255,0.4), transparent 50%),
+      radial-gradient(1px 1px at 40% 80%, rgba(157,210,242,0.5), transparent 50%),
+      radial-gradient(1.2px 1.2px at 90% 50%, rgba(232,159,127,0.4), transparent 50%),
+      radial-gradient(1px 1px at 15% 60%, rgba(255,255,255,0.4), transparent 50%);
   }
-
-  /* Topbar — make it transparent on cosmos */
-  .sage-content + * .app-topbar,
-  body:has(.sage-content) .app-topbar {
-    background: rgba(10, 14, 31, 0.85);
-    border-bottom-color: rgba(168, 196, 232, 0.12);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-  }
-  body:has(.sage-content) .app-brand,
-  body:has(.sage-content) .app-page-title {
-    color: #E5E8EE;
-  }
-  body:has(.sage-content) .app-brand .accent {
-    color: #C84D2C;
-  }
-  body:has(.sage-content) .app-topbar-search {
-    background: rgba(168, 196, 232, 0.06);
-    border-color: rgba(168, 196, 232, 0.15);
-  }
-  body:has(.sage-content) .app-topbar-search input {
-    color: #E5E8EE;
-  }
-  body:has(.sage-content) .app-topbar-search input::placeholder {
-    color: rgba(229, 232, 238, 0.5);
-  }
-  body:has(.sage-content) .app-topbar-search i {
-    color: rgba(229, 232, 238, 0.5);
-  }
-  body:has(.sage-content) .app-topbar-search kbd {
-    background: rgba(168, 196, 232, 0.12);
-    color: rgba(229, 232, 238, 0.7);
-    border-color: rgba(168, 196, 232, 0.2);
-  }
-  body:has(.sage-content) .app-icon-btn {
-    color: rgba(229, 232, 238, 0.7);
-  }
-  body:has(.sage-content) .app-icon-btn:hover {
-    background: rgba(168, 196, 232, 0.1);
-    color: #E5E8EE;
-  }
-
-  /* Sidebar — also cosmos */
-  body:has(.sage-content) .app-leftnav {
-    background: rgba(10, 14, 31, 0.6);
-    border-right-color: rgba(168, 196, 232, 0.1);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-  }
-  body:has(.sage-content) .app-nav-section-label {
-    color: rgba(229, 232, 238, 0.4);
-  }
-  body:has(.sage-content) .app-nav-item {
-    color: rgba(229, 232, 238, 0.65);
-  }
-  body:has(.sage-content) .app-nav-item:hover {
-    background: rgba(168, 196, 232, 0.06);
-    color: #E5E8EE;
-  }
-  body:has(.sage-content) .app-nav-item.active {
-    background: rgba(113, 176, 229, 0.12);
-    color: #71B0E5;
-    border-left-color: #71B0E5;
-  }
-  body:has(.sage-content) .app-nav-item.active .ph {
-    color: #71B0E5;
-  }
-  body:has(.sage-content) .app-nav-divider {
-    border-color: rgba(168, 196, 232, 0.08);
-  }
-  body:has(.sage-content) .nav-badge {
-    background: rgba(200, 77, 44, 0.18);
-    color: #FF9A78;
+  .cosmos-glow {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse at 30% 20%, rgba(91,163,208,0.10), transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(232,159,127,0.06), transparent 50%);
   }
 
   .sage-page {
     position: relative;
-    z-index: 1;
-    max-width: 1600px;
+    max-width: var(--w-bleed);
     margin: 0 auto;
-    padding: var(--s-4) var(--s-5) var(--s-5);
-    height: calc(100vh - var(--topbar-h));
-    display: flex; flex-direction: column;
+    padding: var(--s-4) var(--s-5) var(--s-7);
+    z-index: 1;
   }
 
-  /* Three-column layout */
-  .sage-layout {
-    flex: 1;
+  /* Three-column grid */
+  .sage-grid {
     display: grid;
-    grid-template-columns: 260px 1fr 320px;
+    grid-template-columns: 280px 1fr 280px;
     gap: var(--s-4);
-    min-height: 0;
+    height: calc(100vh - var(--topbar-h) - var(--s-4) - var(--s-7));
+    min-height: 720px;
   }
-  @media (max-width: 1280px) {
-    .sage-layout { grid-template-columns: 220px 1fr 280px; }
+  @media (max-width: 1200px) {
+    .sage-grid { grid-template-columns: 240px 1fr; }
+    .sage-state { display: none; }
   }
-  @media (max-width: 1024px) {
-    .sage-layout { grid-template-columns: 1fr; grid-template-rows: auto 1fr auto; }
-    .sage-threads-rail, .sage-session-rail { display: none; }
+  @media (max-width: 900px) {
+    .sage-grid { grid-template-columns: 1fr; }
+    .sage-threads-panel { display: none; }
   }
 
-  /* SHARED RAIL STYLES */
-  .sage-threads-rail, .sage-session-rail {
-    background: rgba(168, 196, 232, 0.04);
-    border: 1px solid rgba(168, 196, 232, 0.1);
+  /* Cosmos panel base */
+  .sage-threads-panel,
+  .sage-chat,
+  .sage-state {
+    background: rgba(20, 28, 50, 0.5);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(91, 163, 208, 0.18);
     border-radius: var(--r-lg);
-    padding: var(--s-4);
+    overflow: hidden;
     display: flex; flex-direction: column;
-    min-height: 0;
   }
-  .sage-rail-head {
-    display: flex; align-items: center; justify-content: space-between;
-    padding-bottom: var(--s-3);
-    border-bottom: 1px solid rgba(168, 196, 232, 0.1);
-    margin-bottom: var(--s-3);
-  }
-  .sage-rail-head .t-label-mono {
-    color: #71B0E5;
-  }
-  .sage-rail-foot, .sage-session-foot {
-    margin-top: auto;
-    padding-top: var(--s-3);
-    border-top: 1px solid rgba(168, 196, 232, 0.1);
-  }
-  .sage-rail-link {
-    color: #71B0E5;
-    font-size: 12px;
-    display: inline-flex; align-items: center; gap: 4px;
-    font-family: var(--f-body);
-  }
-  .sage-rail-link:hover { color: #A8C4E8; }
-  .sage-rail-link i { font-size: 14px; }
 
+  /* ─── Threads panel ─── */
+  .sage-panel-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: var(--s-3) var(--s-4);
+    border-bottom: 1px solid rgba(91, 163, 208, 0.15);
+  }
+  .sage-eyebrow { color: #5BA3D0 !important; }
   .sage-new-btn {
-    width: 26px; height: 26px;
+    width: 28px; height: 28px;
     border-radius: 6px;
-    background: rgba(168, 196, 232, 0.08);
-    color: #71B0E5;
+    background: rgba(91, 163, 208, 0.12);
+    color: #9DD2F2;
     display: grid; place-items: center;
+    font-size: 14px;
+    cursor: pointer;
     transition: background var(--t-fast);
   }
-  .sage-new-btn:hover { background: rgba(168, 196, 232, 0.16); }
+  .sage-new-btn:hover { background: rgba(91, 163, 208, 0.22); }
 
-  /* Thread list */
-  .sage-thread-list {
+  .sage-threads-list {
     flex: 1;
     overflow-y: auto;
-    margin: 0 calc(-1 * var(--s-4));
-    padding: 0 var(--s-4);
+    display: flex; flex-direction: column;
   }
   .sage-thread-row {
-    display: block;
-    padding: var(--s-3) var(--s-3);
-    border-radius: var(--r-md);
-    color: rgba(229, 232, 238, 0.85);
+    display: flex; flex-direction: column; gap: 4px;
+    padding: var(--s-3) var(--s-4);
+    border-bottom: 1px solid rgba(91, 163, 208, 0.10);
+    color: #D9DDEC;
     transition: background var(--t-fast);
-    margin-bottom: 2px;
-    position: relative;
+    cursor: pointer;
   }
-  .sage-thread-row:hover {
-    background: rgba(168, 196, 232, 0.06);
-  }
+  .sage-thread-row:hover { background: rgba(91, 163, 208, 0.07); color: #FFFFFF; }
   .sage-thread-active {
-    background: rgba(113, 176, 229, 0.1);
-    border-left: 2px solid #71B0E5;
+    background: rgba(232, 159, 127, 0.08);
+    border-left: 2px solid #E89F7F;
+    padding-left: calc(var(--s-4) - 2px);
   }
-  .sage-thread-title {
-    font-size: 13px; font-weight: 500;
-    color: #E5E8EE;
-    margin-bottom: 2px;
-  }
-  .sage-thread-meta {
-    font-family: var(--f-mono); font-size: 10px;
-    color: rgba(229, 232, 238, 0.4);
-    letter-spacing: 0.04em;
-  }
-  .sage-thread-tag {
-    position: absolute; top: var(--s-3); right: var(--s-3);
-    font-family: var(--f-mono); font-size: 9px;
-    text-transform: uppercase; letter-spacing: 0.08em;
-    background: rgba(113, 176, 229, 0.18);
-    color: #71B0E5;
-    padding: 2px 6px;
-    border-radius: 999px;
-  }
+  .sage-thread-active:hover { background: rgba(232, 159, 127, 0.12); }
 
-  /* CHAT CENTER */
-  .sage-chat {
-    background: rgba(10, 14, 31, 0.4);
-    border: 1px solid rgba(168, 196, 232, 0.12);
-    border-radius: var(--r-lg);
-    display: flex; flex-direction: column;
-    min-height: 0;
+  .thread-row-head {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .thread-row-mode {
+    font-family: var(--f-mono); font-size: 9px;
+    letter-spacing: 0.10em; text-transform: uppercase;
+  }
+  .mode-ask    { color: #9DD2F2; }
+  .mode-do     { color: #E89F7F; }
+  .mode-notice { color: #C4A8E8; }
+
+  .thread-row-time {
+    font-family: var(--f-mono); font-size: 10px;
+    color: rgba(217, 221, 236, 0.5);
+  }
+  .thread-row-title {
+    font-family: var(--f-display); font-size: 16px;
+    color: #FFFFFF; line-height: 1.2;
+    font-style: italic;
+  }
+  .thread-row-preview {
+    font-size: 11px; line-height: 1.4;
+    color: rgba(217, 221, 236, 0.6);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
   }
 
-  .sage-chat-head {
-    display: grid;
-    grid-template-columns: 56px 1fr auto;
-    gap: var(--s-3);
-    align-items: center;
-    padding: var(--s-4) var(--s-5);
-    border-bottom: 1px solid rgba(168, 196, 232, 0.1);
-    background: rgba(168, 196, 232, 0.03);
+  .sage-threads-foot {
+    padding: var(--s-3) var(--s-4);
+    border-top: 1px solid rgba(91, 163, 208, 0.15);
   }
-  .sage-chat-orb {
-    width: 48px; height: 48px;
+  .sage-link-arrow {
+    color: #E89F7F;
+    font-family: var(--f-body); font-size: 13px;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .sage-link-arrow:hover { color: #FFB590; }
+
+  /* ─── Chat surface ─── */
+  .sage-chat-head {
+    padding: var(--s-5) var(--s-6) var(--s-4);
+    border-bottom: 1px solid rgba(91, 163, 208, 0.15);
   }
   .sage-chat-eyebrow {
-    color: #71B0E5;
-    margin-bottom: 4px;
+    display: flex; gap: var(--s-3); align-items: center;
+    margin-bottom: var(--s-2);
   }
+  .sage-chat-mode {
+    font-family: var(--f-mono); font-size: 10px;
+    letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  .sage-chat-build {
+    color: rgba(217, 221, 236, 0.6);
+    font-size: 10px;
+  }
+  .sage-chat-build strong { color: #9DD2F2; font-weight: 500; }
   .sage-chat-title {
     font-family: var(--f-display); font-weight: 400;
-    font-size: 22px; line-height: 1.1;
-    color: #E5E8EE;
-    letter-spacing: -0.01em;
+    font-size: clamp(28px, 3.5vw, 42px);
+    line-height: 1.05; letter-spacing: -0.01em;
+    color: #FFFFFF;
   }
-  .sage-chat-title em {
-    font-style: italic;
-    color: #71B0E5;
-  }
-  .sage-chat-actions {
-    display: flex; gap: 4px;
-  }
-  .sage-icon-btn {
-    width: 32px; height: 32px;
-    border-radius: 6px;
-    color: rgba(229, 232, 238, 0.6);
-    display: grid; place-items: center;
-    transition: background var(--t-fast), color var(--t-fast);
-  }
-  .sage-icon-btn:hover {
-    background: rgba(168, 196, 232, 0.08);
-    color: #E5E8EE;
-  }
+  .sage-chat-title em { font-style: italic; color: #E89F7F; }
 
-  /* Chat stream */
-  .sage-chat-stream {
-    flex: 1;
-    overflow-y: auto;
-    padding: var(--s-5) var(--s-5);
+  .sage-messages {
+    flex: 1; overflow-y: auto;
+    padding: var(--s-5) var(--s-6);
     display: flex; flex-direction: column;
-    gap: var(--s-4);
+    gap: var(--s-5);
   }
-  .sage-chat-stream::-webkit-scrollbar { width: 4px; }
-  .sage-chat-stream::-webkit-scrollbar-thumb { background: rgba(168, 196, 232, 0.2); border-radius: 4px; }
 
+  /* Sage messages */
   .sage-msg {
-    max-width: 720px;
-    display: flex; flex-direction: column;
-    gap: 6px;
+    display: flex; flex-direction: column; gap: var(--s-2);
   }
-  .sage-msg-bot {
-    align-self: flex-start;
-  }
-  .sage-msg-user {
-    align-self: flex-end;
-    align-items: flex-end;
-  }
-
   .sage-msg-meta {
-    display: flex; align-items: center; gap: 6px;
-    font-family: var(--f-mono); font-size: 10px;
-    color: rgba(229, 232, 238, 0.5);
-    letter-spacing: 0.04em;
+    display: flex; align-items: center; gap: var(--s-2);
   }
-  .sage-msg-meta .t-label-mono {
-    color: rgba(229, 232, 238, 0.7);
-    font-weight: 500;
+  .sage-avatar {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #5BA3D0, #1A2440);
+    display: grid; place-items: center;
+    color: #FFFFFF; font-size: 11px;
+    box-shadow: 0 0 8px rgba(91,163,208,0.5);
   }
+  .sage-msg-name {
+    font-family: var(--f-display); font-style: italic; font-size: 14px;
+    color: #9DD2F2;
+  }
+  .sage-msg-user .sage-msg-name { color: #E89F7F; }
   .sage-msg-time {
-    color: rgba(229, 232, 238, 0.35);
+    font-family: var(--f-mono); font-size: 10px;
+    color: rgba(217, 221, 236, 0.4);
   }
-
-  /* Status dots */
-  .sage-dot {
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    display: inline-block;
-    box-shadow: 0 0 8px currentColor;
-  }
-  .sage-dot-ask    { background: #71B0E5; color: #71B0E5; }
-  .sage-dot-do     { background: #C84D2C; color: #C84D2C; }
-  .sage-dot-notice { background: #B59FF0; color: #B59FF0; }
-
   .sage-msg-body {
-    background: rgba(168, 196, 232, 0.06);
-    border: 1px solid rgba(168, 196, 232, 0.12);
-    border-radius: 14px;
+    background: rgba(91, 163, 208, 0.05);
+    border: 1px solid rgba(91, 163, 208, 0.12);
+    border-radius: 10px;
     padding: var(--s-3) var(--s-4);
-    font-size: 15px; line-height: 1.55;
-    color: #E5E8EE;
+    color: #E8ECF8;
+    line-height: 1.5;
   }
-  .sage-msg-body em {
-    font-style: italic;
-    color: #A8C4E8;
-  }
-  .sage-msg-user .sage-msg-body {
-    background: rgba(113, 176, 229, 0.14);
-    border-color: rgba(113, 176, 229, 0.25);
-  }
-  .sage-msg-do .sage-msg-body {
-    border-color: rgba(200, 77, 44, 0.3);
-  }
-  .sage-msg-do .sage-msg-body em {
-    color: #FF9A78;
-  }
-
+  .sage-msg-body p { margin-bottom: var(--s-2); font-size: 15px; }
+  .sage-msg-body p:last-child { margin-bottom: 0; }
+  .sage-msg-body p em { font-style: italic; color: #9DD2F2; }
+  .sage-msg-body strong { color: #FFFFFF; font-weight: 600; }
+  .sage-msg-aside { color: rgba(217, 221, 236, 0.65) !important; font-size: 13px !important; }
   .sage-msg-foot {
-    display: flex; gap: var(--s-3); align-items: center;
-    padding-top: 6px;
+    color: rgba(217, 221, 236, 0.5); font-size: 11px;
   }
-  .sage-msg-tag {
-    font-family: var(--f-display); font-style: italic;
-    font-size: 12px; color: #B59FF0;
-    background: rgba(181, 159, 240, 0.12);
-    padding: 3px 9px;
-    border-radius: 999px;
-  }
-  .sage-msg-source {
-    color: rgba(229, 232, 238, 0.4);
-  }
+  .sage-msg-foot strong { color: #9DD2F2; font-weight: 500; }
 
-  .sage-msg-actions {
-    display: flex; flex-wrap: wrap; gap: 6px;
-    margin-top: 4px;
+  /* User messages — terra cotta tinted */
+  .sage-msg-user .sage-msg-body {
+    background: rgba(232, 159, 127, 0.06);
+    border-color: rgba(232, 159, 127, 0.18);
+    align-self: flex-end;
+    max-width: 80%;
   }
-  .btn-sage-ghost {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 6px 12px;
-    background: rgba(168, 196, 232, 0.06);
-    border: 1px solid rgba(168, 196, 232, 0.18);
-    color: #E5E8EE;
-    border-radius: 999px;
-    font-family: var(--f-body);
-    font-size: 12px; font-weight: 500;
-    cursor: pointer;
-    transition: background var(--t-fast), border-color var(--t-fast);
+  .sage-msg-user .sage-msg-meta {
+    align-self: flex-end;
   }
-  .btn-sage-ghost:hover {
-    background: rgba(168, 196, 232, 0.12);
-    border-color: rgba(168, 196, 232, 0.3);
+  .sage-msg-typing .sage-msg-body { padding: 12px 16px; }
+  .typing-dots { display: inline-flex; gap: 3px; }
+  .typing-dots span {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: rgba(232, 159, 127, 0.5);
+    animation: typingPulse 1.2s ease-in-out infinite;
   }
-  .btn-sage-ghost i { font-size: 12px; }
-
-  /* Typing indicator */
-  .sage-msg-typing {
-    flex-direction: row; align-items: center; gap: 8px;
-    align-self: flex-start;
-  }
-  .sage-typing-orb {
-    width: 24px; height: 24px;
-  }
-  .sage-typing-dots {
-    display: flex; gap: 4px;
-    background: rgba(168, 196, 232, 0.06);
-    padding: 10px 14px;
-    border-radius: 999px;
-    border: 1px solid rgba(168, 196, 232, 0.12);
-  }
-  .sage-typing-dots span {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: #71B0E5;
-    opacity: 0.5;
-    animation: sageTypingPulse 1.2s ease-in-out infinite;
-  }
-  .sage-typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-  .sage-typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes sageTypingPulse {
-    0%, 60%, 100% { opacity: 0.3; transform: scale(0.85); }
-    30% { opacity: 1; transform: scale(1.1); }
+  .typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.30s; }
+  @keyframes typingPulse {
+    0%, 100% { opacity: 0.3; transform: scale(0.85); }
+    50% { opacity: 1; transform: scale(1.1); }
   }
 
   /* Composer */
   .sage-composer {
-    border-top: 1px solid rgba(168, 196, 232, 0.1);
-    background: rgba(10, 14, 31, 0.6);
-    padding: var(--s-3) var(--s-5) var(--s-4);
+    padding: var(--s-3) var(--s-4) var(--s-3);
+    border-top: 1px solid rgba(91, 163, 208, 0.15);
+    background: rgba(10, 14, 31, 0.5);
   }
-  .sage-composer-pills {
-    display: flex; gap: 6px;
-    margin-bottom: var(--s-3);
+  .sage-composer-modes {
+    display: flex; gap: 4px; margin-bottom: var(--s-3);
   }
-  .sage-pill {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 6px 12px;
-    background: rgba(168, 196, 232, 0.05);
-    border: 1px solid rgba(168, 196, 232, 0.12);
-    color: rgba(229, 232, 238, 0.7);
-    border-radius: 999px;
-    font-family: var(--f-body);
-    font-size: 12px; font-weight: 500;
+  .composer-mode-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-family: var(--f-body); font-size: 12px; font-weight: 500;
+    color: rgba(217, 221, 236, 0.6);
+    background: transparent; border: 1px solid transparent;
     cursor: pointer;
+    transition: all var(--t-fast);
   }
-  .sage-pill-active {
-    background: rgba(113, 176, 229, 0.18);
-    border-color: rgba(113, 176, 229, 0.4);
-    color: #E5E8EE;
+  .composer-mode-btn:hover { background: rgba(91, 163, 208, 0.08); color: #FFFFFF; }
+  .composer-mode-btn.is-active {
+    background: rgba(91, 163, 208, 0.15);
+    color: #9DD2F2;
+    border-color: rgba(91, 163, 208, 0.3);
   }
 
-  .sage-composer-input-wrap {
-    display: flex; align-items: center; gap: 8px;
-    background: rgba(168, 196, 232, 0.06);
-    border: 1px solid rgba(168, 196, 232, 0.18);
-    border-radius: 14px;
-    padding: 8px 8px 8px 16px;
-    transition: border-color var(--t-fast);
-  }
-  .sage-composer-input-wrap:focus-within {
-    border-color: rgba(113, 176, 229, 0.5);
-    background: rgba(168, 196, 232, 0.1);
-  }
   .sage-composer-input {
+    display: flex; gap: var(--s-2); align-items: end;
+    background: rgba(10, 14, 31, 0.6);
+    border: 1px solid rgba(91, 163, 208, 0.25);
+    border-radius: 10px;
+    padding: var(--s-2);
+  }
+  .sage-composer-input textarea {
     flex: 1;
     background: transparent;
-    border: 0;
-    outline: 0;
-    color: #E5E8EE;
-    font-family: var(--f-body);
-    font-size: 15px;
-    line-height: 1.5;
+    border: 0; outline: 0;
+    color: #FFFFFF;
+    font-family: var(--f-body); font-size: 14px; line-height: 1.5;
     resize: none;
-    padding: 6px 0;
+    padding: 6px 8px;
   }
-  .sage-composer-input::placeholder {
-    color: rgba(229, 232, 238, 0.4);
+  .sage-composer-input textarea::placeholder {
+    color: rgba(217, 221, 236, 0.4);
   }
-  .sage-composer-mic, .sage-composer-send {
-    width: 34px; height: 34px;
+  .composer-send {
+    width: 32px; height: 32px;
     border-radius: 8px;
+    background: #E89F7F;
+    color: #1A1410;
     display: grid; place-items: center;
+    font-size: 14px;
+    cursor: pointer;
     transition: background var(--t-fast);
   }
-  .sage-composer-mic {
-    color: rgba(229, 232, 238, 0.6);
-  }
-  .sage-composer-mic:hover {
-    background: rgba(168, 196, 232, 0.1);
-    color: #E5E8EE;
-  }
-  .sage-composer-send {
-    background: #71B0E5;
-    color: #0A0E1F;
-  }
-  .sage-composer-send:hover {
-    background: #8FC1ED;
-  }
-  .sage-composer-send i { font-size: 16px; }
-  .sage-composer-mic i { font-size: 16px; }
+  .composer-send:hover { background: #FFB590; }
 
-  .sage-composer-hint {
-    margin-top: 8px;
-    display: flex; align-items: center; gap: 6px;
-    font-size: 11px;
-    color: rgba(229, 232, 238, 0.35);
-  }
-  .sage-composer-hint .t-label-mono {
-    color: rgba(229, 232, 238, 0.4);
-  }
-  .sage-composer-hint kbd {
-    background: rgba(168, 196, 232, 0.08);
-    border: 1px solid rgba(168, 196, 232, 0.18);
-    color: rgba(229, 232, 238, 0.7);
-    padding: 1px 6px;
-    border-radius: 4px;
-    font-family: var(--f-mono);
-    font-size: 10px;
-    margin: 0 2px;
-  }
-
-  /* SESSION RAIL (right) */
-  .sage-session-block {
-    margin-bottom: var(--s-5);
-  }
-  .sage-session-eyebrow {
-    color: rgba(229, 232, 238, 0.5);
-    margin-bottom: var(--s-2);
-  }
-
-  .sage-deepening-card {
-    background: rgba(168, 196, 232, 0.06);
-    border: 1px solid rgba(168, 196, 232, 0.15);
-    border-radius: var(--r-md);
-    padding: var(--s-3);
-  }
-  .sage-deepening-dim {
-    font-size: 14px; font-weight: 600;
-    color: #E5E8EE;
-    margin-bottom: 2px;
-  }
-  .sage-deepening-layer {
-    font-family: var(--f-display);
-    font-size: 13px;
-    color: #71B0E5;
-    margin-bottom: var(--s-3);
-  }
-  .sage-deepening-layer em { font-style: italic; }
-  .sage-deepening-bar {
-    height: 6px;
-    background: rgba(168, 196, 232, 0.1);
-    border-radius: 4px;
-    overflow: hidden;
-    margin-bottom: 8px;
-  }
-  .sage-deepening-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #71B0E5, #A8C4E8);
-    border-radius: 4px;
-  }
-  .sage-deepening-meta {
+  .sage-composer-foot {
     display: flex; justify-content: space-between;
-    font-size: 10px;
+    margin-top: var(--s-2);
+    color: rgba(217, 221, 236, 0.4);
   }
-  .sage-deepening-meta .t-label-mono:first-child {
-    color: #71B0E5;
-  }
-  .sage-deepening-meta .t-label-mono:last-child {
-    color: rgba(229, 232, 238, 0.4);
+  .sage-composer-foot kbd {
+    background: rgba(91, 163, 208, 0.15);
+    color: rgba(217, 221, 236, 0.7);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-family: var(--f-mono); font-size: 10px;
   }
 
-  .sage-surfaced-list {
-    list-style: none; padding: 0; margin: 0;
+  /* ─── Right state panel ─── */
+  .sage-state {
+    padding: var(--s-4);
+    gap: var(--s-5);
+  }
+  .sage-orb-wrap {
+    display: flex; flex-direction: column; align-items: center;
+    gap: var(--s-3);
+  }
+  .sage-orb-stage {
+    width: 180px; height: 180px;
+    position: relative;
+  }
+  .sage-orb-svg {
+    width: 100%; height: 100%;
+    animation: orbFloat 8s ease-in-out infinite;
+  }
+  @keyframes orbFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sage-orb-svg { animation: none; }
+  }
+
+  .sage-orb-label {
+    text-align: center;
+  }
+  .sage-orb-label .t-label-mono { color: #5BA3D0 !important; margin-bottom: 4px; }
+  .sage-orb-status {
+    font-family: var(--f-display); font-size: 14px;
+    color: rgba(217, 221, 236, 0.7);
+    line-height: 1.4;
+  }
+  .sage-orb-status em { font-style: italic; color: #E89F7F; }
+
+  .sage-state-section { display: flex; flex-direction: column; gap: var(--s-2); }
+  .sage-state-eyebrow { color: rgba(157, 210, 242, 0.6) !important; }
+
+  .sage-touch-list, .sage-modes-list {
     display: flex; flex-direction: column; gap: var(--s-2);
   }
-  .sage-surfaced-list li {
-    padding: var(--s-3);
-    background: rgba(168, 196, 232, 0.04);
-    border-left: 2px solid #71B0E5;
-    border-radius: 0 var(--r-md) var(--r-md) 0;
-  }
-  .sage-surfaced-list li:nth-child(2) {
-    border-left-color: #B59FF0;
-  }
-  .sage-surfaced-list li:nth-child(3) {
-    border-left-color: #C84D2C;
-  }
-  .sage-surfaced-tag {
-    font-family: var(--f-display); font-style: italic;
-    font-size: 11px;
-    color: #71B0E5;
-    margin-bottom: 4px;
-  }
-  .sage-surfaced-list li:nth-child(2) .sage-surfaced-tag {
-    color: #B59FF0;
-  }
-  .sage-surfaced-list li:nth-child(3) .sage-surfaced-tag {
-    color: #FF9A78;
-  }
-  .sage-surfaced-text {
+  .sage-touch-row {
+    display: grid;
+    grid-template-columns: 14px 1fr auto;
+    gap: 8px;
+    align-items: center;
     font-size: 13px;
-    line-height: 1.45;
-    color: #E5E8EE;
+  }
+  .touch-dim { color: var(--c, #FFFFFF); font-size: 12px; }
+  .touch-name { color: #FFFFFF; }
+  .touch-meta {
+    font-family: var(--f-mono); font-size: 10px;
+    color: rgba(217, 221, 236, 0.5);
   }
 
-  .sage-sources-list {
-    list-style: none; padding: 0; margin: 0;
-    display: flex; flex-direction: column; gap: var(--s-1);
+  .sage-mode-row {
+    display: grid;
+    grid-template-columns: 14px 1fr;
+    gap: 8px;
+    align-items: start;
   }
-  .sage-sources-list li {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 8px 10px;
-    background: rgba(168, 196, 232, 0.04);
-    border-radius: var(--r-sm);
+  .mode-pip { font-size: 12px; line-height: 1.6; }
+  .sage-mode-row .mode-name {
+    font-family: var(--f-display); font-style: italic; font-size: 15px;
+    color: #FFFFFF;
+    margin-bottom: 2px;
   }
-  .sage-source-name {
-    font-size: 13px; font-weight: 500;
-    color: #E5E8EE;
+  .sage-mode-row .mode-sub {
+    font-size: 12px; line-height: 1.4;
+    color: rgba(217, 221, 236, 0.6);
   }
-  .sage-source-meta {
-    font-family: var(--f-mono); font-size: 10px;
-    color: rgba(229, 232, 238, 0.4);
-    letter-spacing: 0.04em;
-  }
+
+  /* Override topbar for cosmos page (just the visible behavior, not structure) */
+  .cosmos-room ~ * { /* nothing — keep app shell as is */ }
 
 </style>
 </head>
-<body class="app-shell sage-room">
+<body class="app-shell sage-cosmos-body">
 <header class="app-topbar">
   <div class="app-topbar-inner">
     <label for="navToggle" class="app-burger" aria-label="Open navigation"><i class="ph ph-list"></i></label>
@@ -653,313 +445,301 @@
       <a href="export.html" class="app-nav-item" data-page="export"><i class="ph ph-download-simple"></i><span>Export &amp; Data</span></a>
       <a href="settings.html" class="app-nav-item" data-page="settings"><i class="ph ph-gear-six"></i><span>Settings</span></a>
 </nav>
-  <main class="app-content sage-content">
+  <main class="app-content cosmos-room">
 
-  <!-- Cosmos atmosphere: starfield + halo -->
+  <!-- Cosmos atmosphere layer (decorative; sits behind content) -->
   <div class="cosmos-atmosphere" aria-hidden="true">
-    <svg class="cosmos-stars" viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-      <defs>
-        <radialGradient id="cosmosCenterHalo" cx="50%" cy="50%" r="60%">
-          <stop offset="0%" stop-color="#1A2748" stop-opacity="0.7"/>
-          <stop offset="60%" stop-color="#0E1830" stop-opacity="0.3"/>
-          <stop offset="100%" stop-color="#0A0E1F" stop-opacity="0"/>
-        </radialGradient>
-      </defs>
-      <rect x="0" y="0" width="1600" height="900" fill="url(#cosmosCenterHalo)"/>
-      <!-- Sparse star field -->
-      <g fill="#A8C4E8">
-        <circle cx="120" cy="80" r="1" opacity="0.6"/>
-        <circle cx="290" cy="150" r="0.7" opacity="0.4"/>
-        <circle cx="450" cy="60" r="1.3" opacity="0.7"/>
-        <circle cx="620" cy="200" r="0.8" opacity="0.5"/>
-        <circle cx="780" cy="100" r="1" opacity="0.6"/>
-        <circle cx="940" cy="220" r="1.2" opacity="0.7"/>
-        <circle cx="1100" cy="80" r="0.9" opacity="0.5"/>
-        <circle cx="1280" cy="160" r="1.1" opacity="0.6"/>
-        <circle cx="1440" cy="100" r="0.8" opacity="0.5"/>
-        <circle cx="200" cy="320" r="1" opacity="0.4"/>
-        <circle cx="380" cy="420" r="1.4" opacity="0.7"/>
-        <circle cx="550" cy="380" r="0.9" opacity="0.5"/>
-        <circle cx="720" cy="500" r="1" opacity="0.5"/>
-        <circle cx="900" cy="400" r="1.2" opacity="0.6"/>
-        <circle cx="1080" cy="490" r="0.8" opacity="0.4"/>
-        <circle cx="1260" cy="370" r="1" opacity="0.5"/>
-        <circle cx="1430" cy="450" r="1.3" opacity="0.6"/>
-        <circle cx="80" cy="600" r="0.9" opacity="0.4"/>
-        <circle cx="260" cy="680" r="1" opacity="0.5"/>
-        <circle cx="440" cy="720" r="0.8" opacity="0.4"/>
-        <circle cx="610" cy="650" r="1.2" opacity="0.6"/>
-        <circle cx="800" cy="780" r="1" opacity="0.5"/>
-        <circle cx="970" cy="650" r="0.9" opacity="0.5"/>
-        <circle cx="1150" cy="720" r="1.1" opacity="0.5"/>
-        <circle cx="1340" cy="680" r="0.8" opacity="0.4"/>
-        <circle cx="1500" cy="800" r="1" opacity="0.5"/>
-      </g>
-    </svg>
+    <div class="cosmos-stars"></div>
+    <div class="cosmos-glow"></div>
   </div>
 
   <div class="sage-page">
 
-    <!-- Three-column layout: threads | chat | session -->
-    <div class="sage-layout">
+    <!-- Three-column layout: thread list | chat surface | orb panel -->
+    <div class="sage-grid">
 
-      <!-- LEFT: thread history -->
-      <aside class="sage-threads-rail">
-        <div class="sage-rail-head">
-          <span class="t-label-mono">Threads</span>
+      <!-- LEFT: Thread list -->
+      <aside class="sage-threads-panel" aria-label="Sage threads">
+        <div class="sage-panel-head">
+          <div class="t-label-mono sage-eyebrow">Sage Threads</div>
           <button class="sage-new-btn" aria-label="New thread"><i class="ph ph-plus"></i></button>
         </div>
-        <div class="sage-thread-list">
+
+        <div class="sage-threads-list">
+
           <a class="sage-thread-row sage-thread-active" href="sage.html?thread=1">
-            <div class="sage-thread-title">Workspace setup</div>
-            <div class="sage-thread-meta">Today · 8 turns</div>
-            <div class="sage-thread-tag">Live</div>
+            <div class="thread-row-head">
+              <span class="thread-row-mode mode-ask">● ASK</span>
+              <span class="thread-row-time">12 min</span>
+            </div>
+            <div class="thread-row-title">Workspace setup</div>
+            <div class="thread-row-preview">Walk me through your preferred tone, formal and crisp, warm and conversational, or direct and brief?</div>
           </a>
+
           <a class="sage-thread-row" href="sage.html?thread=2">
-            <div class="sage-thread-title">Aesthetic preferences</div>
-            <div class="sage-thread-meta">2d ago · 14 turns</div>
+            <div class="thread-row-head">
+              <span class="thread-row-mode mode-do">● DO</span>
+              <span class="thread-row-time">2h</span>
+            </div>
+            <div class="thread-row-title">Drafting investor reply</div>
+            <div class="thread-row-preview">Drafting your follow-up to Kane on yesterday's pricing thread, matched to the warm, direct tone you use for internal threads.</div>
           </a>
+
           <a class="sage-thread-row" href="sage.html?thread=3">
-            <div class="sage-thread-title">Travel patterns</div>
-            <div class="sage-thread-meta">5d ago · 6 turns</div>
+            <div class="thread-row-head">
+              <span class="thread-row-mode mode-notice">● NOTICE</span>
+              <span class="thread-row-time">5h</span>
+            </div>
+            <div class="thread-row-title">Goal drift</div>
+            <div class="thread-row-preview">You set a goal to ship the MVP by month's end, but you've let meetings overwrite that block three times this week.</div>
           </a>
+
           <a class="sage-thread-row" href="sage.html?thread=4">
-            <div class="sage-thread-title">Investor pitch tone</div>
-            <div class="sage-thread-meta">1w ago · 22 turns</div>
+            <div class="thread-row-head">
+              <span class="thread-row-mode mode-ask">● ASK</span>
+              <span class="thread-row-time">1d</span>
+            </div>
+            <div class="thread-row-title">Aesthetic preferences</div>
+            <div class="thread-row-preview">Building Aesthetic dimension. What three brands feel like 'you' right now, and what about them?</div>
           </a>
+
           <a class="sage-thread-row" href="sage.html?thread=5">
-            <div class="sage-thread-title">Daily focus blocks</div>
-            <div class="sage-thread-meta">2w ago · 9 turns</div>
+            <div class="thread-row-head">
+              <span class="thread-row-mode mode-do">● DO</span>
+              <span class="thread-row-time">2d</span>
+            </div>
+            <div class="thread-row-title">Track day prep checklist</div>
+            <div class="thread-row-preview">Built your Chuckwalla prep list, drew from Work Life routines and your past two track sessions.</div>
           </a>
+
           <a class="sage-thread-row" href="sage.html?thread=6">
-            <div class="sage-thread-title">Career inflection</div>
-            <div class="sage-thread-meta">3w ago · 31 turns</div>
+            <div class="thread-row-head">
+              <span class="thread-row-mode mode-notice">● NOTICE</span>
+              <span class="thread-row-time">4d</span>
+            </div>
+            <div class="thread-row-title">Sleep cadence shift</div>
+            <div class="thread-row-preview">Your usual 11pm bedtime has slipped 90 min later five nights running. Aligned with the pitch deck push.</div>
           </a>
+
         </div>
-        <div class="sage-rail-foot">
-          <a href="history.html" class="sage-rail-link">View all threads <i class="ph ph-arrow-right"></i></a>
+
+        <div class="sage-threads-foot">
+          <a href="history.html" class="sage-link-arrow">View all threads <i class="ph ph-arrow-right"></i></a>
         </div>
       </aside>
 
-      <!-- CENTER: chat -->
-      <section class="sage-chat">
+      <!-- CENTER: Chat surface -->
+      <section class="sage-chat" aria-label="Sage conversation">
 
         <header class="sage-chat-head">
-          <div class="sage-chat-orb">
-            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <radialGradient id="orbCore" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stop-color="#FFFFFF"/>
-                  <stop offset="40%" stop-color="#E8F1FE" stop-opacity="0.9"/>
-                  <stop offset="100%" stop-color="#71B0E5" stop-opacity="0"/>
-                </radialGradient>
-                <radialGradient id="orbHalo" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stop-color="#71B0E5" stop-opacity="0.4"/>
-                  <stop offset="100%" stop-color="#71B0E5" stop-opacity="0"/>
-                </radialGradient>
-              </defs>
-              <circle cx="50" cy="50" r="48" fill="url(#orbHalo)"/>
-              <circle cx="50" cy="50" r="6" fill="url(#orbCore)"/>
-              <g stroke="#71B0E5" stroke-opacity="0.35" stroke-width="0.4" fill="none">
-                <line x1="50" y1="50" x2="20" y2="30"/>
-                <line x1="50" y1="50" x2="80" y2="35"/>
-                <line x1="50" y1="50" x2="78" y2="68"/>
-                <line x1="50" y1="50" x2="32" y2="78"/>
-                <line x1="50" y1="50" x2="14" y2="55"/>
-              </g>
-              <g fill="#71B0E5">
-                <circle cx="20" cy="30" r="1.4"/>
-                <circle cx="80" cy="35" r="1.2"/>
-                <circle cx="78" cy="68" r="1.4"/>
-                <circle cx="32" cy="78" r="1.2"/>
-                <circle cx="14" cy="55" r="1.3"/>
-              </g>
-            </svg>
+          <div class="sage-chat-eyebrow">
+            <span class="sage-chat-mode mode-ask">● ASK</span>
+            <span class="t-label-mono sage-chat-build">Building <strong>Communication</strong> dimension</span>
           </div>
-          <div class="sage-chat-head-text">
-            <div class="t-label-mono sage-chat-eyebrow">Sage · Listening · Layer 02</div>
-            <h1 class="sage-chat-title">What did <em>matter</em> to you this week?</h1>
-          </div>
-          <div class="sage-chat-actions">
-            <button class="sage-icon-btn" aria-label="Voice mode"><i class="ph ph-microphone"></i></button>
-            <button class="sage-icon-btn" aria-label="Settings"><i class="ph ph-sliders-horizontal"></i></button>
-            <button class="sage-icon-btn" aria-label="Close"><i class="ph ph-x"></i></button>
-          </div>
+          <h1 class="sage-chat-title">Workspace <em>setup.</em></h1>
         </header>
 
-        <div class="sage-chat-stream">
+        <div class="sage-messages">
 
           <!-- Sage opening -->
-          <article class="sage-msg sage-msg-bot">
+          <article class="sage-msg sage-msg-sage">
             <div class="sage-msg-meta">
-              <span class="sage-dot sage-dot-ask"></span>
-              <span class="t-label-mono">Sage · Ask</span>
-              <span class="sage-msg-time">10:14 AM</span>
+              <span class="sage-avatar"><i class="ph ph-sparkle"></i></span>
+              <span class="sage-msg-name">Sage</span>
+              <span class="sage-msg-time">12 min ago</span>
             </div>
             <div class="sage-msg-body">
-              I noticed you blocked Tuesday morning for deep work but Slack pulled you out three times.
-              <em>What made you say yes when you'd already said no?</em>
-            </div>
-          </article>
-
-          <!-- User reply -->
-          <article class="sage-msg sage-msg-user">
-            <div class="sage-msg-meta">
-              <span class="t-label-mono">You</span>
-              <span class="sage-msg-time">10:16 AM</span>
-            </div>
-            <div class="sage-msg-body">
-              Two were Kane on the Series A deck, one was a customer escalation.
-              I think I'm protective of customer time and bad at protecting my own.
-            </div>
-          </article>
-
-          <!-- Sage reflection -->
-          <article class="sage-msg sage-msg-bot">
-            <div class="sage-msg-meta">
-              <span class="sage-dot sage-dot-notice"></span>
-              <span class="t-label-mono">Sage · Notice</span>
-              <span class="sage-msg-time">10:17 AM</span>
-            </div>
-            <div class="sage-msg-body">
-              That's worth marking. <em>Customer escalations override your deep-work block. Co-founder asks override your deep-work block.</em> Your own priorities don't yet have a defender.
+              <p>Walk me through your preferred tone. Three quick options, or describe in your own words: <em>formal and crisp,</em> <em>warm and conversational,</em> or <em>direct and brief?</em></p>
+              <p class="sage-msg-aside">No wrong answer. Most people land on a blend, and your tone shifts by audience anyway. I'll learn that too.</p>
             </div>
             <div class="sage-msg-foot">
-              <span class="sage-msg-tag">Belief surfaced</span>
-              <span class="t-label-mono sage-msg-source">Work Life · Layer 02</span>
-            </div>
-          </article>
-
-          <!-- Sage do -->
-          <article class="sage-msg sage-msg-bot sage-msg-do">
-            <div class="sage-msg-meta">
-              <span class="sage-dot sage-dot-do"></span>
-              <span class="t-label-mono">Sage · Do</span>
-              <span class="sage-msg-time">10:18 AM</span>
-            </div>
-            <div class="sage-msg-body">
-              I drafted a response template for non-emergency escalations during your deep-work blocks. <em>Want me to use it next time, or only flag it for your review?</em>
-            </div>
-            <div class="sage-msg-actions">
-              <button class="btn btn-sage-ghost"><i class="ph ph-check"></i> Use it automatically</button>
-              <button class="btn btn-sage-ghost"><i class="ph ph-flag"></i> Flag for my review</button>
-              <button class="btn btn-sage-ghost"><i class="ph ph-eye"></i> Show me the draft</button>
+              <span class="t-label-mono">Building <strong>Communication</strong> dimension · Layer 03 / Preferences</span>
             </div>
           </article>
 
           <!-- User reply -->
           <article class="sage-msg sage-msg-user">
             <div class="sage-msg-meta">
-              <span class="t-label-mono">You</span>
-              <span class="sage-msg-time">10:20 AM</span>
+              <span class="sage-msg-name">You</span>
+              <span class="sage-msg-time">10 min ago</span>
             </div>
             <div class="sage-msg-body">
-              Flag for review. I want to see what you'd actually send before you send it.
+              <p>Direct and brief, mostly. Warm only when the relationship calls for it. I get annoyed by AI flattery and excessive hedging, no em-dashes as sentence breaks, just commas.</p>
             </div>
           </article>
 
-          <!-- Sage acknowledge -->
-          <article class="sage-msg sage-msg-bot">
+          <!-- Sage follow-up with reasoning -->
+          <article class="sage-msg sage-msg-sage">
             <div class="sage-msg-meta">
-              <span class="sage-dot sage-dot-ask"></span>
-              <span class="t-label-mono">Sage · Ask</span>
-              <span class="sage-msg-time">10:20 AM</span>
+              <span class="sage-avatar"><i class="ph ph-sparkle"></i></span>
+              <span class="sage-msg-name">Sage</span>
+              <span class="sage-msg-time">10 min ago</span>
             </div>
             <div class="sage-msg-body">
-              Got it. Logged: <em>review-before-send for customer escalations</em>. One more thing while we're here. <em>Was Kane's deck pull urgent, or could it have waited two hours?</em>
+              <p>Got it. Captured: <strong>direct, brief, no flattery, commas over em-dashes, warmth reserved for relationships that earn it.</strong></p>
+              <p>One follow-up. When you're <em>delivering bad news</em> versus <em>negotiating</em> versus <em>celebrating a win</em>, does that style hold, or does the dial shift?</p>
+            </div>
+            <div class="sage-msg-foot">
+              <span class="t-label-mono">3 facts captured · 1 belief captured</span>
             </div>
           </article>
 
-          <!-- Typing indicator (composing) -->
-          <article class="sage-msg sage-msg-typing">
-            <div class="sage-typing-orb">
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="3" fill="#71B0E5"/>
-                <circle cx="12" cy="12" r="10" fill="none" stroke="#71B0E5" stroke-opacity="0.4" stroke-width="0.6"/>
-              </svg>
+          <!-- User typing indicator -->
+          <article class="sage-msg sage-msg-user sage-msg-typing">
+            <div class="sage-msg-meta">
+              <span class="sage-msg-name">You</span>
+              <span class="sage-msg-time">drafting</span>
             </div>
-            <div class="sage-typing-dots">
-              <span></span><span></span><span></span>
+            <div class="sage-msg-body">
+              <span class="typing-dots"><span></span><span></span><span></span></span>
             </div>
           </article>
 
         </div>
 
         <!-- Composer -->
-        <footer class="sage-composer">
-          <div class="sage-composer-pills">
-            <button class="sage-pill sage-pill-active"><span class="sage-dot sage-dot-ask"></span>Ask</button>
-            <button class="sage-pill"><span class="sage-dot sage-dot-do"></span>Do</button>
-            <button class="sage-pill"><span class="sage-dot sage-dot-notice"></span>Notice</button>
+        <div class="sage-composer">
+          <div class="sage-composer-modes">
+            <button class="composer-mode-btn is-active" aria-pressed="true"><i class="ph ph-keyboard"></i> Type</button>
+            <button class="composer-mode-btn"><i class="ph ph-microphone"></i> Talk</button>
+            <button class="composer-mode-btn"><i class="ph ph-phone"></i> Call</button>
           </div>
-          <div class="sage-composer-input-wrap">
-            <textarea class="sage-composer-input" rows="1" placeholder="Talk to Sage…"></textarea>
-            <button class="sage-composer-mic" aria-label="Voice"><i class="ph ph-microphone"></i></button>
-            <button class="sage-composer-send" aria-label="Send"><i class="ph ph-paper-plane-tilt"></i></button>
+          <div class="sage-composer-input">
+            <textarea placeholder="Reply to Sage… or paste any context you want me to absorb." rows="2"></textarea>
+            <button class="composer-send" aria-label="Send"><i class="ph ph-arrow-up"></i></button>
           </div>
-          <div class="sage-composer-hint">
-            <span class="t-label-mono">Press</span>
-            <kbd>↵</kbd>
-            <span class="t-label-mono">to send,</span>
-            <kbd>⇧↵</kbd>
-            <span class="t-label-mono">for newline,</span>
-            <kbd>⌘V</kbd>
-            <span class="t-label-mono">to start voice</span>
+          <div class="sage-composer-foot">
+            <span class="t-label-mono">⌘ <kbd>↵</kbd> to send · ⌘ <kbd>K</kbd> to switch modes</span>
+            <span class="t-label-mono">Sage · listening</span>
           </div>
-        </footer>
+        </div>
+
       </section>
 
-      <!-- RIGHT: what Sage is learning -->
-      <aside class="sage-session-rail">
-        <div class="sage-rail-head">
-          <span class="t-label-mono">This Session</span>
+      <!-- RIGHT: Sage state panel with orb + dimensions touched -->
+      <aside class="sage-state" aria-label="Sage state">
+
+        <!-- Constellation orb -->
+        <div class="sage-orb-wrap">
+          <div class="sage-orb-stage">
+            <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" class="sage-orb-svg">
+              <defs>
+                <radialGradient id="sageOrbBody" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#1A2440" stop-opacity="1"/>
+                  <stop offset="60%" stop-color="#0E1429" stop-opacity="1"/>
+                  <stop offset="100%" stop-color="#070B1A" stop-opacity="1"/>
+                </radialGradient>
+                <radialGradient id="sageOrbCore" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#FFFFFF" stop-opacity="1"/>
+                  <stop offset="40%" stop-color="#9DD2F2" stop-opacity="0.9"/>
+                  <stop offset="100%" stop-color="#5BA3D0" stop-opacity="0"/>
+                </radialGradient>
+                <radialGradient id="sageOrbHalo" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#5BA3D0" stop-opacity="0.4"/>
+                  <stop offset="100%" stop-color="#5BA3D0" stop-opacity="0"/>
+                </radialGradient>
+              </defs>
+
+              <!-- Halo -->
+              <circle cx="120" cy="120" r="118" fill="url(#sageOrbHalo)"/>
+              <!-- Body -->
+              <circle cx="120" cy="120" r="100" fill="url(#sageOrbBody)" stroke="#2A3855" stroke-width="0.5"/>
+
+              <!-- Constellation lines (sage blue) -->
+              <g stroke="#5BA3D0" stroke-width="0.4" fill="none" opacity="0.7">
+                <line x1="120" y1="120" x2="60" y2="80"/>
+                <line x1="120" y1="120" x2="180" y2="60"/>
+                <line x1="120" y1="120" x2="200" y2="120"/>
+                <line x1="120" y1="120" x2="170" y2="190"/>
+                <line x1="120" y1="120" x2="60" y2="180"/>
+                <line x1="120" y1="120" x2="40" y2="130"/>
+                <line x1="120" y1="120" x2="100" y2="40"/>
+                <line x1="60" y1="80" x2="100" y2="40"/>
+                <line x1="180" y1="60" x2="200" y2="120"/>
+                <line x1="200" y1="120" x2="170" y2="190"/>
+                <line x1="60" y1="180" x2="40" y2="130"/>
+              </g>
+
+              <!-- Constellation node dots -->
+              <g>
+                <circle cx="60"  cy="80"  r="2.4" fill="#9DD2F2"/>
+                <circle cx="180" cy="60"  r="2.0" fill="#9DD2F2"/>
+                <circle cx="200" cy="120" r="2.4" fill="#9DD2F2"/>
+                <circle cx="170" cy="190" r="2.0" fill="#9DD2F2"/>
+                <circle cx="60"  cy="180" r="2.4" fill="#9DD2F2"/>
+                <circle cx="40"  cy="130" r="2.0" fill="#9DD2F2"/>
+                <circle cx="100" cy="40"  r="1.8" fill="#9DD2F2"/>
+                <circle cx="220" cy="100" r="1.6" fill="#9DD2F2"/>
+                <circle cx="180" cy="200" r="1.6" fill="#9DD2F2"/>
+                <circle cx="50"  cy="220" r="1.6" fill="#9DD2F2"/>
+                <circle cx="20"  cy="150" r="1.6" fill="#9DD2F2"/>
+
+                <!-- Two coral accent stars -->
+                <circle cx="200" cy="80"  r="2.4" fill="#E89F7F"/>
+                <circle cx="80"  cy="220" r="2.0" fill="#E89F7F"/>
+              </g>
+
+              <!-- Bright core -->
+              <circle cx="120" cy="120" r="22" fill="url(#sageOrbCore)"/>
+              <circle cx="120" cy="120" r="6" fill="#FFFFFF"/>
+            </svg>
+          </div>
+          <div class="sage-orb-label">
+            <div class="t-label-mono">Sage · listening</div>
+            <div class="sage-orb-status"><em>Right now</em>, building Layer 03 / Preferences.</div>
+          </div>
         </div>
 
-        <div class="sage-session-block">
-          <div class="t-label-mono sage-session-eyebrow">Deepening</div>
-          <div class="sage-deepening-card">
-            <div class="sage-deepening-dim">Work Life</div>
-            <div class="sage-deepening-layer"><em>Layer 02 · Beliefs</em></div>
-            <div class="sage-deepening-bar">
-              <div class="sage-deepening-fill" style="width: 68%;"></div>
+        <!-- Context being touched -->
+        <div class="sage-state-section">
+          <div class="t-label-mono sage-state-eyebrow">This thread touches</div>
+          <div class="sage-touch-list">
+            <div class="sage-touch-row">
+              <span class="touch-dim" style="--c: var(--dim-professional);">●</span>
+              <span class="touch-name">Communication</span>
+              <span class="touch-meta">Layer 03</span>
             </div>
-            <div class="sage-deepening-meta">
-              <span class="t-label-mono">68% solid</span>
-              <span class="t-label-mono">+3 this session</span>
+            <div class="sage-touch-row">
+              <span class="touch-dim" style="--c: var(--dim-worklife);">●</span>
+              <span class="touch-name">Work Life</span>
+              <span class="touch-meta">Layer 02</span>
+            </div>
+            <div class="sage-touch-row">
+              <span class="touch-dim" style="--c: var(--dim-relationships);">●</span>
+              <span class="touch-name">Relationships</span>
+              <span class="touch-meta">Layer 02</span>
             </div>
           </div>
         </div>
 
-        <div class="sage-session-block">
-          <div class="t-label-mono sage-session-eyebrow">Surfaced</div>
-          <ul class="sage-surfaced-list">
-            <li>
-              <div class="sage-surfaced-tag">Belief</div>
-              <div class="sage-surfaced-text">Customer time is worth more than my own.</div>
-            </li>
-            <li>
-              <div class="sage-surfaced-tag">Pattern</div>
-              <div class="sage-surfaced-text">Co-founder asks override deep-work blocks.</div>
-            </li>
-            <li>
-              <div class="sage-surfaced-tag">Preference</div>
-              <div class="sage-surfaced-text">Review-before-send for customer drafts.</div>
-            </li>
-          </ul>
+        <!-- Sage modes summary -->
+        <div class="sage-state-section">
+          <div class="t-label-mono sage-state-eyebrow">Three modes, one mind</div>
+          <div class="sage-modes-list">
+            <div class="sage-mode-row">
+              <span class="mode-pip mode-ask">●</span>
+              <div>
+                <div class="mode-name">Ask</div>
+                <div class="mode-sub">Builds your context through conversation.</div>
+              </div>
+            </div>
+            <div class="sage-mode-row">
+              <span class="mode-pip mode-do">●</span>
+              <div>
+                <div class="mode-name">Do</div>
+                <div class="mode-sub">Drafts and acts on your behalf.</div>
+              </div>
+            </div>
+            <div class="sage-mode-row">
+              <span class="mode-pip mode-notice">●</span>
+              <div>
+                <div class="mode-name">Notice</div>
+                <div class="mode-sub">Watches the gap between intention and action.</div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div class="sage-session-block">
-          <div class="t-label-mono sage-session-eyebrow">Sources Pulled</div>
-          <ul class="sage-sources-list">
-            <li><span class="sage-source-name">Calendar</span><span class="sage-source-meta">Tuesday 9–11am block</span></li>
-            <li><span class="sage-source-name">Slack</span><span class="sage-source-meta">3 messages from Kane</span></li>
-            <li><span class="sage-source-name">Gmail</span><span class="sage-source-meta">Customer thread, 2 replies</span></li>
-          </ul>
-        </div>
-
-        <div class="sage-session-foot">
-          <a href="atlas.html" class="sage-rail-link">Open in Atlas <i class="ph ph-arrow-right"></i></a>
-        </div>
       </aside>
 
     </div>
