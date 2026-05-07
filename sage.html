@@ -53,9 +53,12 @@
   }
   .sage-cosmos-body .app-nav-item.active {
     background: rgba(113, 176, 229, 0.12);
-    color: #71B0E5;
-    border-left-color: #71B0E5;
+    color: #71B0E5 !important;
   }
+  .sage-cosmos-body .app-nav-item.active::before {
+    background: #71B0E5;
+  }
+  .sage-cosmos-body .app-nav-item.active i,
   .sage-cosmos-body .app-nav-item.active .ph { color: #71B0E5; }
   .sage-cosmos-body .app-nav-divider { border-color: rgba(168, 196, 232, 0.08); }
   .sage-cosmos-body .nav-badge {
