@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Context Layers · MyGentic</title>
+<link rel="stylesheet" href="app.css" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+
+<style>
+
+  .app-content { padding: 0; }
+  .layers-page {
+    max-width: var(--w-bleed);
+    margin: 0 auto;
+    padding: var(--s-5) var(--s-6) var(--s-9);
+  }
+  @media (max-width: 900px) {
+    .layers-page { padding: var(--s-4) var(--s-4) var(--s-7); }
+  }
+
+  /* Breadcrumb (reused from atlas) */
+  .atlas-breadcrumb {
+    display: flex; align-items: center; gap: var(--s-2);
+    font-family: var(--f-mono); font-size: 11px;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--ink-mute);
+    padding: var(--s-2) 0 var(--s-4);
+  }
+  .atlas-breadcrumb a { color: var(--ink-mute); }
+  .atlas-breadcrumb a:hover { color: var(--terra); }
+  .atlas-breadcrumb i { font-size: 14px; opacity: 0.6; }
+
+  /* Hero */
+  .layers-hero {
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: var(--s-6);
+    margin-bottom: var(--s-7);
+    max-width: 980px;
+  }
+  .layers-eyebrow { color: var(--terra); margin-bottom: var(--s-3); }
+  .layers-hero-title {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: clamp(40px, 5vw, 64px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: var(--s-4);
+  }
+  .layers-hero-title em { font-style: italic; }
+  .layers-hero-deck {
+    font-size: 17px; line-height: 1.55;
+    color: var(--ink-soft);
+    max-width: 780px;
+  }
+  .layers-hero-deck strong { color: var(--ink); font-weight: 600; }
+
+  /* Three layer summary cards */
+  .layers-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s-4);
+    margin-bottom: var(--s-7);
+  }
+  @media (max-width: 1100px) { .layers-summary { grid-template-columns: 1fr; } }
+
+  .layer-card {
+    position: relative;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    padding: var(--s-5);
+    border-top: 4px solid var(--terra);
+    overflow: hidden;
+  }
+  .layer-card-eyebrow {
+    color: var(--terra);
+    margin-bottom: var(--s-3);
+  }
+  .layer-card-title {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: 36px; line-height: 1;
+    letter-spacing: -0.01em;
+    margin-bottom: var(--s-1);
+    color: var(--ink);
+  }
+  .layer-card-sub {
+    font-family: var(--f-display); font-style: italic;
+    font-size: 16px; color: var(--terra);
+    margin-bottom: var(--s-3);
+  }
+  .layer-card-body {
+    font-size: 14px; line-height: 1.55;
+    color: var(--ink-soft);
+  }
+
+  /* Matrix */
+  .layers-matrix-wrap { margin-bottom: var(--s-7); }
+  .layers-matrix-head {
+    display: flex; align-items: end; justify-content: space-between;
+    flex-wrap: wrap; gap: var(--s-4);
+    margin-bottom: var(--s-5);
+  }
+  .layers-matrix-title {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: clamp(28px, 3vw, 36px);
+    letter-spacing: -0.01em; line-height: 1.1;
+    color: var(--ink);
+    margin-bottom: var(--s-1);
+  }
+  .layers-matrix-title em { font-style: italic; }
+  .layers-matrix-deck {
+    font-size: 14px;
+    color: var(--ink-mute);
+  }
+  .layers-matrix-meta {
+    display: flex; align-items: center; gap: var(--s-3);
+  }
+  .layers-depth-key {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 6px 10px;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+  }
+  .depth-ring {
+    width: 10px; height: 10px; border-radius: 50%;
+    border: 1.5px solid var(--terra);
+    display: inline-block;
+  }
+  .depth-ring-1 { opacity: 0.35; }
+  .depth-ring-2 { opacity: 0.65; }
+  .depth-ring-3 { opacity: 1; background: var(--terra); }
+  .depth-key-label {
+    font-family: var(--f-mono); font-size: 10px;
+    color: var(--ink-mute); letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-left: 6px;
+  }
+
+  /* The matrix grid itself */
+  .layers-matrix {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+  }
+  .matrix-row {
+    display: grid;
+    grid-template-columns: 200px repeat(6, 1fr);
+    border-bottom: 1px solid var(--rule);
+  }
+  .matrix-row:last-child { border-bottom: 0; }
+  .matrix-cell {
+    padding: var(--s-3) var(--s-4);
+    border-right: 1px solid var(--rule);
+    display: flex; flex-direction: column; gap: 4px;
+    transition: background var(--t-fast);
+  }
+  .matrix-cell:last-child { border-right: 0; }
+
+  .matrix-row-head .matrix-cell {
+    background: var(--paper-2);
+    padding: var(--s-3) var(--s-3);
+  }
+  .matrix-cell-corner { background: var(--paper-2) !important; }
+  .matrix-cell-col-head {
+    flex-direction: row; align-items: center; gap: 6px;
+    font-family: var(--f-eyebrow);
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--ink);
+  }
+  .matrix-cell-col-head i { font-size: 14px; }
+
+  .matrix-cell-row-head {
+    background: var(--paper-2);
+    justify-content: center;
+    padding: var(--s-4);
+  }
+  .row-head-name {
+    font-family: var(--f-display); font-size: 24px;
+    line-height: 1;
+    color: var(--ink);
+    margin-top: 4px;
+  }
+  .row-head-sub {
+    font-size: 12px; color: var(--ink-mute);
+    margin-top: 4px;
+  }
+
+  /* Data cells */
+  .matrix-cell-data {
+    color: inherit; cursor: pointer;
+    border-top: 3px solid var(--c, var(--rule));
+    background: linear-gradient(180deg, color-mix(in srgb, var(--c-tint, var(--paper-2)) 30%, var(--paper)), var(--paper));
+    justify-content: space-between;
+    min-height: 88px;
+  }
+  .matrix-cell-data:hover {
+    background: var(--c-tint, var(--paper-3));
+    color: var(--ink);
+  }
+  .cell-topic {
+    font-family: var(--f-body);
+    font-size: 13px; font-weight: 500;
+    color: var(--ink);
+    line-height: 1.3;
+  }
+  .cell-meta {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: var(--s-2);
+  }
+  .cell-count {
+    font-family: var(--f-mono); font-size: 10px;
+    color: var(--ink-mute); letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .cell-freshness {
+    font-family: var(--f-mono); font-size: 10px;
+    color: var(--ink-mute); letter-spacing: 0.04em;
+  }
+
+  /* Layer-specific intensity (deeper layer = more saturated cell) */
+  .matrix-row-facts .matrix-cell-data { 
+    background: linear-gradient(180deg, color-mix(in srgb, var(--c-tint) 18%, var(--paper)), var(--paper));
+  }
+  .matrix-row-beliefs .matrix-cell-data { 
+    background: linear-gradient(180deg, color-mix(in srgb, var(--c-tint) 32%, var(--paper)), var(--paper));
+  }
+  .matrix-row-preferences .matrix-cell-data { 
+    background: linear-gradient(180deg, color-mix(in srgb, var(--c-tint) 50%, var(--paper)), color-mix(in srgb, var(--c-tint) 12%, var(--paper)));
+  }
+
+  /* Responsive matrix */
+  @media (max-width: 1100px) {
+    .layers-matrix { overflow-x: auto; }
+    .matrix-row { grid-template-columns: 160px repeat(6, 180px); }
+  }
+
+  /* Foot */
+  .layers-foot {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    padding: var(--s-6);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: var(--s-4);
+  }
+  .layers-foot-title {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: 28px; letter-spacing: -0.01em; line-height: 1.1;
+    color: var(--ink);
+    margin-bottom: var(--s-2);
+  }
+  .layers-foot p {
+    font-size: 15px; color: var(--ink-soft); line-height: 1.5;
+    max-width: 540px;
+  }
+  .layers-foot p em { font-style: italic; color: var(--terra); }
+  .layers-foot-actions {
+    display: flex; gap: var(--s-3); flex-wrap: wrap;
+  }
+
+</style>
+</head>
+<body class="app-shell context-layers-body">
+<header class="app-topbar">
+  <div class="app-topbar-inner">
+    <label for="navToggle" class="app-burger" aria-label="Open navigation"><i class="ph ph-list"></i></label>
+    <a class="app-brand" href="dashboard.html">My<span class="accent">Gen</span>tic</a>
+    <h1 class="app-page-title">Context Layers</h1>
+    <div class="app-topbar-actions">
+      <div class="app-topbar-search">
+        <i class="ph ph-magnifying-glass"></i>
+        <input type="text" placeholder="Search your context, agents, libraries…" />
+        <kbd>⌘K</kbd>
+      </div>
+      <button class="app-icon-btn" aria-label="Notifications"><i class="ph ph-bell"></i><span class="dot"></span></button>
+      <button class="app-avatar" aria-label="User menu">NA</button>
+    </div>
+  </div>
+</header>
+<div class="app-layout">
+  <input type="checkbox" id="navToggle" class="app-nav-toggle sr-only" />
+<label for="navToggle" class="app-leftnav-backdrop"></label>
+<nav class="app-leftnav" aria-label="Primary">
+  <div class="app-nav-section-label">Workspace</div>
+      <a href="dashboard.html" class="app-nav-item" data-page="dashboard"><i class="ph ph-gauge"></i><span>Dashboard</span></a>
+      <a href="atlas.html" class="app-nav-item" data-page="atlas"><i class="ph ph-graph"></i><span>Atlas</span></a>
+      <a href="sage.html" class="app-nav-item" data-page="sage"><i class="ph ph-chats-circle"></i><span>Sage</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Context</div>
+      <a href="context.html" class="app-nav-item active" data-page="context"><i class="ph ph-stack"></i><span>Context Layers</span></a>
+      <a href="token-compaction.html" class="app-nav-item" data-page="token-compaction"><i class="ph ph-funnel"></i><span>Token Compaction</span></a>
+      <a href="history.html" class="app-nav-item" data-page="history"><i class="ph ph-clock-counter-clockwise"></i><span>History</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Connect</div>
+      <a href="connections.html" class="app-nav-item" data-page="connections"><i class="ph ph-plugs-connected"></i><span>Connections</span></a>
+      <a href="upload-data.html" class="app-nav-item" data-page="upload-data"><i class="ph ph-upload-simple"></i><span>Upload Data</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Build</div>
+      <a href="agents.html" class="app-nav-item" data-page="agents"><i class="ph ph-sparkle"></i><span>Agents</span></a>
+      <a href="marketplace.html" class="app-nav-item" data-page="marketplace"><i class="ph ph-books"></i><span>Expert Libraries</span><span class="nav-badge">New</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Account</div>
+      <a href="export.html" class="app-nav-item" data-page="export"><i class="ph ph-download-simple"></i><span>Export &amp; Data</span></a>
+      <a href="settings.html" class="app-nav-item" data-page="settings"><i class="ph ph-gear-six"></i><span>Settings</span></a>
+</nav>
+  <main class="app-content">
+  <div class="layers-page">
+    <div class="atlas-breadcrumb">
+      <a href="dashboard.html">Dashboard</a>
+      <i class="ph ph-caret-right"></i>
+      <span>Context Layers</span>
+    </div>
+    <header class="layers-hero">
+      <div class="t-label-mono layers-eyebrow">The Context Architecture</div>
+      <h1 class="layers-hero-title">Six dimensions. <em>Three depth layers.</em> One <em>coherent</em> you.</h1>
+      <p class="layers-hero-deck">
+        Every dimension captured at three depths. Surface <strong>facts</strong> you'd put on a résumé.
+        The <strong>beliefs</strong> and frameworks underneath. The <strong>preferences</strong> that shape
+        how you actually live. <strong>18 cells.</strong> One model. Sage builds the deeper layers most AI tools never see.
+      </p>
+    </header>
+    <section class="layers-summary">
+      <article class="layer-card layer-card-facts">
+        <div class="t-label-mono layer-card-eyebrow">Layer 01</div>
+        <h2 class="layer-card-title">Facts.</h2>
+        <p class="layer-card-sub">What is true</p>
+        <p class="layer-card-body">Roles, locations, demographics, lifestyle. The verifiable surface of who you are.</p>
+      </article>
+      <article class="layer-card layer-card-beliefs">
+        <div class="t-label-mono layer-card-eyebrow">Layer 02</div>
+        <h2 class="layer-card-title">Beliefs.</h2>
+        <p class="layer-card-sub">How you think</p>
+        <p class="layer-card-body">Values, motivations, decision patterns, communication style. The lens you see the world through.</p>
+      </article>
+      <article class="layer-card layer-card-preferences">
+        <div class="t-label-mono layer-card-eyebrow">Layer 03</div>
+        <h2 class="layer-card-title">Preferences.</h2>
+        <p class="layer-card-sub">How you live</p>
+        <p class="layer-card-body">Brand affinities, dietary choices, aesthetic taste, tone of voice. The texture of your daily life.</p>
+      </article>
+    </section>
+    <section class="layers-matrix-wrap">
+      <div class="layers-matrix-head">
+        <div>
+          <h2 class="layers-matrix-title">Your <em>matrix.</em></h2>
+          <p class="layers-matrix-deck">18 cells. Click any to see what's known.</p>
+        </div>
+        <div class="layers-matrix-meta">
+          <span class="t-label-mono">DEPTH</span>
+          <div class="layers-depth-key">
+            <span class="depth-ring depth-ring-1"></span>
+            <span class="depth-ring depth-ring-2"></span>
+            <span class="depth-ring depth-ring-3"></span>
+            <span class="depth-key-label">Surface → Deep</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="layers-matrix">
+        <div class="matrix-row matrix-row-head">
+          <div class="matrix-cell matrix-cell-corner"></div>
+          <div class="matrix-cell matrix-cell-col-head">
+            <i class="ph ph-briefcase" style="color: var(--dim-professional);"></i>
+            <span>Professional</span>
+          </div>
+          <div class="matrix-cell matrix-cell-col-head">
+            <i class="ph ph-coffee" style="color: var(--dim-worklife);"></i>
+            <span>Work Life</span>
+          </div>
+          <div class="matrix-cell matrix-cell-col-head">
+            <i class="ph ph-compass" style="color: var(--dim-interests);"></i>
+            <span>Interests</span>
+          </div>
+          <div class="matrix-cell matrix-cell-col-head">
+            <i class="ph ph-palette" style="color: var(--dim-aesthetic);"></i>
+            <span>Aesthetic</span>
+          </div>
+          <div class="matrix-cell matrix-cell-col-head">
+            <i class="ph ph-shopping-bag" style="color: var(--dim-consumer);"></i>
+            <span>Consumer</span>
+          </div>
+          <div class="matrix-cell matrix-cell-col-head">
+            <i class="ph ph-users-three" style="color: var(--dim-relationships);"></i>
+            <span>Relationships</span>
+          </div>
+        </div>
+        <div class="matrix-row matrix-row-facts">
+          <div class="matrix-cell matrix-cell-row-head">
+            <div class="t-label-mono">Layer 01</div>
+            <div class="row-head-name"><em>Facts</em></div>
+            <div class="row-head-sub">What is true</div>
+          </div>
+          <a class="matrix-cell matrix-cell-data layer-facts" 
+            href="context-detail.html?layer=facts&dim=professional"
+            style="--c: var(--dim-professional); --c-tint: var(--dim-professional-tint);">
+            <div class="cell-topic">Roles & expertise</div>
+            <div class="cell-meta">
+              <span class="cell-count">14 nodes</span>
+              <span class="cell-freshness">2d ago</span>
+            </div>
+          </a>
+          <a class="matrix-cell matrix-cell-data layer-facts" 
+            href="context-detail.html?layer=facts&dim=worklife"
+            style="--c: var(--dim-worklife); --c-tint: var(--dim-worklife-tint);">
+            <div class="cell-topic">Routines & cadence</div>
+            <div class="cell-meta">
+              <span class="cell-count">11 nodes</span>
+              <span class="cell-freshness">3d ago</span>
+            </div>
+          </a>
+          <a class="matrix-cell matrix-cell-data layer-facts" 
+            href="context-detail.html?layer=facts&dim=interests"
+            style="--c: var(--dim-interests); --c-tint: var(--dim-interests-tint);">
+            <div class="cell-topic">Hobbies & topics</div>
+            <div class="cell-meta">
+              <span class="cell-count">18 nodes</span>
+              <span class="cell-freshness">1d ago</span>
+            </div>
+          </a>
+          <a class="matrix-cell matrix-cell-data layer-facts" 
+            href="context-detail.html?layer=facts&dim=aesthetic"
+            style="--c: var(--dim-aesthetic); --c-tint: var(--dim-aesthetic-tint);">
+            <div class="cell-topic">Personal style</div>
+            <div class="cell-meta">
+              <span class="cell-count">7 nodes</span>
+              <span class="cell-freshness">5d ago</span>
+            </div>
+          </a>
+          <a class="matrix-cell matrix-cell-data layer-facts" 
+            href="context-detail.html?layer=facts&dim=consumer"
+            style="--c: var(--dim-consumer); --c-tint: var(--dim-consumer-tint);">
+            <div class="cell-topic">Brands & products</div>
+            <div class="cell-meta">
+              <span class="cell-count">12 nodes</span>
+              <span class="cell-freshness">2d ago</span>
+            </div>
+          </a>
+          <a class="matrix-cell matrix-cell-data layer-facts" 
+            href="context-detail.html?layer=facts&dim=relationships"
+            style="--c: var(--dim-relationships); --c-tint: var(--dim-relationships-tint);">
+            <div class="cell-topic">Family & network</div>
+            <div class="cell-meta">
+              <span class="cell-count">9 nodes</span>
+              <span class="cell-freshness">4d ago</span>
+            </div>
+          </a>
+        </div>
+        <div class="matrix-row matrix-row-beliefs">
+          <div class="matrix-cell matrix-cell-row-head">
+            <div class="t-label-mono">Layer 02</div>
+            <div class="row-head-name"><em>Beliefs</em></div>
+            <div class="row-head-sub">How you think</div>
+          </div>
+          <a class="matrix-cell matrix-cell-data layer-beliefs" 
+            href="context-detail.html?layer=beliefs&dim=professional"
+            style="--c: var(--dim-professional); --c-tint: var(--dim-professional-tint);">
+            <div class="cell-topic">Career values</div>
+            <div class="cell-meta">
+              <span class="cell-count">23 nodes</span>
+              <span class="cell-freshness">2d ago</span>
+            </div>
+          </a>
+          <a class="matrix-cell matrix-cell-data layer-beliefs" 
+            href="context-detail.html?layer=beliefs&dim=worklife"
+            style="--c: var(--dim-worklife); --c-tint: var(--dim-worklife-tint);">
+            <div class="cell-topic">Operating principles</div>
+            <div class="cell-meta">
+              <span class="cell-count">19 nodes</span>
+              <span class="cell-freshness">3d ago</span>
+            </div>
+          </a>
+          <a class="matrix-cell matrix-cell-data layer-beliefs" 
+            href="context-detail.html?layer=beliefs&dim=interests"
+            style="--c: var(--dim-interests); --c-tint: var(--dim-interests-tint);">
+            <div class="cell-topic">Curiosity drivers</div>
+            <div class="cell-meta">
+              <span class="cell-count">17 nodes</span>
+              <span class="cell-freshness">1d ago</span>
+            </div>
+          </a>
+          <a class="matrix-cell matrix-cell-data layer-beliefs" 
+            href="context-detail.html?layer=beliefs&dim=aesthetic"
+            style="--c: var(--dim-aesthetic); --c-tint: var(--dim-aesthetic-tint);">
+            <div class="cell-topic">Taste principles</div>
+            <div class="cell-meta">
+              <span class="cell-count">8 nodes</span>
+              <span class="cell-freshness">5d ago</span>
+            </div>
+          </a>
+          <a class="matrix-cell matrix-cell-data layer-beliefs" 
+            href="context-detail.html?layer=beliefs&dim=consumer"
+            style="--c: var(--dim-consumer); --c-tint: var(--dim-consumer-tint);">
+            <div class="cell-topic">Money mindset</div>
+            <div class="cell-meta">
+              <span class="cell-count">14 nodes</span>
+              <span class="cell-freshness">2d ago</span>
+            </div>
+          </a>
+          <a class="matrix-cell matrix-cell-data layer-beliefs" 
+            href="context-detail.html?layer=beliefs&dim=relationships"
+            style="--c: var(--dim-relationships); --c-tint: var(--dim-relationships-tint);">
+            <div class="cell-topic">Trust frameworks</div>
+            <div class="cell-meta">
+              <span class="cell-count">11 nodes</span>
+              <span class="cell-freshness">4d ago</span>
+            </div>
+          </a>
+        </div>
+        <div class="matrix-row matrix-row-preferences">
+          <div class="matrix-cell matrix-cell-row-head">
+            <div class="t-label-mono">Layer 03</div>
+            <div class="row-head-name"><em>Preferences</em></div>
+            <div class="row-head-sub">How you live</div>
+          </div>
+          <a class="matrix-cell matrix-cell-data layer-preferences" 
+            href="context-detail.html?layer=preferences&dim=professional"
+            style="--c: var(--dim-professional); --c-tint: var(--dim-professional-tint);">
+            <div class="cell-topic">Communication style</div>
+            <div class="cell-meta">
+              <span class="cell-count">31 nodes</span>
+              <span class="cell-freshness">12 min ago</span>
+            </div>
+          </a>
+          <a class="matrix-cell matrix-cell-data layer-preferences" 
+            href="context-detail.html?layer=preferences&dim=worklife"
+            style="--c: var(--dim-worklife); --c-tint: var(--dim-worklife-tint);">
+            <div class="cell-topic">Daily blocks & focus</div>
+            <div class="cell-meta">
+              <span class="cell-count">24 nodes</span>
+              <span class="cell-freshness">5h ago</span>
+            </div>
+          </a>
+          <a class="matrix-cell matrix-cell-data layer-preferences" 
+            href="context-detail.html?layer=preferences&dim=interests"
+            style="--c: var(--dim-interests); --c-tint: var(--dim-interests-tint);">
+            <div class="cell-topic">Discovery rituals</div>
+            <div class="cell-meta">
+              <span class="cell-count">20 nodes</span>
+              <span class="cell-freshness">1d ago</span>
+            </div>
+          </a>
+          <a class="matrix-cell matrix-cell-data layer-preferences" 
+            href="context-detail.html?layer=preferences&dim=aesthetic"
+            style="--c: var(--dim-aesthetic); --c-tint: var(--dim-aesthetic-tint);">
+            <div class="cell-topic">Brands & tone</div>
+            <div class="cell-meta">
+              <span class="cell-count">13 nodes</span>
+              <span class="cell-freshness">3d ago</span>
+            </div>
+          </a>
+          <a class="matrix-cell matrix-cell-data layer-preferences" 
+            href="context-detail.html?layer=preferences&dim=consumer"
+            style="--c: var(--dim-consumer); --c-tint: var(--dim-consumer-tint);">
+            <div class="cell-topic">Spending habits</div>
+            <div class="cell-meta">
+              <span class="cell-count">17 nodes</span>
+              <span class="cell-freshness">2d ago</span>
+            </div>
+          </a>
+          <a class="matrix-cell matrix-cell-data layer-preferences" 
+            href="context-detail.html?layer=preferences&dim=relationships"
+            style="--c: var(--dim-relationships); --c-tint: var(--dim-relationships-tint);">
+            <div class="cell-topic">Social cadence</div>
+            <div class="cell-meta">
+              <span class="cell-count">13 nodes</span>
+              <span class="cell-freshness">4d ago</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+    <section class="layers-foot">
+      <div class="layers-foot-text">
+        <h3 class="layers-foot-title">Want to deepen a layer?</h3>
+        <p>Sage interviews you to build the deeper layers. <em>Beliefs</em> and <em>Preferences</em> are where most AI tools fall short.</p>
+      </div>
+      <div class="layers-foot-actions">
+        <a href="sage.html" class="btn btn-primary terra btn-lg"><i class="ph ph-chats-circle"></i> Continue with Sage</a>
+        <a href="atlas.html" class="btn btn-secondary btn-lg"><i class="ph ph-graph"></i> Open Atlas</a>
+      </div>
+    </section>
+  </div>
+</main>
+</div>
+</body>
+</html>
