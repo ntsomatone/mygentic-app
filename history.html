@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>History · MyGentic</title>
+<link rel="stylesheet" href="app.css" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+
+<style>
+
+  .app-content { padding: 0; }
+  .history-page {
+    max-width: var(--w-bleed);
+    margin: 0 auto;
+    padding: var(--s-5) var(--s-6) var(--s-9);
+  }
+  @media (max-width: 900px) {
+    .history-page { padding: var(--s-4) var(--s-4) var(--s-7); }
+  }
+
+  /* Breadcrumb */
+  .atlas-breadcrumb {
+    display: flex; align-items: center; gap: var(--s-2);
+    font-family: var(--f-mono); font-size: 11px;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--ink-mute);
+    padding: var(--s-2) 0 var(--s-4);
+  }
+  .atlas-breadcrumb a { color: var(--ink-mute); }
+  .atlas-breadcrumb a:hover { color: var(--terra); }
+  .atlas-breadcrumb i { font-size: 14px; opacity: 0.6; }
+
+  /* Hero */
+  .history-hero {
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: var(--s-5);
+    margin-bottom: var(--s-5);
+    max-width: 980px;
+  }
+  .history-eyebrow { color: var(--terra); margin-bottom: var(--s-3); }
+  .history-hero-title {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: clamp(40px, 5vw, 64px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: var(--s-3);
+  }
+  .history-hero-title em { font-style: italic; }
+  .history-hero-deck {
+    font-size: 16px; line-height: 1.55;
+    color: var(--ink-soft);
+    max-width: 720px;
+  }
+  .history-hero-deck em {
+    font-family: var(--f-display); font-style: italic;
+    color: var(--terra);
+  }
+
+  /* Controls bar */
+  .history-controls {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: var(--s-4);
+    flex-wrap: wrap;
+    padding: var(--s-3) 0;
+    margin-bottom: var(--s-5);
+    border-bottom: 1px solid var(--rule);
+  }
+  .history-filters {
+    display: flex; gap: 6px; flex-wrap: wrap;
+  }
+  .history-filter {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    color: var(--ink-soft);
+    font-family: var(--f-body);
+    font-size: 12px; font-weight: 500;
+    cursor: pointer;
+    transition: background var(--t-fast), border-color var(--t-fast);
+  }
+  .history-filter:hover {
+    background: var(--paper-3);
+    border-color: var(--rule-strong);
+  }
+  .history-filter-active {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+  .history-filter-active:hover {
+    background: var(--ink);
+    border-color: var(--ink);
+  }
+  .history-filter i { font-size: 13px; }
+  .filter-count {
+    font-family: var(--f-mono); font-size: 10px;
+    color: var(--ink-mute);
+    margin-left: 2px;
+  }
+  .history-filter-active .filter-count { color: rgba(255,255,255,0.5); }
+
+  .history-actions {
+    display: flex; align-items: center; gap: var(--s-2);
+  }
+  .history-search {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 12px;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    width: 220px;
+  }
+  .history-search input {
+    flex: 1; background: transparent; border: 0; outline: 0;
+    font-family: var(--f-body); font-size: 13px;
+    color: var(--ink);
+  }
+  .history-search input::placeholder { color: var(--ink-mute); }
+  .history-search i { color: var(--ink-mute); font-size: 14px; }
+
+  .btn-sm {
+    padding: 6px 12px; font-size: 12px;
+  }
+
+  /* Event dot colors — these are also used in filter pills */
+  .event-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+  .event-dot-sage    { background: #5BA3D0; }
+  .event-dot-capture { background: var(--terra); }
+  .event-dot-ingest  { background: #D89534; }
+  .event-dot-deepen  { background: #B8552E; }
+  .event-dot-agent   { background: #7C9C5E; }
+  .event-dot-library { background: #C97956; }
+  .event-dot-merge   { background: #B59FF0; }
+
+  /* Timeline */
+  .history-timeline {
+    display: flex; flex-direction: column;
+    gap: var(--s-6);
+  }
+
+  .history-day-head {
+    padding: var(--s-2) 0 var(--s-3);
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: var(--s-3);
+  }
+  .history-day-head .t-label-mono {
+    color: var(--ink-mute);
+    font-weight: 600;
+  }
+
+  .history-day-events {
+    display: flex; flex-direction: column;
+    gap: var(--s-3);
+  }
+
+  .history-event {
+    display: grid;
+    grid-template-columns: 32px 80px 1fr;
+    gap: var(--s-3);
+    align-items: stretch;
+    position: relative;
+  }
+  @media (max-width: 700px) {
+    .history-event { grid-template-columns: 24px 1fr; }
+    .history-event-time { display: none; }
+  }
+
+  /* Rail dot + line */
+  .history-event-rail {
+    display: flex; flex-direction: column; align-items: center;
+    padding-top: 16px;
+  }
+  .history-event-rail .event-dot {
+    width: 10px; height: 10px;
+    border: 2px solid var(--paper);
+    box-shadow: 0 0 0 1px currentColor;
+  }
+  .event-rail-line {
+    flex: 1;
+    width: 1px;
+    background: var(--rule);
+    margin-top: 6px;
+  }
+  .history-day-events .history-event:last-child .event-rail-line {
+    background: transparent;
+  }
+
+  /* Time column */
+  .history-event-time {
+    padding-top: 16px;
+  }
+  .history-event-time .t-label-mono {
+    color: var(--ink-mute);
+  }
+
+  /* Event card */
+  .history-event-card {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    padding: var(--s-3) var(--s-4);
+    transition: border-color var(--t-fast), background var(--t-fast);
+  }
+  .history-event-card:hover {
+    border-color: var(--rule-strong);
+    background: var(--paper-2);
+  }
+
+  .event-card-head {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: var(--s-2);
+  }
+  .event-card-eyebrow {
+    display: flex; align-items: center; gap: 6px;
+    font-family: var(--f-mono); font-size: 10px;
+    color: var(--ink-mute); letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .event-card-eyebrow i { font-size: 13px; }
+  .event-card-divider { opacity: 0.4; }
+  .event-card-dim {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .event-card-menu {
+    color: var(--ink-mute);
+    width: 24px; height: 24px;
+    border-radius: 4px;
+    display: grid; place-items: center;
+    transition: background var(--t-fast);
+  }
+  .event-card-menu:hover { background: var(--paper-3); color: var(--ink); }
+  .event-card-menu i { font-size: 16px; }
+
+  .event-card-title {
+    font-family: var(--f-body);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: var(--s-1);
+    line-height: 1.3;
+  }
+  .event-card-body {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    margin-bottom: var(--s-3);
+  }
+
+  .event-card-foot {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-top: var(--s-2);
+    border-top: 1px solid var(--rule);
+  }
+  .event-card-meta { color: var(--ink-mute); }
+  .event-card-link {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-family: var(--f-body); font-size: 12px; font-weight: 500;
+    color: var(--ink);
+  }
+  .event-card-link:hover { color: var(--terra); }
+  .event-card-link i { font-size: 13px; }
+
+  /* Event-type left accent */
+  .event-sage    .history-event-card { border-left: 2px solid #5BA3D0; }
+  .event-capture .history-event-card { border-left: 2px solid var(--terra); }
+  .event-ingest  .history-event-card { border-left: 2px solid #D89534; }
+  .event-deepen  .history-event-card { border-left: 2px solid #B8552E; }
+  .event-agent   .history-event-card { border-left: 2px solid #7C9C5E; }
+  .event-library .history-event-card { border-left: 2px solid #C97956; }
+  .event-merge   .history-event-card { border-left: 2px solid #B59FF0; }
+
+  /* Foot */
+  .history-foot {
+    margin-top: var(--s-7);
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    padding: var(--s-6);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: var(--s-4);
+  }
+  .history-foot-title {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: 28px; letter-spacing: -0.01em; line-height: 1.1;
+    color: var(--ink);
+    margin-bottom: var(--s-2);
+  }
+  .history-foot p {
+    font-size: 15px; color: var(--ink-soft); line-height: 1.5;
+    max-width: 540px;
+  }
+  .history-foot p em { font-style: italic; color: var(--terra); }
+  .history-foot-actions {
+    display: flex; gap: var(--s-3); flex-wrap: wrap;
+  }
+
+</style>
+</head>
+<body class="app-shell history-body">
+<header class="app-topbar">
+  <div class="app-topbar-inner">
+    <label for="navToggle" class="app-burger" aria-label="Open navigation"><i class="ph ph-list"></i></label>
+    <a class="app-brand" href="dashboard.html">My<span class="accent">Gen</span>tic</a>
+    <h1 class="app-page-title">History</h1>
+    <div class="app-topbar-actions">
+      <div class="app-topbar-search">
+        <i class="ph ph-magnifying-glass"></i>
+        <input type="text" placeholder="Search your context, agents, libraries…" />
+        <kbd>⌘K</kbd>
+      </div>
+      <button class="app-icon-btn" aria-label="Notifications"><i class="ph ph-bell"></i><span class="dot"></span></button>
+      <button class="app-avatar" aria-label="User menu">NA</button>
+    </div>
+  </div>
+</header>
+<div class="app-layout">
+  <input type="checkbox" id="navToggle" class="app-nav-toggle sr-only" />
+<label for="navToggle" class="app-leftnav-backdrop"></label>
+<nav class="app-leftnav" aria-label="Primary">
+  <div class="app-nav-section-label">Workspace</div>
+      <a href="dashboard.html" class="app-nav-item" data-page="dashboard"><i class="ph ph-gauge"></i><span>Dashboard</span></a>
+      <a href="atlas.html" class="app-nav-item" data-page="atlas"><i class="ph ph-graph"></i><span>Atlas</span></a>
+      <a href="sage.html" class="app-nav-item" data-page="sage"><i class="ph ph-chats-circle"></i><span>Sage</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Context</div>
+      <a href="context.html" class="app-nav-item" data-page="context"><i class="ph ph-stack"></i><span>Context Layers</span></a>
+      <a href="token-compaction.html" class="app-nav-item" data-page="token-compaction"><i class="ph ph-funnel"></i><span>Token Compaction</span></a>
+      <a href="history.html" class="app-nav-item active" data-page="history"><i class="ph ph-clock-counter-clockwise"></i><span>History</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Connect</div>
+      <a href="connections.html" class="app-nav-item" data-page="connections"><i class="ph ph-plugs-connected"></i><span>Connections</span></a>
+      <a href="upload-data.html" class="app-nav-item" data-page="upload-data"><i class="ph ph-upload-simple"></i><span>Upload Data</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Build</div>
+      <a href="agents.html" class="app-nav-item" data-page="agents"><i class="ph ph-sparkle"></i><span>Agents</span></a>
+      <a href="marketplace.html" class="app-nav-item" data-page="marketplace"><i class="ph ph-books"></i><span>Expert Libraries</span><span class="nav-badge">New</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Account</div>
+      <a href="export.html" class="app-nav-item" data-page="export"><i class="ph ph-download-simple"></i><span>Export &amp; Data</span></a>
+      <a href="settings.html" class="app-nav-item" data-page="settings"><i class="ph ph-gear-six"></i><span>Settings</span></a>
+</nav>
+  <main class="app-content history-content">
+  <div class="history-page">
+    <div class="atlas-breadcrumb">
+      <a href="dashboard.html">Dashboard</a>
+      <i class="ph ph-caret-right"></i>
+      <span>History</span>
+    </div>
+    <header class="history-hero">
+      <div class="t-label-mono history-eyebrow">Everything Sage has noticed</div>
+      <h1 class="history-hero-title">Your <em>history.</em></h1>
+      <p class="history-hero-deck">
+        Every conversation, capture, ingestion, and decision Sage has surfaced about you.
+        <em>Filter by what matters.</em> Export anything. Rewind anytime.
+      </p>
+    </header>
+    <div class="history-controls">
+      <div class="history-filters">
+        <button class="history-filter history-filter-active">
+          <i class="ph ph-list"></i> All <span class="filter-count">142</span>
+        </button>
+        <button class="history-filter">
+          <span class="event-dot event-dot-sage"></span> Sage <span class="filter-count">38</span>
+        </button>
+        <button class="history-filter">
+          <span class="event-dot event-dot-capture"></span> Captures <span class="filter-count">47</span>
+        </button>
+        <button class="history-filter">
+          <span class="event-dot event-dot-ingest"></span> Ingestions <span class="filter-count">29</span>
+        </button>
+        <button class="history-filter">
+          <span class="event-dot event-dot-deepen"></span> Deepenings <span class="filter-count">14</span>
+        </button>
+        <button class="history-filter">
+          <span class="event-dot event-dot-agent"></span> Agent runs <span class="filter-count">9</span>
+        </button>
+        <button class="history-filter">
+          <span class="event-dot event-dot-library"></span> Libraries <span class="filter-count">3</span>
+        </button>
+        <button class="history-filter">
+          <span class="event-dot event-dot-merge"></span> Merges <span class="filter-count">2</span>
+        </button>
+      </div>
+      <div class="history-actions">
+        <div class="history-search">
+          <i class="ph ph-magnifying-glass"></i>
+          <input type="search" placeholder="Search history…">
+        </div>
+        <button class="btn btn-secondary btn-sm"><i class="ph ph-download-simple"></i> Export</button>
+      </div>
+    </div>
+    <div class="history-timeline">
+      <section class="history-day">
+        <div class="history-day-head"><span class="t-label-mono">TODAY · MAY 7</span></div>
+        <div class="history-day-events">
+          <article class="history-event event-sage">
+            <div class="history-event-rail">
+              <span class="event-dot event-dot-sage"></span>
+              <span class="event-rail-line"></span>
+            </div>
+            <div class="history-event-time">
+              <span class="t-label-mono">10:42 AM</span>
+            </div>
+            <div class="history-event-card">
+              <div class="event-card-head">
+                <div class="event-card-eyebrow">
+                  <i class="ph ph-chats-circle"></i>
+                  <span class="t-label-mono">Sage</span>
+                  <span class="event-card-divider">·</span>
+                  <span class="event-card-dim">Work Life</span>
+                </div>
+                <button class="event-card-menu" aria-label="Event menu"><i class="ph ph-dots-three"></i></button>
+              </div>
+              <h3 class="event-card-title">Workspace setup</h3>
+              <p class="event-card-body">Captured: direct, brief, no flattery, commas over em-dashes, warmth reserved for relationships that earn it.</p>
+              <div class="event-card-foot">
+                <span class="t-label-mono event-card-meta">8 turns · 3 facts · 1 belief</span>
+                <a class="event-card-link" href="#">Open <i class="ph ph-arrow-up-right"></i></a>
+              </div>
+            </div>
+          </article>
+          <article class="history-event event-deepen">
+            <div class="history-event-rail">
+              <span class="event-dot event-dot-deepen"></span>
+              <span class="event-rail-line"></span>
+            </div>
+            <div class="history-event-time">
+              <span class="t-label-mono">10:38 AM</span>
+            </div>
+            <div class="history-event-card">
+              <div class="event-card-head">
+                <div class="event-card-eyebrow">
+                  <i class="ph ph-arrow-up"></i>
+                  <span class="t-label-mono">Deepening</span>
+                  <span class="event-card-divider">·</span>
+                  <span class="event-card-dim">Communication</span>
+                </div>
+                <button class="event-card-menu" aria-label="Event menu"><i class="ph ph-dots-three"></i></button>
+              </div>
+              <h3 class="event-card-title">Promoted to Layer 03</h3>
+              <p class="event-card-body">Tone preferences moved from Beliefs to Preferences. Sage confirmed across two separate conversations.</p>
+              <div class="event-card-foot">
+                <span class="t-label-mono event-card-meta">Layer 02 → Layer 03 · Confidence 0.91</span>
+                <a class="event-card-link" href="#">Open <i class="ph ph-arrow-up-right"></i></a>
+              </div>
+            </div>
+          </article>
+          <article class="history-event event-ingest">
+            <div class="history-event-rail">
+              <span class="event-dot event-dot-ingest"></span>
+              <span class="event-rail-line"></span>
+            </div>
+            <div class="history-event-time">
+              <span class="t-label-mono">9:14 AM</span>
+            </div>
+            <div class="history-event-card">
+              <div class="event-card-head">
+                <div class="event-card-eyebrow">
+                  <i class="ph ph-arrow-down-right"></i>
+                  <span class="t-label-mono">Ingestion</span>
+                  <span class="event-card-divider">·</span>
+                  <span class="event-card-dim">Work Life</span>
+                </div>
+                <button class="event-card-menu" aria-label="Event menu"><i class="ph ph-dots-three"></i></button>
+              </div>
+              <h3 class="event-card-title">Calendar synced</h3>
+              <p class="event-card-body">12 events from this week added. 4 deep-work blocks identified, 3 of which were broken by Slack interruptions.</p>
+              <div class="event-card-foot">
+                <span class="t-label-mono event-card-meta">Google Calendar · 12 events</span>
+                <a class="event-card-link" href="#">Open <i class="ph ph-arrow-up-right"></i></a>
+              </div>
+            </div>
+          </article>
+          <article class="history-event event-capture">
+            <div class="history-event-rail">
+              <span class="event-dot event-dot-capture"></span>
+              <span class="event-rail-line"></span>
+            </div>
+            <div class="history-event-time">
+              <span class="t-label-mono">8:47 AM</span>
+            </div>
+            <div class="history-event-card">
+              <div class="event-card-head">
+                <div class="event-card-eyebrow">
+                  <i class="ph ph-note-pencil"></i>
+                  <span class="t-label-mono">Capture</span>
+                  <span class="event-card-divider">·</span>
+                  <span class="event-card-dim">Interests</span>
+                </div>
+                <button class="event-card-menu" aria-label="Event menu"><i class="ph ph-dots-three"></i></button>
+              </div>
+              <h3 class="event-card-title">Track day prep notes</h3>
+              <p class="event-card-body">Quick capture from voice memo: tire pressures for Chuckwalla — 32F/30R cold, drop 2psi after first session.</p>
+              <div class="event-card-foot">
+                <span class="t-label-mono event-card-meta">iOS Voice Memos · 47 sec</span>
+                <a class="event-card-link" href="#">Open <i class="ph ph-arrow-up-right"></i></a>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+      <section class="history-day">
+        <div class="history-day-head"><span class="t-label-mono">YESTERDAY · MAY 6</span></div>
+        <div class="history-day-events">
+          <article class="history-event event-agent">
+            <div class="history-event-rail">
+              <span class="event-dot event-dot-agent"></span>
+              <span class="event-rail-line"></span>
+            </div>
+            <div class="history-event-time">
+              <span class="t-label-mono">5:22 PM</span>
+            </div>
+            <div class="history-event-card">
+              <div class="event-card-head">
+                <div class="event-card-eyebrow">
+                  <i class="ph ph-sparkle"></i>
+                  <span class="t-label-mono">Agent</span>
+                  <span class="event-card-divider">·</span>
+                  <span class="event-card-dim">Professional</span>
+                </div>
+                <button class="event-card-menu" aria-label="Event menu"><i class="ph ph-dots-three"></i></button>
+              </div>
+              <h3 class="event-card-title">Investor reply drafted</h3>
+              <p class="event-card-body">Agent drafted reply to Aurora Capital follow-up question on revenue projections. Flagged for review.</p>
+              <div class="event-card-foot">
+                <span class="t-label-mono event-card-meta">Run 0.8s · 1,247 tokens · Awaiting approval</span>
+                <a class="event-card-link" href="#">Open <i class="ph ph-arrow-up-right"></i></a>
+              </div>
+            </div>
+          </article>
+          <article class="history-event event-sage">
+            <div class="history-event-rail">
+              <span class="event-dot event-dot-sage"></span>
+              <span class="event-rail-line"></span>
+            </div>
+            <div class="history-event-time">
+              <span class="t-label-mono">3:10 PM</span>
+            </div>
+            <div class="history-event-card">
+              <div class="event-card-head">
+                <div class="event-card-eyebrow">
+                  <i class="ph ph-chats-circle"></i>
+                  <span class="t-label-mono">Sage</span>
+                  <span class="event-card-divider">·</span>
+                  <span class="event-card-dim">Aesthetic</span>
+                </div>
+                <button class="event-card-menu" aria-label="Event menu"><i class="ph ph-dots-three"></i></button>
+              </div>
+              <h3 class="event-card-title">Aesthetic preferences</h3>
+              <p class="event-card-body">Walked through brand affinities for personal site refresh. Captured: editorial serif, warm palette, generous whitespace.</p>
+              <div class="event-card-foot">
+                <span class="t-label-mono event-card-meta">14 turns · 9 facts · 4 beliefs</span>
+                <a class="event-card-link" href="#">Open <i class="ph ph-arrow-up-right"></i></a>
+              </div>
+            </div>
+          </article>
+          <article class="history-event event-library">
+            <div class="history-event-rail">
+              <span class="event-dot event-dot-library"></span>
+              <span class="event-rail-line"></span>
+            </div>
+            <div class="history-event-time">
+              <span class="t-label-mono">11:55 AM</span>
+            </div>
+            <div class="history-event-card">
+              <div class="event-card-head">
+                <div class="event-card-eyebrow">
+                  <i class="ph ph-books"></i>
+                  <span class="t-label-mono">Library</span>
+                  <span class="event-card-divider">·</span>
+                  <span class="event-card-dim">Professional</span>
+                </div>
+                <button class="event-card-menu" aria-label="Event menu"><i class="ph ph-dots-three"></i></button>
+              </div>
+              <h3 class="event-card-title">Founder OS · activated</h3>
+              <p class="event-card-body">Layered Founder OS expert library on top of Professional dimension. Operating frameworks now available to agents.</p>
+              <div class="event-card-foot">
+                <span class="t-label-mono event-card-meta">Industry Rockstar · 187 frameworks</span>
+                <a class="event-card-link" href="#">Open <i class="ph ph-arrow-up-right"></i></a>
+              </div>
+            </div>
+          </article>
+          <article class="history-event event-ingest">
+            <div class="history-event-rail">
+              <span class="event-dot event-dot-ingest"></span>
+              <span class="event-rail-line"></span>
+            </div>
+            <div class="history-event-time">
+              <span class="t-label-mono">9:30 AM</span>
+            </div>
+            <div class="history-event-card">
+              <div class="event-card-head">
+                <div class="event-card-eyebrow">
+                  <i class="ph ph-arrow-down-right"></i>
+                  <span class="t-label-mono">Ingestion</span>
+                  <span class="event-card-divider">·</span>
+                  <span class="event-card-dim">Work Life</span>
+                </div>
+                <button class="event-card-menu" aria-label="Event menu"><i class="ph ph-dots-three"></i></button>
+              </div>
+              <h3 class="event-card-title">LinkedIn updated</h3>
+              <p class="event-card-body">42 nodes from your LinkedIn profile added or updated. New role at MyGentic now reflected.</p>
+              <div class="event-card-foot">
+                <span class="t-label-mono event-card-meta">LinkedIn · 42 nodes</span>
+                <a class="event-card-link" href="#">Open <i class="ph ph-arrow-up-right"></i></a>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+      <section class="history-day">
+        <div class="history-day-head"><span class="t-label-mono">2 DAYS AGO · MAY 5</span></div>
+        <div class="history-day-events">
+          <article class="history-event event-merge">
+            <div class="history-event-rail">
+              <span class="event-dot event-dot-merge"></span>
+              <span class="event-rail-line"></span>
+            </div>
+            <div class="history-event-time">
+              <span class="t-label-mono">7:48 PM</span>
+            </div>
+            <div class="history-event-card">
+              <div class="event-card-head">
+                <div class="event-card-eyebrow">
+                  <i class="ph ph-git-merge"></i>
+                  <span class="t-label-mono">Merge</span>
+                  <span class="event-card-divider">·</span>
+                  <span class="event-card-dim">Relationships</span>
+                </div>
+                <button class="event-card-menu" aria-label="Event menu"><i class="ph ph-dots-three"></i></button>
+              </div>
+              <h3 class="event-card-title">Reconciled co-founder roles</h3>
+              <p class="event-card-body">Sage noticed two slightly different framings of Kane's role across threads. Merged into single canonical fact.</p>
+              <div class="event-card-foot">
+                <span class="t-label-mono event-card-meta">Confidence 0.88 · 2 sources reconciled</span>
+                <a class="event-card-link" href="#">Open <i class="ph ph-arrow-up-right"></i></a>
+              </div>
+            </div>
+          </article>
+          <article class="history-event event-sage">
+            <div class="history-event-rail">
+              <span class="event-dot event-dot-sage"></span>
+              <span class="event-rail-line"></span>
+            </div>
+            <div class="history-event-time">
+              <span class="t-label-mono">2:14 PM</span>
+            </div>
+            <div class="history-event-card">
+              <div class="event-card-head">
+                <div class="event-card-eyebrow">
+                  <i class="ph ph-chats-circle"></i>
+                  <span class="t-label-mono">Sage</span>
+                  <span class="event-card-divider">·</span>
+                  <span class="event-card-dim">Work Life</span>
+                </div>
+                <button class="event-card-menu" aria-label="Event menu"><i class="ph ph-dots-three"></i></button>
+              </div>
+              <h3 class="event-card-title">Goal drift</h3>
+              <p class="event-card-body">Notice mode flagged: MVP ship date slipping. You've let meetings overwrite three deep-work blocks this week.</p>
+              <div class="event-card-foot">
+                <span class="t-label-mono event-card-meta">6 turns · 2 patterns surfaced</span>
+                <a class="event-card-link" href="#">Open <i class="ph ph-arrow-up-right"></i></a>
+              </div>
+            </div>
+          </article>
+          <article class="history-event event-capture">
+            <div class="history-event-rail">
+              <span class="event-dot event-dot-capture"></span>
+              <span class="event-rail-line"></span>
+            </div>
+            <div class="history-event-time">
+              <span class="t-label-mono">10:01 AM</span>
+            </div>
+            <div class="history-event-card">
+              <div class="event-card-head">
+                <div class="event-card-eyebrow">
+                  <i class="ph ph-note-pencil"></i>
+                  <span class="t-label-mono">Capture</span>
+                  <span class="event-card-divider">·</span>
+                  <span class="event-card-dim">Consumer</span>
+                </div>
+                <button class="event-card-menu" aria-label="Event menu"><i class="ph ph-dots-three"></i></button>
+              </div>
+              <h3 class="event-card-title">EV charging tariffs</h3>
+              <p class="event-card-body">Notes from PG&E rate research — EV2-A peak/off-peak break-even calculation for home charging.</p>
+              <div class="event-card-foot">
+                <span class="t-label-mono event-card-meta">Manual capture · 12 nodes</span>
+                <a class="event-card-link" href="#">Open <i class="ph ph-arrow-up-right"></i></a>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+      <section class="history-day">
+        <div class="history-day-head"><span class="t-label-mono">5 DAYS AGO · MAY 2</span></div>
+        <div class="history-day-events">
+          <article class="history-event event-sage">
+            <div class="history-event-rail">
+              <span class="event-dot event-dot-sage"></span>
+              <span class="event-rail-line"></span>
+            </div>
+            <div class="history-event-time">
+              <span class="t-label-mono">4:33 PM</span>
+            </div>
+            <div class="history-event-card">
+              <div class="event-card-head">
+                <div class="event-card-eyebrow">
+                  <i class="ph ph-chats-circle"></i>
+                  <span class="t-label-mono">Sage</span>
+                  <span class="event-card-divider">·</span>
+                  <span class="event-card-dim">Interests</span>
+                </div>
+                <button class="event-card-menu" aria-label="Event menu"><i class="ph ph-dots-three"></i></button>
+              </div>
+              <h3 class="event-card-title">Travel patterns</h3>
+              <p class="event-card-body">Captured travel cadence and preferences. Surfaced belief: long stays over week-long sprints, preferred shoulder seasons.</p>
+              <div class="event-card-foot">
+                <span class="t-label-mono event-card-meta">6 turns · 4 facts · 2 prefs</span>
+                <a class="event-card-link" href="#">Open <i class="ph ph-arrow-up-right"></i></a>
+              </div>
+            </div>
+          </article>
+          <article class="history-event event-agent">
+            <div class="history-event-rail">
+              <span class="event-dot event-dot-agent"></span>
+              <span class="event-rail-line"></span>
+            </div>
+            <div class="history-event-time">
+              <span class="t-label-mono">1:00 PM</span>
+            </div>
+            <div class="history-event-card">
+              <div class="event-card-head">
+                <div class="event-card-eyebrow">
+                  <i class="ph ph-sparkle"></i>
+                  <span class="t-label-mono">Agent</span>
+                  <span class="event-card-divider">·</span>
+                  <span class="event-card-dim">Work Life</span>
+                </div>
+                <button class="event-card-menu" aria-label="Event menu"><i class="ph ph-dots-three"></i></button>
+              </div>
+              <h3 class="event-card-title">Weekly review prepared</h3>
+              <p class="event-card-body">Agent assembled weekly OKR review across Calendar + Notion + email threads. Saved to Atlas as a brief.</p>
+              <div class="event-card-foot">
+                <span class="t-label-mono event-card-meta">Run 1.4s · 3,891 tokens · Done</span>
+                <a class="event-card-link" href="#">Open <i class="ph ph-arrow-up-right"></i></a>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+      <section class="history-day">
+        <div class="history-day-head"><span class="t-label-mono">LAST WEEK · APR 28 → MAY 1</span></div>
+        <div class="history-day-events">
+          <article class="history-event event-library">
+            <div class="history-event-rail">
+              <span class="event-dot event-dot-library"></span>
+              <span class="event-rail-line"></span>
+            </div>
+            <div class="history-event-time">
+              <span class="t-label-mono">Tue</span>
+            </div>
+            <div class="history-event-card">
+              <div class="event-card-head">
+                <div class="event-card-eyebrow">
+                  <i class="ph ph-books"></i>
+                  <span class="t-label-mono">Library</span>
+                  <span class="event-card-divider">·</span>
+                  <span class="event-card-dim">Aesthetic</span>
+                </div>
+                <button class="event-card-menu" aria-label="Event menu"><i class="ph ph-dots-three"></i></button>
+              </div>
+              <h3 class="event-card-title">Industry Rockstar · activated</h3>
+              <p class="event-card-body">Added Industry Rockstar library. Now informs all agent runs that touch design, branding, and content.</p>
+              <div class="event-card-foot">
+                <span class="t-label-mono event-card-meta">94 frameworks · Active</span>
+                <a class="event-card-link" href="#">Open <i class="ph ph-arrow-up-right"></i></a>
+              </div>
+            </div>
+          </article>
+          <article class="history-event event-sage">
+            <div class="history-event-rail">
+              <span class="event-dot event-dot-sage"></span>
+              <span class="event-rail-line"></span>
+            </div>
+            <div class="history-event-time">
+              <span class="t-label-mono">Mon</span>
+            </div>
+            <div class="history-event-card">
+              <div class="event-card-head">
+                <div class="event-card-eyebrow">
+                  <i class="ph ph-chats-circle"></i>
+                  <span class="t-label-mono">Sage</span>
+                  <span class="event-card-divider">·</span>
+                  <span class="event-card-dim">Work Life</span>
+                </div>
+                <button class="event-card-menu" aria-label="Event menu"><i class="ph ph-dots-three"></i></button>
+              </div>
+              <h3 class="event-card-title">Daily focus blocks</h3>
+              <p class="event-card-body">Captured your default deep-work cadence: 9–11 AM Tue/Thu/Fri. Sage will defend these by default starting next week.</p>
+              <div class="event-card-foot">
+                <span class="t-label-mono event-card-meta">9 turns · 5 prefs</span>
+                <a class="event-card-link" href="#">Open <i class="ph ph-arrow-up-right"></i></a>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+    </div>
+    <section class="history-foot">
+      <div class="history-foot-text">
+        <h3 class="history-foot-title">Want all of it?</h3>
+        <p>You own this history. Export to JSON, CSV, or a shareable archive. <em>Built once. Used everywhere. Yours forever.</em></p>
+      </div>
+      <div class="history-foot-actions">
+        <a href="export.html" class="btn btn-primary terra btn-lg"><i class="ph ph-download-simple"></i> Export everything</a>
+        <a href="atlas.html" class="btn btn-secondary btn-lg"><i class="ph ph-graph"></i> Open in Atlas</a>
+      </div>
+    </section>
+  </div>
+</main>
+</div>
+</body>
+</html>
