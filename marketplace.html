@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Expert Libraries · MyGentic</title>
+<link rel="stylesheet" href="app.css" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+
+<style>
+
+  /* THE FOREST MATRIX ROOM — workspace only, chrome stays cream */
+  .app-content {
+    padding: 0;
+    background: #0C1A12;
+    min-height: calc(100vh - var(--topbar-h));
+    position: relative;
+    overflow: hidden;
+    color: #E5EDE7;
+  }
+
+  /* Atmosphere layer */
+  .matrix-atmosphere {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .matrix-rain {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+  }
+
+  .market-page {
+    position: relative; z-index: 1;
+    max-width: var(--w-bleed);
+    margin: 0 auto;
+    padding: var(--s-5) var(--s-6) var(--s-9);
+  }
+  @media (max-width: 900px) {
+    .market-page { padding: var(--s-4) var(--s-4) var(--s-7); }
+  }
+
+  /* Breadcrumb on matrix surface */
+  .breadcrumb-matrix {
+    color: rgba(229, 237, 231, 0.4);
+  }
+  .breadcrumb-matrix a {
+    color: rgba(229, 237, 231, 0.5);
+  }
+  .breadcrumb-matrix a:hover {
+    color: #3DEE93;
+  }
+  .breadcrumb-matrix span {
+    color: rgba(229, 237, 231, 0.7);
+  }
+
+  /* HERO */
+  .market-hero {
+    border-bottom: 1px solid rgba(61, 238, 147, 0.12);
+    padding-bottom: var(--s-6);
+    margin-bottom: var(--s-7);
+    max-width: 1100px;
+  }
+  .market-eyebrow {
+    color: #3DEE93;
+    margin-bottom: var(--s-3);
+    text-shadow: 0 0 12px rgba(61, 238, 147, 0.4);
+  }
+  .market-hero-title {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: clamp(40px, 5vw, 60px);
+    line-height: 1.05; letter-spacing: -0.02em;
+    color: #E5EDE7;
+    margin-bottom: var(--s-4);
+  }
+  .market-hero-title em {
+    font-style: italic;
+    color: #3DEE93;
+    text-shadow: 0 0 16px rgba(61, 238, 147, 0.4);
+  }
+  .market-hero-deck {
+    font-size: 17px; line-height: 1.55;
+    color: rgba(229, 237, 231, 0.75);
+    max-width: 800px;
+  }
+  .market-hero-deck em {
+    font-style: italic;
+    color: #6FE5A8;
+  }
+
+  .market-hero-stats {
+    display: grid;
+    grid-template-columns: repeat(4, auto);
+    gap: var(--s-7);
+    padding-top: var(--s-5);
+  }
+  @media (max-width: 700px) {
+    .market-hero-stats { grid-template-columns: repeat(2, 1fr); gap: var(--s-4); }
+  }
+  .market-stat { display: flex; flex-direction: column; gap: 2px; }
+  .market-stat-num {
+    font-family: var(--f-display);
+    font-size: 32px;
+    color: #E5EDE7;
+    line-height: 1;
+  }
+  .market-stat .t-label-mono {
+    color: rgba(229, 237, 231, 0.5);
+  }
+
+  /* CATEGORY PILLS */
+  .market-categories { margin-bottom: var(--s-6); }
+  .market-category-pills {
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .market-category {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px;
+    background: rgba(61, 238, 147, 0.04);
+    border: 1px solid rgba(61, 238, 147, 0.18);
+    border-radius: 999px;
+    font-family: var(--f-body); font-size: 13px; font-weight: 500;
+    color: rgba(229, 237, 231, 0.75);
+    cursor: pointer;
+    transition: background var(--t-fast), border-color var(--t-fast);
+  }
+  .market-category:hover {
+    background: rgba(61, 238, 147, 0.1);
+    border-color: rgba(61, 238, 147, 0.3);
+    color: #E5EDE7;
+  }
+  .market-category-active {
+    background: rgba(61, 238, 147, 0.18);
+    border-color: #3DEE93;
+    color: #3DEE93;
+    box-shadow: 0 0 16px rgba(61, 238, 147, 0.2);
+  }
+  .market-category-count {
+    font-family: var(--f-mono); font-size: 10px;
+    opacity: 0.6;
+  }
+
+  /* SECTION HEAD */
+  .market-section-head {
+    display: flex; justify-content: space-between; align-items: end;
+    flex-wrap: wrap; gap: var(--s-4);
+    padding-bottom: var(--s-4);
+    border-bottom: 1px solid rgba(61, 238, 147, 0.1);
+    margin-bottom: var(--s-5);
+  }
+  .market-section-title {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: clamp(28px, 3vw, 36px);
+    line-height: 1.1; letter-spacing: -0.01em;
+    color: #E5EDE7;
+    margin-bottom: 4px;
+  }
+  .market-section-title em { font-style: italic; color: #3DEE93; }
+  .market-section-deck {
+    font-size: 14px;
+    color: rgba(229, 237, 231, 0.55);
+  }
+  .market-section-actions {
+    display: flex; gap: var(--s-2); align-items: center;
+  }
+  .market-search {
+    position: relative;
+    display: flex; align-items: center;
+  }
+  .market-search i {
+    position: absolute; left: 10px;
+    color: rgba(229, 237, 231, 0.4);
+    font-size: 14px;
+  }
+  .market-search input {
+    background: rgba(61, 238, 147, 0.04);
+    border: 1px solid rgba(61, 238, 147, 0.18);
+    border-radius: 999px;
+    padding: 8px 14px 8px 32px;
+    font-family: var(--f-body); font-size: 13px;
+    color: #E5EDE7;
+    width: 220px;
+  }
+  .market-search input::placeholder { color: rgba(229, 237, 231, 0.4); }
+  .market-search input:focus {
+    outline: none;
+    border-color: #3DEE93;
+  }
+
+  /* GRID & CARDS */
+  .market-grid-section { margin-bottom: var(--s-7); }
+  .market-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s-3);
+  }
+  @media (max-width: 1100px) { .market-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 700px)  { .market-grid { grid-template-columns: 1fr; } }
+
+  .lib-card {
+    background: linear-gradient(180deg, rgba(61, 238, 147, 0.04), rgba(61, 238, 147, 0.01));
+    border: 1px solid rgba(61, 238, 147, 0.15);
+    border-radius: var(--r-lg);
+    padding: var(--s-4);
+    display: flex; flex-direction: column; gap: var(--s-2);
+    transition: border-color var(--t-fast), box-shadow var(--t-fast);
+  }
+  .lib-card:hover {
+    border-color: rgba(61, 238, 147, 0.4);
+    box-shadow: 0 0 24px rgba(61, 238, 147, 0.08);
+  }
+  .lib-card-active {
+    border-color: rgba(61, 238, 147, 0.4);
+    background: linear-gradient(180deg, rgba(61, 238, 147, 0.1), rgba(61, 238, 147, 0.02));
+  }
+
+  .lib-card-head {
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .lib-card-cat {
+    color: #3DEE93;
+    background: rgba(61, 238, 147, 0.1);
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+  .lib-card-rating {
+    display: inline-flex; align-items: center; gap: 4px;
+    color: #E5EDE7;
+    font-size: 13px;
+  }
+  .lib-card-rating i { color: #FFC76B; font-size: 13px; }
+
+  .lib-card-name {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: 24px; line-height: 1.1;
+    color: #E5EDE7;
+  }
+  .lib-card-author {
+    font-size: 13px;
+    color: rgba(229, 237, 231, 0.6);
+  }
+  .lib-card-author em {
+    font-style: italic;
+    color: #6FE5A8;
+  }
+  .lib-card-summary {
+    font-size: 13px; line-height: 1.5;
+    color: rgba(229, 237, 231, 0.7);
+    flex: 1;
+  }
+  .lib-card-meta {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: var(--s-2) 0;
+    border-top: 1px solid rgba(61, 238, 147, 0.12);
+    border-bottom: 1px solid rgba(61, 238, 147, 0.12);
+  }
+  .lib-card-frameworks { color: rgba(229, 237, 231, 0.5); }
+  .lib-card-price {
+    font-family: var(--f-display);
+    font-size: 14px;
+    color: #3DEE93;
+  }
+
+  .lib-card-foot {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: var(--s-2);
+  }
+  .lib-card-link {
+    color: rgba(229, 237, 231, 0.7);
+    font-size: 13px; font-weight: 500;
+    padding: 8px 0;
+  }
+  .lib-card-link:hover { color: #3DEE93; }
+
+  /* Buttons in matrix room */
+  .btn-matrix-license {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px;
+    background: #3DEE93;
+    color: #0C1A12;
+    border-radius: var(--r-sm);
+    font-family: var(--f-body);
+    font-size: 13px; font-weight: 600;
+    cursor: pointer;
+    border: 0;
+    box-shadow: 0 0 16px rgba(61, 238, 147, 0.3);
+    transition: background var(--t-fast);
+  }
+  .btn-matrix-license:hover { background: #6FE5A8; }
+  .btn-matrix-license i { font-size: 13px; }
+
+  .btn-matrix-active {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px;
+    background: rgba(61, 238, 147, 0.15);
+    color: #3DEE93;
+    border-radius: var(--r-sm);
+    font-family: var(--f-body);
+    font-size: 13px; font-weight: 600;
+    border: 1px solid rgba(61, 238, 147, 0.4);
+    cursor: pointer;
+  }
+  .btn-matrix-active i { font-size: 13px; }
+
+  .btn-matrix-secondary {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px;
+    background: rgba(61, 238, 147, 0.04);
+    color: rgba(229, 237, 231, 0.75);
+    border: 1px solid rgba(61, 238, 147, 0.2);
+    border-radius: var(--r-sm);
+    font-family: var(--f-body);
+    font-size: 13px; font-weight: 500;
+    cursor: pointer;
+  }
+  .btn-matrix-secondary:hover {
+    background: rgba(61, 238, 147, 0.1);
+    color: #E5EDE7;
+  }
+
+  .btn-matrix-primary {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 20px;
+    background: #3DEE93;
+    color: #0C1A12;
+    border-radius: var(--r-sm);
+    font-family: var(--f-body);
+    font-size: 14px; font-weight: 600;
+    box-shadow: 0 0 24px rgba(61, 238, 147, 0.3);
+    transition: background var(--t-fast);
+  }
+  .btn-matrix-primary:hover { background: #6FE5A8; }
+
+  /* WHY-STRIP */
+  .market-why {
+    background: rgba(61, 238, 147, 0.03);
+    border: 1px solid rgba(61, 238, 147, 0.12);
+    border-radius: var(--r-lg);
+    padding: var(--s-6);
+    margin-bottom: var(--s-7);
+  }
+  .market-why-title {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: clamp(28px, 3vw, 36px);
+    line-height: 1.1; letter-spacing: -0.01em;
+    color: #E5EDE7;
+    margin-bottom: var(--s-5);
+  }
+  .market-why-title em {
+    font-style: italic;
+    color: #3DEE93;
+  }
+  .market-why-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s-4);
+  }
+  @media (max-width: 1100px) { .market-why-grid { grid-template-columns: 1fr; } }
+
+  .market-why-card {
+    display: flex; flex-direction: column; gap: var(--s-1);
+    padding: var(--s-3);
+    border-top: 3px solid #3DEE93;
+    background: rgba(61, 238, 147, 0.03);
+    border-radius: 0 0 var(--r-md) var(--r-md);
+  }
+  .market-why-num {
+    color: #3DEE93;
+    margin-bottom: 2px;
+  }
+  .market-why-name {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: 22px;
+    line-height: 1.15;
+    color: #E5EDE7;
+  }
+  .market-why-card p {
+    font-size: 13px; line-height: 1.5;
+    color: rgba(229, 237, 231, 0.7);
+    margin: 0;
+  }
+  .market-why-aside {
+    color: rgba(229, 237, 231, 0.5) !important;
+    font-style: italic;
+  }
+
+  /* PUBLISH CTA */
+  .market-publish {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--s-6);
+    align-items: center;
+    background: linear-gradient(135deg, rgba(61, 238, 147, 0.08), rgba(61, 238, 147, 0.02));
+    border: 1px solid rgba(61, 238, 147, 0.25);
+    border-radius: var(--r-lg);
+    padding: var(--s-6);
+  }
+  @media (max-width: 900px) {
+    .market-publish { grid-template-columns: 1fr; }
+  }
+  .market-publish-eyebrow {
+    color: #3DEE93;
+    margin-bottom: var(--s-3);
+  }
+  .market-publish-title {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: clamp(28px, 3vw, 36px);
+    line-height: 1.1; letter-spacing: -0.01em;
+    color: #E5EDE7;
+    margin-bottom: var(--s-3);
+  }
+  .market-publish-title em {
+    font-style: italic;
+    color: #3DEE93;
+  }
+  .market-publish-text p {
+    font-size: 15px; line-height: 1.55;
+    color: rgba(229, 237, 231, 0.75);
+    max-width: 720px;
+  }
+  .market-publish-actions {
+    display: flex; flex-direction: column; gap: var(--s-2); align-items: flex-end;
+  }
+  @media (max-width: 900px) {
+    .market-publish-actions { align-items: flex-start; }
+  }
+  .market-publish-link {
+    color: rgba(229, 237, 231, 0.7);
+    font-size: 13px;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .market-publish-link:hover { color: #3DEE93; }
+
+</style>
+</head>
+<body class="app-shell market-body">
+<header class="app-topbar">
+  <div class="app-topbar-inner">
+    <label for="navToggle" class="app-burger" aria-label="Open navigation"><i class="ph ph-list"></i></label>
+    <a class="app-brand" href="dashboard.html">My<span class="accent">Gen</span>tic</a>
+    <h1 class="app-page-title">Expert Libraries</h1>
+    <div class="app-topbar-actions">
+      <div class="app-topbar-search">
+        <i class="ph ph-magnifying-glass"></i>
+        <input type="text" placeholder="Search your context, agents, libraries…" />
+        <kbd>⌘K</kbd>
+      </div>
+      <button class="app-icon-btn" aria-label="Notifications"><i class="ph ph-bell"></i><span class="dot"></span></button>
+      <button class="app-avatar" aria-label="User menu">NA</button>
+    </div>
+  </div>
+</header>
+<div class="app-layout">
+  <input type="checkbox" id="navToggle" class="app-nav-toggle sr-only" />
+<label for="navToggle" class="app-leftnav-backdrop"></label>
+<nav class="app-leftnav" aria-label="Primary">
+  <div class="app-nav-section-label">Workspace</div>
+      <a href="dashboard.html" class="app-nav-item" data-page="dashboard"><i class="ph ph-gauge"></i><span>Dashboard</span></a>
+      <a href="atlas.html" class="app-nav-item" data-page="atlas"><i class="ph ph-graph"></i><span>Atlas</span></a>
+      <a href="sage.html" class="app-nav-item" data-page="sage"><i class="ph ph-chats-circle"></i><span>Sage</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Context</div>
+      <a href="context.html" class="app-nav-item" data-page="context"><i class="ph ph-stack"></i><span>Context Layers</span></a>
+      <a href="token-compaction.html" class="app-nav-item" data-page="token-compaction"><i class="ph ph-funnel"></i><span>Token Compaction</span></a>
+      <a href="history.html" class="app-nav-item" data-page="history"><i class="ph ph-clock-counter-clockwise"></i><span>History</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Connect</div>
+      <a href="connections.html" class="app-nav-item" data-page="connections"><i class="ph ph-plugs-connected"></i><span>Connections</span></a>
+      <a href="upload-data.html" class="app-nav-item" data-page="upload-data"><i class="ph ph-upload-simple"></i><span>Upload Data</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Build</div>
+      <a href="agents.html" class="app-nav-item" data-page="agents"><i class="ph ph-sparkle"></i><span>Agents</span></a>
+      <a href="marketplace.html" class="app-nav-item active" data-page="marketplace"><i class="ph ph-books"></i><span>Expert Libraries</span><span class="nav-badge">New</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Account</div>
+      <a href="export.html" class="app-nav-item" data-page="export"><i class="ph ph-download-simple"></i><span>Export &amp; Data</span></a>
+      <a href="settings.html" class="app-nav-item" data-page="settings"><i class="ph ph-gear-six"></i><span>Settings</span></a>
+</nav>
+  <main class="app-content">
+  <div class="matrix-atmosphere" aria-hidden="true">
+    <svg class="matrix-rain" viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <radialGradient id="matrixCenterGlow" cx="50%" cy="50%" r="60%">
+          <stop offset="0%" stop-color="#1A3A2A" stop-opacity="0.7"/>
+          <stop offset="60%" stop-color="#0E2018" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="#080F0B" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect x="0" y="0" width="1600" height="900" fill="url(#matrixCenterGlow)"/>
+      <!-- Sparse green character glyphs scattered like rain -->
+      <g fill="#3DEE93" font-family="JetBrains Mono, monospace" font-size="11" opacity="0.18">
+        <text x="80"  y="120">01</text>
+        <text x="180" y="180">A8</text>
+        <text x="320" y="90">3F</text>
+        <text x="450" y="220">7E</text>
+        <text x="580" y="140">B2</text>
+        <text x="720" y="80">9C</text>
+        <text x="880" y="200">D1</text>
+        <text x="1020" y="120">4E</text>
+        <text x="1180" y="170">A5</text>
+        <text x="1320" y="100">62</text>
+        <text x="1480" y="180">F0</text>
+        <text x="120" y="380">EF</text>
+        <text x="280" y="440">21</text>
+        <text x="440" y="380">8B</text>
+        <text x="600" y="460">C7</text>
+        <text x="780" y="400">3A</text>
+        <text x="940" y="430">D2</text>
+        <text x="1100" y="380">59</text>
+        <text x="1280" y="420">7F</text>
+        <text x="1440" y="380">B6</text>
+        <text x="80" y="640">02</text>
+        <text x="240" y="680">E1</text>
+        <text x="420" y="660">9D</text>
+        <text x="580" y="700">4C</text>
+        <text x="780" y="660">B3</text>
+        <text x="960" y="700">A8</text>
+        <text x="1140" y="660">5F</text>
+        <text x="1340" y="690">CE</text>
+      </g>
+      <g fill="#3DEE93" opacity="0.4">
+        <circle cx="280" cy="200" r="1"/>
+        <circle cx="540" cy="320" r="1.2"/>
+        <circle cx="820" cy="280" r="1"/>
+        <circle cx="1100" cy="360" r="0.9"/>
+        <circle cx="1340" cy="240" r="1.1"/>
+        <circle cx="180" cy="520" r="1"/>
+        <circle cx="460" cy="580" r="1.2"/>
+        <circle cx="740" cy="540" r="0.9"/>
+        <circle cx="1000" cy="600" r="1"/>
+        <circle cx="1280" cy="560" r="1.3"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="market-page">
+    <div class="atlas-breadcrumb breadcrumb-matrix">
+      <a href="dashboard.html">Dashboard</a>
+      <i class="ph ph-caret-right"></i>
+      <span>Expert Libraries</span>
+    </div>
+    <header class="market-hero">
+      <div class="t-label-mono market-eyebrow">● Discover · Domain expertise</div>
+      <h1 class="market-hero-title">Borrow a working playbook from someone who's <em>actually done it.</em></h1>
+      <p class="market-hero-deck">
+        Expert Libraries are licensable expertise modules — <em>operator playbooks, founder frameworks, designer methodologies.</em> Layer one onto your context. Watch your AI start thinking like a subject matter leader.
+      </p>
+      <div class="market-hero-stats">
+        <div class="market-stat">
+          <span class="market-stat-num">131</span>
+          <span class="t-label-mono">Libraries</span>
+        </div>
+        <div class="market-stat">
+          <span class="market-stat-num">8</span>
+          <span class="t-label-mono">Categories</span>
+        </div>
+        <div class="market-stat">
+          <span class="market-stat-num">2</span>
+          <span class="t-label-mono">Active on your context</span>
+        </div>
+        <div class="market-stat">
+          <span class="market-stat-num">329</span>
+          <span class="t-label-mono">Frameworks layered in</span>
+        </div>
+      </div>
+    </header>
+    <section class="market-categories">
+      <div class="market-category-pills">
+        <button class="market-category market-category-active">Founder OS <span class="market-category-count">18</span></button>
+        <button class="market-category">GTM <span class="market-category-count">24</span></button>
+        <button class="market-category">Design <span class="market-category-count">19</span></button>
+        <button class="market-category">Engineering <span class="market-category-count">16</span></button>
+        <button class="market-category">Product <span class="market-category-count">21</span></button>
+        <button class="market-category">Legal <span class="market-category-count">11</span></button>
+        <button class="market-category">Medical <span class="market-category-count">8</span></button>
+        <button class="market-category">Finance <span class="market-category-count">14</span></button>
+      </div>
+    </section>
+    <section class="market-grid-section">
+      <header class="market-section-head">
+        <div>
+          <h2 class="market-section-title">Featured <em>Libraries.</em></h2>
+          <p class="market-section-deck">Curated from operators, founders, and subject matter leaders.</p>
+        </div>
+        <div class="market-section-actions">
+          <div class="market-search">
+            <i class="ph ph-magnifying-glass"></i>
+            <input type="search" placeholder="Search Libraries…" />
+          </div>
+          <button class="btn-matrix-secondary">Sort: Featured</button>
+        </div>
+      </header>
+      <div class="market-grid">
+      <article class="lib-card lib-card-active">
+        <div class="lib-card-head">
+          <div class="lib-card-cat t-label-mono">Founder OS</div>
+          <div class="lib-card-rating">
+            <i class="ph ph-star-fill"></i>
+            <span>4.9</span>
+          </div>
+        </div>
+        <h3 class="lib-card-name">Industry Rockstar</h3>
+        <div class="lib-card-author">by <em>MyGentic</em></div>
+        <p class="lib-card-summary">The flagship operator playbook. Founder frameworks, GTM motions, hiring rubrics, fundraising rituals. Built from 1,000+ exits.</p>
+        <div class="lib-card-meta">
+          <span class="lib-card-frameworks t-label-mono">187 frameworks</span>
+          <span class="lib-card-price">Free during beta</span>
+        </div>
+        <div class="lib-card-foot">
+          <a href="library-detail.html?id=industry-rockstar" class="lib-card-link">Preview</a>
+          <button class="btn-matrix-active"><i class="ph ph-check-circle"></i> Active</button>
+        </div>
+      </article>
+      <article class="lib-card lib-card-active">
+        <div class="lib-card-head">
+          <div class="lib-card-cat t-label-mono">Founder OS</div>
+          <div class="lib-card-rating">
+            <i class="ph ph-star-fill"></i>
+            <span>4.8</span>
+          </div>
+        </div>
+        <h3 class="lib-card-name">Founder OS</h3>
+        <div class="lib-card-author">by <em>MyGentic</em></div>
+        <p class="lib-card-summary">Operating principles, decision frameworks, weekly rituals. The OS that ran 1,000+ founder weeks.</p>
+        <div class="lib-card-meta">
+          <span class="lib-card-frameworks t-label-mono">142 frameworks</span>
+          <span class="lib-card-price">Free during beta</span>
+        </div>
+        <div class="lib-card-foot">
+          <a href="library-detail.html?id=founder-os" class="lib-card-link">Preview</a>
+          <button class="btn-matrix-active"><i class="ph ph-check-circle"></i> Active</button>
+        </div>
+      </article>
+      <article class="lib-card lib-card-available">
+        <div class="lib-card-head">
+          <div class="lib-card-cat t-label-mono">GTM</div>
+          <div class="lib-card-rating">
+            <i class="ph ph-star-fill"></i>
+            <span>4.7</span>
+          </div>
+        </div>
+        <h3 class="lib-card-name">SaaS Pricing Lab</h3>
+        <div class="lib-card-author">by <em>Patrick Q.</em></div>
+        <p class="lib-card-summary">Tiering, packaging, expansion mechanics. From 30+ B2B SaaS companies between $1M and $200M ARR.</p>
+        <div class="lib-card-meta">
+          <span class="lib-card-frameworks t-label-mono">89 frameworks</span>
+          <span class="lib-card-price">$29/mo</span>
+        </div>
+        <div class="lib-card-foot">
+          <a href="library-detail.html?id=saas-pricing" class="lib-card-link">Preview</a>
+          <button class="btn-matrix-license">License <i class="ph ph-arrow-right"></i></button>
+        </div>
+      </article>
+      <article class="lib-card lib-card-available">
+        <div class="lib-card-head">
+          <div class="lib-card-cat t-label-mono">Design</div>
+          <div class="lib-card-rating">
+            <i class="ph ph-star-fill"></i>
+            <span>4.9</span>
+          </div>
+        </div>
+        <h3 class="lib-card-name">Design Systems Studio</h3>
+        <div class="lib-card-author">by <em>Mark D.</em></div>
+        <p class="lib-card-summary">Tokens, components, governance. Battle-tested across 12 published design systems.</p>
+        <div class="lib-card-meta">
+          <span class="lib-card-frameworks t-label-mono">64 frameworks</span>
+          <span class="lib-card-price">$19/mo</span>
+        </div>
+        <div class="lib-card-foot">
+          <a href="library-detail.html?id=design-systems" class="lib-card-link">Preview</a>
+          <button class="btn-matrix-license">License <i class="ph ph-arrow-right"></i></button>
+        </div>
+      </article>
+      <article class="lib-card lib-card-available">
+        <div class="lib-card-head">
+          <div class="lib-card-cat t-label-mono">Legal</div>
+          <div class="lib-card-rating">
+            <i class="ph ph-star-fill"></i>
+            <span>4.8</span>
+          </div>
+        </div>
+        <h3 class="lib-card-name">Legal · Early-Stage</h3>
+        <div class="lib-card-author">by <em>Sarah K.</em></div>
+        <p class="lib-card-summary">Term sheet patterns, employee equity, vendor contracts. From 200+ Series A and Seed deals.</p>
+        <div class="lib-card-meta">
+          <span class="lib-card-frameworks t-label-mono">53 frameworks</span>
+          <span class="lib-card-price">$49/mo</span>
+        </div>
+        <div class="lib-card-foot">
+          <a href="library-detail.html?id=legal-startup" class="lib-card-link">Preview</a>
+          <button class="btn-matrix-license">License <i class="ph ph-arrow-right"></i></button>
+        </div>
+      </article>
+      <article class="lib-card lib-card-available">
+        <div class="lib-card-head">
+          <div class="lib-card-cat t-label-mono">Medical</div>
+          <div class="lib-card-rating">
+            <i class="ph ph-star-fill"></i>
+            <span>4.6</span>
+          </div>
+        </div>
+        <h3 class="lib-card-name">Clinical Research Methods</h3>
+        <div class="lib-card-author">by <em>Dr. Wong</em></div>
+        <p class="lib-card-summary">Trial design, IRB navigation, manuscript voice. From a working PI at a research hospital.</p>
+        <div class="lib-card-meta">
+          <span class="lib-card-frameworks t-label-mono">34 frameworks</span>
+          <span class="lib-card-price">$79/mo</span>
+        </div>
+        <div class="lib-card-foot">
+          <a href="library-detail.html?id=clinical-research" class="lib-card-link">Preview</a>
+          <button class="btn-matrix-license">License <i class="ph ph-arrow-right"></i></button>
+        </div>
+      </article>
+      </div>
+    </section>
+    <section class="market-why">
+      <h2 class="market-why-title">Stop reinventing wheels <em>someone already paid to build.</em></h2>
+      <div class="market-why-grid">
+        <article class="market-why-card">
+          <div class="t-label-mono market-why-num">01 · Real expertise</div>
+          <h3 class="market-why-name">Not training data.</h3>
+          <p>Built by working operators, founders, and subject matter leaders. Not scraped from the web.</p>
+          <p class="market-why-aside">You get judgement, not just knowledge. The kind of thing that takes a decade to learn.</p>
+        </article>
+        <article class="market-why-card">
+          <div class="t-label-mono market-why-num">02 · Composable</div>
+          <h3 class="market-why-name">Layers on your context.</h3>
+          <p>Stack a Library on top of your existing context. Your voice and goals stay intact. The expertise layers in.</p>
+          <p class="market-why-aside">You don't lose yourself by borrowing expertise. You add a specialist's brain to your own.</p>
+        </article>
+        <article class="market-why-card">
+          <div class="t-label-mono market-why-num">03 · One-click</div>
+          <h3 class="market-why-name">Toggle on, toggle off.</h3>
+          <p>Apply a Library to a single agent or your whole context. No commitment. Try a sales playbook for a week.</p>
+          <p class="market-why-aside">Keep what works. Drop what doesn't. Your context, your call.</p>
+        </article>
+      </div>
+    </section>
+    <section class="market-publish">
+      <div class="market-publish-text">
+        <div class="t-label-mono market-publish-eyebrow">● Library Builder</div>
+        <h2 class="market-publish-title">Package <em>your expertise.</em> License it. Earn revenue.</h2>
+        <p>You've spent years getting good at something. Turn that operating knowledge into a Library. Set your price. Earn every time someone layers it on.</p>
+      </div>
+      <div class="market-publish-actions">
+        <a href="library-builder.html" class="btn-matrix-primary"><i class="ph ph-package"></i> Build a Library</a>
+        <a href="library-builder.html" class="market-publish-link">How it works <i class="ph ph-arrow-right"></i></a>
+      </div>
+    </section>
+  </div>
+</main>
+</div>
+</body>
+</html>
