@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Export & Data · MyGentic</title>
+<link rel="stylesheet" href="app.css" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+
+<style>
+
+  .app-content { padding: 0; }
+  .export-page {
+    max-width: var(--w-bleed);
+    margin: 0 auto;
+    padding: var(--s-5) var(--s-6) var(--s-9);
+  }
+  @media (max-width: 900px) {
+    .export-page { padding: var(--s-4) var(--s-4) var(--s-7); }
+  }
+
+  .atlas-breadcrumb {
+    display: flex; align-items: center; gap: var(--s-2);
+    font-family: var(--f-mono); font-size: 11px;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--ink-mute);
+    padding: var(--s-2) 0 var(--s-4);
+  }
+  .atlas-breadcrumb a { color: var(--ink-mute); }
+  .atlas-breadcrumb a:hover { color: var(--terra); }
+  .atlas-breadcrumb i { font-size: 14px; opacity: 0.6; }
+
+  /* HERO */
+  .export-hero {
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: var(--s-6);
+    margin-bottom: var(--s-7);
+    max-width: 1100px;
+  }
+  .export-eyebrow { color: var(--terra); margin-bottom: var(--s-3); }
+  .export-hero-title {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: clamp(48px, 6vw, 72px);
+    line-height: 1.05; letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: var(--s-4);
+  }
+  .export-hero-title em { font-style: italic; color: var(--terra); }
+  .export-hero-deck {
+    font-size: 17px; line-height: 1.55;
+    color: var(--ink-soft);
+    max-width: 780px;
+  }
+  .export-hero-deck em { font-style: italic; color: var(--terra); }
+  .export-hero-deck strong { color: var(--ink); font-weight: 600; }
+
+  .export-hero-stats {
+    display: grid;
+    grid-template-columns: repeat(4, auto);
+    gap: var(--s-7);
+    padding-top: var(--s-5);
+  }
+  @media (max-width: 700px) {
+    .export-hero-stats { grid-template-columns: repeat(2, 1fr); gap: var(--s-4); }
+  }
+  .export-stat { display: flex; flex-direction: column; gap: 2px; }
+  .export-stat-num {
+    font-family: var(--f-display);
+    font-size: 32px;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .export-stat .t-label-mono { color: var(--ink-mute); }
+
+  /* SECTION HEADS (shared) */
+  .export-section-head {
+    margin-bottom: var(--s-5);
+    padding-bottom: var(--s-3);
+    border-bottom: 1px solid var(--rule);
+  }
+  .export-section-title {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: clamp(28px, 3vw, 36px);
+    line-height: 1.1; letter-spacing: -0.01em;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .export-section-title em { font-style: italic; }
+  .export-section-deck {
+    font-size: 14px;
+    color: var(--ink-mute);
+  }
+
+  /* QUICK EXPORTS */
+  .export-quick { margin-bottom: var(--s-7); }
+  .export-quick-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s-3);
+  }
+  @media (max-width: 1100px) { .export-quick-grid { grid-template-columns: 1fr; } }
+
+  .export-quick-card {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-top: 4px solid var(--terra);
+    border-radius: var(--r-lg);
+    padding: var(--s-5);
+    display: flex; flex-direction: column; gap: var(--s-2);
+  }
+  .export-quick-primary {
+    background: var(--terra-tint);
+    border-top-color: var(--terra-deep);
+  }
+  .export-quick-eyebrow { color: var(--terra); margin-bottom: 2px; }
+  .export-quick-name {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: 30px; line-height: 1.1;
+    color: var(--ink);
+  }
+  .export-quick-card p {
+    font-size: 14px; line-height: 1.55;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+  .export-quick-card p em { font-style: italic; color: var(--terra); }
+  .export-quick-meta {
+    display: flex; gap: 4px;
+    margin-top: var(--s-2);
+    color: var(--ink-mute);
+  }
+  .export-quick-cta {
+    margin-top: auto;
+    align-self: flex-start;
+  }
+
+  /* FORMAT CARDS */
+  .export-formats { margin-bottom: var(--s-7); }
+  .export-formats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--s-3);
+  }
+  @media (max-width: 1100px) { .export-formats-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px)  { .export-formats-grid { grid-template-columns: 1fr; } }
+
+  .export-format-card {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    padding: var(--s-4);
+    display: flex; flex-direction: column; gap: var(--s-2);
+    cursor: pointer;
+    transition: border-color var(--t-fast);
+  }
+  .export-format-card:hover { border-color: var(--terra); }
+  .export-format-active {
+    border-color: var(--terra);
+    background: var(--terra-tint);
+  }
+  .export-format-icon {
+    width: 44px; height: 44px;
+    background: var(--terra-tint);
+    color: var(--terra);
+    border-radius: var(--r-sm);
+    display: grid; place-items: center;
+    margin-bottom: 4px;
+  }
+  .export-format-active .export-format-icon {
+    background: var(--terra);
+    color: white;
+  }
+  .export-format-icon i { font-size: 22px; }
+  .export-format-name {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: 22px; line-height: 1.15;
+    color: var(--ink);
+  }
+  .export-format-card p {
+    font-size: 13px; line-height: 1.5;
+    color: var(--ink-soft);
+    margin: 0;
+    flex: 1;
+  }
+  .export-format-meta {
+    color: var(--terra);
+    padding-top: var(--s-2);
+    border-top: 1px solid var(--rule);
+    margin-top: var(--s-2);
+  }
+  .export-format-active .export-format-meta { border-top-color: rgba(200, 77, 44, 0.2); }
+
+  /* DIMENSION CARDS */
+  .export-dims { margin-bottom: var(--s-7); }
+  .export-dims-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s-3);
+  }
+  @media (max-width: 900px) { .export-dims-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 500px) { .export-dims-grid { grid-template-columns: 1fr; } }
+
+  .export-dim-card {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-md);
+    padding: var(--s-3) var(--s-4);
+    display: flex; flex-direction: column; gap: var(--s-1);
+  }
+  .export-dim-head {
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .export-dim-name {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: 20px;
+    color: var(--ink);
+  }
+  .export-dim-action {
+    width: 32px; height: 32px;
+    background: var(--terra-tint);
+    color: var(--terra);
+    border-radius: var(--r-sm);
+    display: grid; place-items: center;
+    cursor: pointer;
+    border: 0;
+  }
+  .export-dim-action:hover {
+    background: var(--terra);
+    color: white;
+  }
+  .export-dim-action i { font-size: 14px; }
+  .export-dim-stats {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-top: 4px;
+  }
+  .export-dim-nodes {
+    font-size: 13px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .export-dim-depth { color: var(--ink-mute); }
+
+  /* RECENT EXPORTS */
+  .export-recent { margin-bottom: var(--s-7); }
+  .export-recent-rows {
+    display: flex; flex-direction: column; gap: var(--s-2);
+  }
+  .export-row {
+    display: grid;
+    grid-template-columns: 44px 1fr 110px auto;
+    gap: var(--s-3);
+    align-items: center;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-md);
+    padding: var(--s-3) var(--s-4);
+    transition: border-color var(--t-fast);
+  }
+  .export-row:hover { border-color: var(--rule-strong); }
+  @media (max-width: 700px) { .export-row { grid-template-columns: 44px 1fr; } .export-row-when, .export-row-actions { grid-column: 2; } }
+
+  .export-row-icon {
+    width: 40px; height: 40px;
+    background: var(--paper-2);
+    color: var(--terra);
+    border-radius: var(--r-sm);
+    display: grid; place-items: center;
+  }
+  .export-row-icon i { font-size: 18px; }
+  .export-row-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .export-row-name {
+    font-family: var(--f-mono); font-size: 13px;
+    font-weight: 500; color: var(--ink);
+  }
+  .export-row-meta { color: var(--ink-mute); }
+  .export-row-when { color: var(--ink-mute); justify-self: end; }
+  .export-row-actions {
+    display: flex; gap: 4px; align-items: center;
+  }
+  .export-row-link {
+    display: inline-flex; align-items: center; gap: 4px;
+    color: var(--terra);
+    font-size: 13px; font-weight: 500;
+    padding: 6px 10px;
+    border-radius: var(--r-sm);
+  }
+  .export-row-link:hover { background: var(--terra-tint); color: var(--terra-deep); }
+  .export-row-link i { font-size: 13px; }
+  .export-row-menu {
+    width: 32px; height: 32px;
+    background: transparent;
+    color: var(--ink-mute);
+    border: 0;
+    border-radius: var(--r-sm);
+    display: grid; place-items: center;
+    cursor: pointer;
+  }
+  .export-row-menu:hover { background: var(--paper-2); color: var(--ink); }
+
+  /* WALK-AWAY STRIP */
+  .export-walkaway {
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    padding: var(--s-6);
+    margin-bottom: var(--s-7);
+  }
+  .export-walkaway-title {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: clamp(32px, 4vw, 48px);
+    line-height: 1.05; letter-spacing: -0.01em;
+    color: var(--ink);
+    margin-bottom: var(--s-3);
+  }
+  .export-walkaway-title em { font-style: italic; color: var(--terra); }
+  .export-walkaway-deck {
+    font-size: 15px; line-height: 1.55;
+    color: var(--ink-soft);
+    max-width: 720px;
+    margin-bottom: var(--s-4);
+  }
+  .export-walkaway-list {
+    list-style: none; padding: 0; margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--s-2) var(--s-5);
+  }
+  @media (max-width: 700px) { .export-walkaway-list { grid-template-columns: 1fr; } }
+  .export-walkaway-list li {
+    display: flex; align-items: center; gap: var(--s-2);
+    padding: var(--s-2) var(--s-3);
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-sm);
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+  .export-walkaway-list li i {
+    color: var(--terra);
+    font-size: 14px;
+  }
+
+  /* DELETE ZONE */
+  .export-delete-head { margin-bottom: var(--s-5); }
+  .export-delete-eyebrow { color: var(--terra); margin-bottom: var(--s-2); }
+  .export-delete-title {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: clamp(28px, 3vw, 36px);
+    line-height: 1.1; letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .export-delete-title em { font-style: italic; color: var(--terra); }
+  .export-delete-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s-3);
+  }
+  @media (max-width: 1100px) { .export-delete-grid { grid-template-columns: 1fr; } }
+
+  .export-delete-card {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    padding: var(--s-4);
+    display: flex; flex-direction: column; gap: var(--s-2);
+  }
+  .export-delete-name {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: 22px; line-height: 1.15;
+    color: var(--ink);
+  }
+  .export-delete-name em { font-style: italic; color: var(--terra); }
+  .export-delete-card p {
+    font-size: 13px; line-height: 1.5;
+    color: var(--ink-soft);
+    margin: 0;
+    flex: 1;
+  }
+  .export-delete-card p strong { color: var(--ink); font-weight: 600; }
+  .export-delete-link {
+    color: var(--terra);
+    font-size: 13px; font-weight: 500;
+    display: inline-flex; align-items: center; gap: 4px;
+    margin-top: var(--s-2);
+  }
+  .export-delete-link:hover { color: var(--terra-deep); }
+  .export-delete-link i { font-size: 13px; }
+
+  .export-delete-card-danger {
+    border-color: rgba(184, 80, 64, 0.3);
+    background: rgba(184, 80, 64, 0.04);
+  }
+  .export-delete-card-danger .export-delete-name em { color: #B85040; }
+  .export-delete-danger-btn {
+    margin-top: var(--s-2);
+    padding: 10px 16px;
+    background: transparent;
+    border: 1px solid #B85040;
+    color: #B85040;
+    border-radius: var(--r-sm);
+    font-family: var(--f-body);
+    font-size: 13px; font-weight: 500;
+    cursor: pointer;
+    align-self: flex-start;
+    transition: background var(--t-fast);
+  }
+  .export-delete-danger-btn:hover {
+    background: #B85040;
+    color: white;
+  }
+
+</style>
+</head>
+<body class="app-shell export-body">
+<header class="app-topbar">
+  <div class="app-topbar-inner">
+    <label for="navToggle" class="app-burger" aria-label="Open navigation"><i class="ph ph-list"></i></label>
+    <a class="app-brand" href="dashboard.html">My<span class="accent">Gen</span>tic</a>
+    <h1 class="app-page-title">Export & Data</h1>
+    <div class="app-topbar-actions">
+      <div class="app-topbar-search">
+        <i class="ph ph-magnifying-glass"></i>
+        <input type="text" placeholder="Search your context, agents, libraries…" />
+        <kbd>⌘K</kbd>
+      </div>
+      <button class="app-icon-btn" aria-label="Notifications"><i class="ph ph-bell"></i><span class="dot"></span></button>
+      <button class="app-avatar" aria-label="User menu">NA</button>
+    </div>
+  </div>
+</header>
+<div class="app-layout">
+  <input type="checkbox" id="navToggle" class="app-nav-toggle sr-only" />
+<label for="navToggle" class="app-leftnav-backdrop"></label>
+<nav class="app-leftnav" aria-label="Primary">
+  <div class="app-nav-section-label">Workspace</div>
+      <a href="dashboard.html" class="app-nav-item" data-page="dashboard"><i class="ph ph-gauge"></i><span>Dashboard</span></a>
+      <a href="atlas.html" class="app-nav-item" data-page="atlas"><i class="ph ph-graph"></i><span>Atlas</span></a>
+      <a href="sage.html" class="app-nav-item" data-page="sage"><i class="ph ph-chats-circle"></i><span>Sage</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Context</div>
+      <a href="context.html" class="app-nav-item" data-page="context"><i class="ph ph-stack"></i><span>Context Layers</span></a>
+      <a href="token-compaction.html" class="app-nav-item" data-page="token-compaction"><i class="ph ph-funnel"></i><span>Token Compaction</span></a>
+      <a href="history.html" class="app-nav-item" data-page="history"><i class="ph ph-clock-counter-clockwise"></i><span>History</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Connect</div>
+      <a href="connections.html" class="app-nav-item" data-page="connections"><i class="ph ph-plugs-connected"></i><span>Connections</span></a>
+      <a href="upload-data.html" class="app-nav-item" data-page="upload-data"><i class="ph ph-upload-simple"></i><span>Upload Data</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Build</div>
+      <a href="agents.html" class="app-nav-item" data-page="agents"><i class="ph ph-sparkle"></i><span>Agents</span></a>
+      <a href="marketplace.html" class="app-nav-item" data-page="marketplace"><i class="ph ph-books"></i><span>Expert Libraries</span><span class="nav-badge">New</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Account</div>
+      <a href="export.html" class="app-nav-item active" data-page="export"><i class="ph ph-download-simple"></i><span>Export &amp; Data</span></a>
+      <a href="settings.html" class="app-nav-item" data-page="settings"><i class="ph ph-gear-six"></i><span>Settings</span></a>
+</nav>
+  <main class="app-content">
+  <div class="export-page">
+    <div class="atlas-breadcrumb">
+      <a href="dashboard.html">Dashboard</a>
+      <i class="ph ph-caret-right"></i>
+      <span>Export &amp; Data</span>
+    </div>
+    <header class="export-hero">
+      <div class="t-label-mono export-eyebrow">Own your data · Always portable</div>
+      <h1 class="export-hero-title"><em>Own</em> what you build.</h1>
+      <p class="export-hero-deck">
+        Your context graph is yours. <em>To export, edit, or delete.</em> We're the custodian, not the owner. Export the whole graph as JSON anytime. Delete anything. <strong>No lock-in. No portability traps.</strong>
+      </p>
+      <div class="export-hero-stats">
+        <div class="export-stat">
+          <span class="export-stat-num">347</span>
+          <span class="t-label-mono">Nodes in your graph</span>
+        </div>
+        <div class="export-stat">
+          <span class="export-stat-num">6</span>
+          <span class="t-label-mono">Dimensions</span>
+        </div>
+        <div class="export-stat">
+          <span class="export-stat-num">11</span>
+          <span class="t-label-mono">Connected sources</span>
+        </div>
+        <div class="export-stat">
+          <span class="export-stat-num">4.2 MB</span>
+          <span class="t-label-mono">Full graph size</span>
+        </div>
+      </div>
+    </header>
+    <section class="export-quick">
+      <header class="export-section-head">
+        <h2 class="export-section-title"><em>Export</em> your data.</h2>
+        <p class="export-section-deck">Three ways to walk away with everything you put in.</p>
+      </header>
+      <div class="export-quick-grid">
+        <article class="export-quick-card export-quick-primary">
+          <div class="t-label-mono export-quick-eyebrow">Most common</div>
+          <h3 class="export-quick-name">Full graph.</h3>
+          <p>Everything we know about you, structured as JSON. <em>Re-import to MyGentic later, or use it elsewhere.</em></p>
+          <div class="export-quick-meta">
+            <span class="t-label-mono">347 nodes</span>
+            <span class="t-label-mono">·</span>
+            <span class="t-label-mono">~4.2 MB</span>
+          </div>
+          <button class="btn btn-primary terra btn-lg export-quick-cta"><i class="ph ph-download-simple"></i> Export full graph</button>
+        </article>
+
+        <article class="export-quick-card">
+          <div class="t-label-mono export-quick-eyebrow">Granular</div>
+          <h3 class="export-quick-name">Selected dimensions.</h3>
+          <p>Pick which of the six dimensions to include. Useful if you want to share only Work Life with a coach.</p>
+          <div class="export-quick-meta">
+            <span class="t-label-mono">Pick what flows out</span>
+          </div>
+          <button class="btn btn-secondary btn-lg export-quick-cta"><i class="ph ph-sliders-horizontal"></i> Configure export</button>
+        </article>
+
+        <article class="export-quick-card">
+          <div class="t-label-mono export-quick-eyebrow">Single source</div>
+          <h3 class="export-quick-name">By origin.</h3>
+          <p>Pull just what came from one source. Notion-only, Gmail-only, voice-memo-only. <em>Your call.</em></p>
+          <div class="export-quick-meta">
+            <span class="t-label-mono">11 sources available</span>
+          </div>
+          <button class="btn btn-secondary btn-lg export-quick-cta"><i class="ph ph-funnel"></i> Choose source</button>
+        </article>
+      </div>
+    </section>
+    <section class="export-formats">
+      <header class="export-section-head">
+        <h2 class="export-section-title">Pick your <em>format.</em></h2>
+        <p class="export-section-deck">Same data. Different containers, depending on where it's going.</p>
+      </header>
+      <div class="export-formats-grid">
+        <article class="export-format-card export-format-active">
+          <div class="export-format-icon"><i class="ph ph-brackets-curly"></i></div>
+          <h3 class="export-format-name">JSON</h3>
+          <p>Structured graph with nodes, edges, layers, and source attribution. Re-importable.</p>
+          <div class="t-label-mono export-format-meta">Default · machine-readable</div>
+        </article>
+        <article class="export-format-card">
+          <div class="export-format-icon"><i class="ph ph-file-text"></i></div>
+          <h3 class="export-format-name">Markdown</h3>
+          <p>Human-readable. One file per dimension, or one continuous document. Good for review.</p>
+          <div class="t-label-mono export-format-meta">For reading · sharing</div>
+        </article>
+        <article class="export-format-card">
+          <div class="export-format-icon"><i class="ph ph-table"></i></div>
+          <h3 class="export-format-name">CSV</h3>
+          <p>Flat tabular form. One row per node, with dimension and layer columns. For spreadsheet work.</p>
+          <div class="t-label-mono export-format-meta">For analysis</div>
+        </article>
+        <article class="export-format-card">
+          <div class="export-format-icon"><i class="ph ph-file-zip"></i></div>
+          <h3 class="export-format-name">Full archive</h3>
+          <p>Everything. Original uploaded files, structured nodes, source logs, audit trail. Bundled as ZIP.</p>
+          <div class="t-label-mono export-format-meta">For migration · backup</div>
+        </article>
+      </div>
+    </section>
+    <section class="export-dims">
+      <header class="export-section-head">
+        <h2 class="export-section-title">Or export <em>by dimension.</em></h2>
+        <p class="export-section-deck">Each dimension exports independently. Same JSON shape, narrower scope.</p>
+      </header>
+      <div class="export-dims-grid">
+        <article class="export-dim-card export-dim-professional">
+          <div class="export-dim-head">
+            <h3 class="export-dim-name">Professional</h3>
+            <button class="export-dim-action" aria-label="Export Professional"><i class="ph ph-download-simple"></i></button>
+          </div>
+          <div class="export-dim-stats">
+            <span class="export-dim-nodes">68 nodes</span>
+            <span class="t-label-mono export-dim-depth">Stage 3 · Solid</span>
+          </div>
+        </article>
+        <article class="export-dim-card export-dim-worklife">
+          <div class="export-dim-head">
+            <h3 class="export-dim-name">Work Life</h3>
+            <button class="export-dim-action" aria-label="Export Work Life"><i class="ph ph-download-simple"></i></button>
+          </div>
+          <div class="export-dim-stats">
+            <span class="export-dim-nodes">54 nodes</span>
+            <span class="t-label-mono export-dim-depth">Stage 2 · Developing</span>
+          </div>
+        </article>
+        <article class="export-dim-card export-dim-interests">
+          <div class="export-dim-head">
+            <h3 class="export-dim-name">Interests</h3>
+            <button class="export-dim-action" aria-label="Export Interests"><i class="ph ph-download-simple"></i></button>
+          </div>
+          <div class="export-dim-stats">
+            <span class="export-dim-nodes">71 nodes</span>
+            <span class="t-label-mono export-dim-depth">Stage 3 · Solid</span>
+          </div>
+        </article>
+        <article class="export-dim-card export-dim-aesthetic">
+          <div class="export-dim-head">
+            <h3 class="export-dim-name">Aesthetic</h3>
+            <button class="export-dim-action" aria-label="Export Aesthetic"><i class="ph ph-download-simple"></i></button>
+          </div>
+          <div class="export-dim-stats">
+            <span class="export-dim-nodes">38 nodes</span>
+            <span class="t-label-mono export-dim-depth">Stage 2 · Developing</span>
+          </div>
+        </article>
+        <article class="export-dim-card export-dim-consumer">
+          <div class="export-dim-head">
+            <h3 class="export-dim-name">Consumer</h3>
+            <button class="export-dim-action" aria-label="Export Consumer"><i class="ph ph-download-simple"></i></button>
+          </div>
+          <div class="export-dim-stats">
+            <span class="export-dim-nodes">54 nodes</span>
+            <span class="t-label-mono export-dim-depth">Stage 3 · Solid</span>
+          </div>
+        </article>
+        <article class="export-dim-card export-dim-relationships">
+          <div class="export-dim-head">
+            <h3 class="export-dim-name">Relationships</h3>
+            <button class="export-dim-action" aria-label="Export Relationships"><i class="ph ph-download-simple"></i></button>
+          </div>
+          <div class="export-dim-stats">
+            <span class="export-dim-nodes">33 nodes</span>
+            <span class="t-label-mono export-dim-depth">Stage 2 · Developing</span>
+          </div>
+        </article>
+      </div>
+    </section>
+    <section class="export-recent">
+      <header class="export-section-head">
+        <h2 class="export-section-title"><em>Recent</em> exports.</h2>
+        <p class="export-section-deck">Re-download within 30 days. After that, a fresh export pulls the latest state.</p>
+      </header>
+      <div class="export-recent-rows">
+        <article class="export-row">
+          <div class="export-row-icon"><i class="ph ph-file-arrow-down"></i></div>
+          <div class="export-row-main">
+            <div class="export-row-name">full-graph-2026-05-07.json</div>
+            <div class="export-row-meta t-label-mono">Full graph · JSON · 4.2 MB · 347 nodes</div>
+          </div>
+          <div class="export-row-when t-label-mono">12 min ago</div>
+          <div class="export-row-actions">
+            <a class="export-row-link" href="#"><i class="ph ph-download-simple"></i> Download</a>
+            <button class="export-row-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+          </div>
+        </article>
+        <article class="export-row">
+          <div class="export-row-icon"><i class="ph ph-file-arrow-down"></i></div>
+          <div class="export-row-main">
+            <div class="export-row-name">professional-2026-05-05.json</div>
+            <div class="export-row-meta t-label-mono">Professional dim only · JSON · 892 KB · 68 nodes</div>
+          </div>
+          <div class="export-row-when t-label-mono">2d ago</div>
+          <div class="export-row-actions">
+            <a class="export-row-link" href="#"><i class="ph ph-download-simple"></i> Download</a>
+            <button class="export-row-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+          </div>
+        </article>
+        <article class="export-row">
+          <div class="export-row-icon"><i class="ph ph-file-arrow-down"></i></div>
+          <div class="export-row-main">
+            <div class="export-row-name">weekly-review-export.md</div>
+            <div class="export-row-meta t-label-mono">Weekly review feed · Markdown · 156 KB · 12 entries</div>
+          </div>
+          <div class="export-row-when t-label-mono">1w ago</div>
+          <div class="export-row-actions">
+            <a class="export-row-link" href="#"><i class="ph ph-download-simple"></i> Download</a>
+            <button class="export-row-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+          </div>
+        </article>
+        <article class="export-row">
+          <div class="export-row-icon"><i class="ph ph-file-arrow-down"></i></div>
+          <div class="export-row-main">
+            <div class="export-row-name">mygentic-2026-04-29.zip</div>
+            <div class="export-row-meta t-label-mono">Full archive · ZIP · 6.1 MB · 347 nodes</div>
+          </div>
+          <div class="export-row-when t-label-mono">8d ago</div>
+          <div class="export-row-actions">
+            <a class="export-row-link" href="#"><i class="ph ph-download-simple"></i> Download</a>
+            <button class="export-row-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+          </div>
+        </article>
+      </div>
+    </section>
+    <section class="export-walkaway">
+      <h2 class="export-walkaway-title"><em>Walk away</em> with everything you put in.</h2>
+      <p class="export-walkaway-deck">Most platforms talk about data ownership. Few make it real. Your context graph is yours, to scope, export, edit, or delete. We're the custodian, not the owner.</p>
+      <ul class="export-walkaway-list">
+        <li><i class="ph ph-arrow-right"></i> JSON export of full context graph, on demand</li>
+        <li><i class="ph ph-arrow-right"></i> Per-AI, per-dimension, per-timeframe scopes</li>
+        <li><i class="ph ph-arrow-right"></i> One-click revoke for any connected tool</li>
+        <li><i class="ph ph-arrow-right"></i> GDPR + CCPA compliance baked in, not bolted on</li>
+      </ul>
+    </section>
+    <section class="export-delete">
+      <header class="export-delete-head">
+        <div>
+          <div class="t-label-mono export-delete-eyebrow">Data lifecycle</div>
+          <h2 class="export-delete-title">Delete anything. <em>Including everything.</em></h2>
+        </div>
+      </header>
+      <div class="export-delete-grid">
+        <article class="export-delete-card">
+          <h3 class="export-delete-name">Delete a node.</h3>
+          <p>Pinpoint removal. Open Atlas, find the node, mark it for deletion. Gone within 24 hours, including all sources.</p>
+          <a href="atlas.html" class="export-delete-link">Open Atlas <i class="ph ph-arrow-up-right"></i></a>
+        </article>
+        <article class="export-delete-card">
+          <h3 class="export-delete-name">Delete a dimension.</h3>
+          <p>Remove an entire dimension from your graph. Useful if a life chapter ends and you'd rather not carry it.</p>
+          <a href="context.html" class="export-delete-link">Open Context Layers <i class="ph ph-arrow-up-right"></i></a>
+        </article>
+        <article class="export-delete-card export-delete-card-danger">
+          <h3 class="export-delete-name">Delete <em>everything.</em></h3>
+          <p>Tear down your entire MyGentic account. <strong>30-day grace period</strong> to change your mind. After that, gone for good.</p>
+          <button class="export-delete-danger-btn">Begin account deletion</button>
+        </article>
+      </div>
+    </section>
+  </div>
+</main>
+</div>
+</body>
+</html>
