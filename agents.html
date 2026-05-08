@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Agents · MyGentic</title>
+<link rel="stylesheet" href="app.css" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+
+<style>
+
+  .app-content { padding: 0; }
+  .agents-page {
+    max-width: var(--w-bleed);
+    margin: 0 auto;
+    padding: var(--s-5) var(--s-6) var(--s-9);
+  }
+  @media (max-width: 900px) {
+    .agents-page { padding: var(--s-4) var(--s-4) var(--s-7); }
+  }
+
+  .atlas-breadcrumb {
+    display: flex; align-items: center; gap: var(--s-2);
+    font-family: var(--f-mono); font-size: 11px;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--ink-mute);
+    padding: var(--s-2) 0 var(--s-4);
+  }
+  .atlas-breadcrumb a { color: var(--ink-mute); }
+  .atlas-breadcrumb a:hover { color: var(--terra); }
+  .atlas-breadcrumb i { font-size: 14px; opacity: 0.6; }
+
+  /* HERO */
+  .agents-hero {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--s-6);
+    align-items: end;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: var(--s-6);
+    margin-bottom: var(--s-6);
+  }
+  @media (max-width: 900px) {
+    .agents-hero { grid-template-columns: 1fr; }
+  }
+  .agents-hero-text { max-width: 800px; }
+  .agents-eyebrow { color: var(--terra); margin-bottom: var(--s-3); }
+  .agents-hero-title {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: clamp(40px, 5vw, 60px);
+    line-height: 1.05; letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: var(--s-4);
+  }
+  .agents-hero-title em { font-style: italic; }
+  .agents-hero-deck {
+    font-size: 17px; line-height: 1.55;
+    color: var(--ink-soft);
+  }
+  .agents-hero-deck em { font-style: italic; color: var(--terra); }
+  .agents-hero-actions {
+    display: flex; gap: var(--s-2);
+    flex-shrink: 0;
+  }
+
+  /* STATS STRIP */
+  .agents-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--s-4);
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    padding: var(--s-4) var(--s-5);
+    margin-bottom: var(--s-7);
+  }
+  @media (max-width: 700px) {
+    .agents-stats { grid-template-columns: repeat(2, 1fr); }
+  }
+  .agents-stat { display: flex; flex-direction: column; gap: 2px; }
+  .agents-stat-num {
+    font-family: var(--f-display);
+    font-size: 32px;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .agents-stat .t-label-mono { color: var(--ink-mute); }
+
+  /* SECTION HEAD (shared) */
+  .agents-section-head {
+    display: flex; justify-content: space-between; align-items: end;
+    flex-wrap: wrap; gap: var(--s-4);
+    padding-bottom: var(--s-4);
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: var(--s-5);
+  }
+  .agents-section-title {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: clamp(28px, 3vw, 36px);
+    line-height: 1.1; letter-spacing: -0.01em;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .agents-section-title em { font-style: italic; }
+  .agents-section-deck {
+    font-size: 14px; color: var(--ink-mute);
+  }
+  .agents-section-link {
+    color: var(--terra);
+    font-size: 14px; font-weight: 500;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .agents-section-link:hover { color: var(--terra-deep); }
+  .agents-section-link i { font-size: 14px; }
+
+  /* FILTER PILLS */
+  .agents-section-filters {
+    display: flex; gap: 4px; flex-wrap: wrap;
+  }
+  .agents-filter {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px;
+    background: transparent;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    font-family: var(--f-body); font-size: 12px; font-weight: 500;
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .agents-filter:hover { background: var(--paper-2); }
+  .agents-filter-active {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+  .agents-filter-count {
+    font-family: var(--f-mono); font-size: 10px;
+    opacity: 0.7;
+  }
+
+  /* AGENTS GRID */
+  .agents-mine { margin-bottom: var(--s-8); }
+  .agents-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s-3);
+  }
+  @media (max-width: 1100px) { .agents-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 700px)  { .agents-grid { grid-template-columns: 1fr; } }
+
+  .agent-card {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    padding: var(--s-4);
+    display: flex; flex-direction: column; gap: var(--s-3);
+    transition: border-color var(--t-fast);
+    position: relative;
+  }
+  .agent-card:hover { border-color: var(--rule-strong); }
+  .agent-card-paused { opacity: 0.85; }
+  .agent-card-draft  { background: var(--paper-2); border-style: dashed; }
+
+  .agent-card-head {
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .agent-card-status {
+    display: flex; align-items: center; gap: 6px;
+  }
+  .agent-status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .agent-status-active { background: #4FAF6F; box-shadow: 0 0 6px rgba(79,175,111,0.5); }
+  .agent-status-paused { background: var(--ink-mute); }
+  .agent-status-draft  { background: var(--terra); opacity: 0.5; }
+  .agent-status-active + .agent-status-label { color: #2D7A47; }
+  .agent-status-paused + .agent-status-label { color: var(--ink-mute); }
+  .agent-status-draft  + .agent-status-label { color: var(--terra-deep); }
+
+  .agent-card-menu {
+    width: 28px; height: 28px;
+    background: transparent;
+    color: var(--ink-mute);
+    border-radius: var(--r-sm);
+    display: grid; place-items: center;
+    cursor: pointer;
+  }
+  .agent-card-menu:hover { background: var(--paper-2); color: var(--ink); }
+
+  .agent-card-body {
+    display: flex; flex-direction: column; gap: 6px;
+    flex: 1;
+  }
+  .agent-card-name {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: 24px; line-height: 1.1;
+    color: var(--ink);
+  }
+  .agent-card-role {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-bottom: 4px;
+  }
+  .agent-card-role em { font-style: italic; color: var(--terra); }
+  .agent-card-role strong { color: var(--ink); font-weight: 500; }
+  .agent-card-desc {
+    font-size: 13px; line-height: 1.5;
+    color: var(--ink-soft);
+  }
+  .agent-card-libraries {
+    display: flex; flex-wrap: wrap; gap: 4px;
+    margin-top: 4px;
+  }
+  .agent-lib-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-family: var(--f-display); font-style: italic;
+    font-size: 11px;
+    color: var(--terra);
+    background: var(--terra-tint);
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+  .agent-lib-pill i { font-size: 11px; opacity: 0.7; }
+
+  .agent-card-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    padding: var(--s-2) 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .agent-card-stat {
+    display: flex; flex-direction: column; gap: 1px;
+  }
+  .agent-card-stat-val {
+    font-family: var(--f-display);
+    font-size: 18px;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+  .agent-card-stat .t-label-mono {
+    color: var(--ink-mute);
+  }
+
+  .agent-card-foot {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: var(--s-2);
+  }
+  .agent-card-run {
+    flex: 1;
+    justify-content: center;
+  }
+  .agent-card-link {
+    display: inline-flex; align-items: center; gap: 4px;
+    color: var(--ink-soft);
+    font-size: 13px; font-weight: 500;
+    padding: 8px 12px;
+    border-radius: var(--r-sm);
+  }
+  .agent-card-link:hover { background: var(--paper-2); color: var(--ink); }
+  .agent-card-link i { font-size: 13px; }
+
+  /* TEMPLATES GRID */
+  .agents-templates { margin-bottom: var(--s-8); }
+  .agents-templates-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s-3);
+  }
+  @media (max-width: 1100px) { .agents-templates-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 700px)  { .agents-templates-grid { grid-template-columns: 1fr; } }
+
+  .template-card {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    padding: var(--s-4);
+    display: flex; flex-direction: column; gap: var(--s-2);
+    transition: border-color var(--t-fast);
+  }
+  .template-card:hover { border-color: var(--terra); }
+  .template-card-icon {
+    width: 40px; height: 40px;
+    background: var(--terra-tint);
+    color: var(--terra);
+    border-radius: var(--r-sm);
+    display: grid; place-items: center;
+    margin-bottom: 4px;
+  }
+  .template-card-icon i { font-size: 20px; }
+  .template-card-name {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: 22px; line-height: 1.15;
+    color: var(--ink);
+  }
+  .template-card-desc {
+    font-size: 13px; line-height: 1.5;
+    color: var(--ink-soft);
+    flex: 1;
+  }
+  .template-card-foot {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-top: var(--s-2);
+    border-top: 1px solid var(--rule);
+    margin-top: var(--s-2);
+  }
+  .template-card-tool { color: var(--ink-mute); }
+  .template-card-link {
+    color: var(--terra);
+    font-size: 13px; font-weight: 500;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .template-card-link:hover { color: var(--terra-deep); }
+  .template-card-link i { font-size: 13px; }
+
+  /* WHY-BETTER */
+  .agents-why {
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    padding: var(--s-6);
+  }
+  .agents-why-title {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: clamp(28px, 3vw, 36px);
+    line-height: 1.1; letter-spacing: -0.01em;
+    color: var(--ink);
+    margin-bottom: var(--s-5);
+  }
+  .agents-why-title em { font-style: italic; }
+  .agents-why-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s-4);
+  }
+  @media (max-width: 1100px) { .agents-why-grid { grid-template-columns: 1fr; } }
+
+  .why-card {
+    display: flex; flex-direction: column; gap: var(--s-1);
+    padding: var(--s-3);
+    border-left: 2px solid var(--terra);
+  }
+  .why-card-num { color: var(--terra); }
+  .why-card-name {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: 20px;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+  .why-card p {
+    font-size: 13px; line-height: 1.5;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+
+</style>
+</head>
+<body class="app-shell agents-body">
+<header class="app-topbar">
+  <div class="app-topbar-inner">
+    <label for="navToggle" class="app-burger" aria-label="Open navigation"><i class="ph ph-list"></i></label>
+    <a class="app-brand" href="dashboard.html">My<span class="accent">Gen</span>tic</a>
+    <h1 class="app-page-title">Agents</h1>
+    <div class="app-topbar-actions">
+      <div class="app-topbar-search">
+        <i class="ph ph-magnifying-glass"></i>
+        <input type="text" placeholder="Search your context, agents, libraries…" />
+        <kbd>⌘K</kbd>
+      </div>
+      <button class="app-icon-btn" aria-label="Notifications"><i class="ph ph-bell"></i><span class="dot"></span></button>
+      <button class="app-avatar" aria-label="User menu">NA</button>
+    </div>
+  </div>
+</header>
+<div class="app-layout">
+  <input type="checkbox" id="navToggle" class="app-nav-toggle sr-only" />
+<label for="navToggle" class="app-leftnav-backdrop"></label>
+<nav class="app-leftnav" aria-label="Primary">
+  <div class="app-nav-section-label">Workspace</div>
+      <a href="dashboard.html" class="app-nav-item" data-page="dashboard"><i class="ph ph-gauge"></i><span>Dashboard</span></a>
+      <a href="atlas.html" class="app-nav-item" data-page="atlas"><i class="ph ph-graph"></i><span>Atlas</span></a>
+      <a href="sage.html" class="app-nav-item" data-page="sage"><i class="ph ph-chats-circle"></i><span>Sage</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Context</div>
+      <a href="context.html" class="app-nav-item" data-page="context"><i class="ph ph-stack"></i><span>Context Layers</span></a>
+      <a href="token-compaction.html" class="app-nav-item" data-page="token-compaction"><i class="ph ph-funnel"></i><span>Token Compaction</span></a>
+      <a href="history.html" class="app-nav-item" data-page="history"><i class="ph ph-clock-counter-clockwise"></i><span>History</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Connect</div>
+      <a href="connections.html" class="app-nav-item" data-page="connections"><i class="ph ph-plugs-connected"></i><span>Connections</span></a>
+      <a href="upload-data.html" class="app-nav-item" data-page="upload-data"><i class="ph ph-upload-simple"></i><span>Upload Data</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Build</div>
+      <a href="agents.html" class="app-nav-item active" data-page="agents"><i class="ph ph-sparkle"></i><span>Agents</span></a>
+      <a href="marketplace.html" class="app-nav-item" data-page="marketplace"><i class="ph ph-books"></i><span>Expert Libraries</span><span class="nav-badge">New</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Account</div>
+      <a href="export.html" class="app-nav-item" data-page="export"><i class="ph ph-download-simple"></i><span>Export &amp; Data</span></a>
+      <a href="settings.html" class="app-nav-item" data-page="settings"><i class="ph ph-gear-six"></i><span>Settings</span></a>
+</nav>
+  <main class="app-content">
+  <div class="agents-page">
+    <div class="atlas-breadcrumb">
+      <a href="dashboard.html">Dashboard</a>
+      <i class="ph ph-caret-right"></i>
+      <span>Agents</span>
+    </div>
+    <header class="agents-hero">
+      <div class="agents-hero-text">
+        <div class="t-label-mono agents-eyebrow">Build · Agents that know you</div>
+        <h1 class="agents-hero-title">Build agents <em>grounded</em> in your actual context.</h1>
+        <p class="agents-hero-deck">
+          A writing partner with your voice. A planner with your priorities. A research agent with your taste. <em>Skip the prompt-engineering grind</em> — your agents start knowing you.
+        </p>
+      </div>
+      <div class="agents-hero-actions">
+        <a href="agent-builder.html" class="btn btn-primary terra btn-lg"><i class="ph ph-plus"></i> Build an agent</a>
+        <a href="#templates" class="btn btn-secondary btn-lg">See templates</a>
+      </div>
+    </header>
+    <section class="agents-stats">
+      <div class="agents-stat">
+        <span class="agents-stat-num">5</span>
+        <span class="t-label-mono">Active</span>
+      </div>
+      <div class="agents-stat">
+        <span class="agents-stat-num">101</span>
+        <span class="t-label-mono">Runs this month</span>
+      </div>
+      <div class="agents-stat">
+        <span class="agents-stat-num">93%</span>
+        <span class="t-label-mono">Avg success</span>
+      </div>
+      <div class="agents-stat">
+        <span class="agents-stat-num">2.4s</span>
+        <span class="t-label-mono">Avg latency</span>
+      </div>
+    </section>
+    <section class="agents-mine">
+      <header class="agents-section-head">
+        <div>
+          <h2 class="agents-section-title">Your <em>agents.</em></h2>
+          <p class="agents-section-deck">4 active · 6 total. All running on your context.</p>
+        </div>
+        <div class="agents-section-filters">
+          <button class="agents-filter agents-filter-active">All <span class="agents-filter-count">6</span></button>
+          <button class="agents-filter">Active <span class="agents-filter-count">4</span></button>
+          <button class="agents-filter">Paused <span class="agents-filter-count">1</span></button>
+          <button class="agents-filter">Drafts <span class="agents-filter-count">1</span></button>
+        </div>
+      </header>
+      <div class="agents-grid">
+      <article class="agent-card agent-card-active">
+        <header class="agent-card-head">
+          <div class="agent-card-status">
+            <span class="agent-status-dot agent-status-active"></span>
+            <span class="t-label-mono agent-status-label">ACTIVE</span>
+          </div>
+          <button class="agent-card-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+        </header>
+        
+        <div class="agent-card-body">
+          <h3 class="agent-card-name">Investor Replier</h3>
+          <p class="agent-card-role"><em>Writing partner</em> · runs on <strong>Claude</strong></p>
+          <p class="agent-card-desc">Drafts replies to investor follow-ups in your direct, warm-but-brief voice. Knows your pitch deck and current metrics.</p>
+          <div class="agent-card-libraries"><span class="agent-lib-pill"><i class="ph ph-books"></i>Founder OS</span></div>
+        </div>
+
+        <div class="agent-card-stats">
+          <div class="agent-card-stat">
+            <span class="agent-card-stat-val">47</span>
+            <span class="t-label-mono">Runs</span>
+          </div>
+          <div class="agent-card-stat">
+            <span class="agent-card-stat-val">94%</span>
+            <span class="t-label-mono">Success</span>
+          </div>
+          <div class="agent-card-stat">
+            <span class="agent-card-stat-val">2h ago</span>
+            <span class="t-label-mono">Last run</span>
+          </div>
+        </div>
+
+        <footer class="agent-card-foot">
+          <button class="btn btn-primary terra agent-card-run"><i class="ph ph-play"></i> Run now</button>
+          <a class="agent-card-link" href="agent-detail.html?id=investor-replier">Open <i class="ph ph-arrow-up-right"></i></a>
+        </footer>
+      </article>
+      <article class="agent-card agent-card-active">
+        <header class="agent-card-head">
+          <div class="agent-card-status">
+            <span class="agent-status-dot agent-status-active"></span>
+            <span class="t-label-mono agent-status-label">ACTIVE</span>
+          </div>
+          <button class="agent-card-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+        </header>
+        
+        <div class="agent-card-body">
+          <h3 class="agent-card-name">Weekly Reviewer</h3>
+          <p class="agent-card-role"><em>Planner</em> · runs on <strong>Claude</strong></p>
+          <p class="agent-card-desc">Pulls Calendar + Notion + email threads every Friday at 4pm. Writes a 1-page weekly review with what shifted.</p>
+          
+        </div>
+
+        <div class="agent-card-stats">
+          <div class="agent-card-stat">
+            <span class="agent-card-stat-val">18</span>
+            <span class="t-label-mono">Runs</span>
+          </div>
+          <div class="agent-card-stat">
+            <span class="agent-card-stat-val">100%</span>
+            <span class="t-label-mono">Success</span>
+          </div>
+          <div class="agent-card-stat">
+            <span class="agent-card-stat-val">Yesterday</span>
+            <span class="t-label-mono">Last run</span>
+          </div>
+        </div>
+
+        <footer class="agent-card-foot">
+          <button class="btn btn-primary terra agent-card-run"><i class="ph ph-play"></i> Run now</button>
+          <a class="agent-card-link" href="agent-detail.html?id=weekly-review">Open <i class="ph ph-arrow-up-right"></i></a>
+        </footer>
+      </article>
+      <article class="agent-card agent-card-active">
+        <header class="agent-card-head">
+          <div class="agent-card-status">
+            <span class="agent-status-dot agent-status-active"></span>
+            <span class="t-label-mono agent-status-label">ACTIVE</span>
+          </div>
+          <button class="agent-card-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+        </header>
+        
+        <div class="agent-card-body">
+          <h3 class="agent-card-name">Research Spotter</h3>
+          <p class="agent-card-role"><em>Researcher</em> · runs on <strong>Perplexity</strong></p>
+          <p class="agent-card-desc">Watches 6 industries you care about, surfaces 3 stories per week that match your strategic POV.</p>
+          <div class="agent-card-libraries"><span class="agent-lib-pill"><i class="ph ph-books"></i>Industry Rockstar</span></div>
+        </div>
+
+        <div class="agent-card-stats">
+          <div class="agent-card-stat">
+            <span class="agent-card-stat-val">23</span>
+            <span class="t-label-mono">Runs</span>
+          </div>
+          <div class="agent-card-stat">
+            <span class="agent-card-stat-val">87%</span>
+            <span class="t-label-mono">Success</span>
+          </div>
+          <div class="agent-card-stat">
+            <span class="agent-card-stat-val">3h ago</span>
+            <span class="t-label-mono">Last run</span>
+          </div>
+        </div>
+
+        <footer class="agent-card-foot">
+          <button class="btn btn-primary terra agent-card-run"><i class="ph ph-play"></i> Run now</button>
+          <a class="agent-card-link" href="agent-detail.html?id=research-spotter">Open <i class="ph ph-arrow-up-right"></i></a>
+        </footer>
+      </article>
+      <article class="agent-card agent-card-active">
+        <header class="agent-card-head">
+          <div class="agent-card-status">
+            <span class="agent-status-dot agent-status-active"></span>
+            <span class="t-label-mono agent-status-label">ACTIVE</span>
+          </div>
+          <button class="agent-card-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+        </header>
+        
+        <div class="agent-card-body">
+          <h3 class="agent-card-name">Design Critique</h3>
+          <p class="agent-card-role"><em>Coach</em> · runs on <strong>Claude</strong></p>
+          <p class="agent-card-desc">Reviews UI screens against your aesthetic preferences. Calls out drift before it ships.</p>
+          <div class="agent-card-libraries"><span class="agent-lib-pill"><i class="ph ph-books"></i>Industry Rockstar</span></div>
+        </div>
+
+        <div class="agent-card-stats">
+          <div class="agent-card-stat">
+            <span class="agent-card-stat-val">9</span>
+            <span class="t-label-mono">Runs</span>
+          </div>
+          <div class="agent-card-stat">
+            <span class="agent-card-stat-val">89%</span>
+            <span class="t-label-mono">Success</span>
+          </div>
+          <div class="agent-card-stat">
+            <span class="agent-card-stat-val">4d ago</span>
+            <span class="t-label-mono">Last run</span>
+          </div>
+        </div>
+
+        <footer class="agent-card-foot">
+          <button class="btn btn-primary terra agent-card-run"><i class="ph ph-play"></i> Run now</button>
+          <a class="agent-card-link" href="agent-detail.html?id=design-critique">Open <i class="ph ph-arrow-up-right"></i></a>
+        </footer>
+      </article>
+      <article class="agent-card agent-card-paused">
+        <header class="agent-card-head">
+          <div class="agent-card-status">
+            <span class="agent-status-dot agent-status-paused"></span>
+            <span class="t-label-mono agent-status-label">PAUSED</span>
+          </div>
+          <button class="agent-card-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+        </header>
+        
+        <div class="agent-card-body">
+          <h3 class="agent-card-name">Track Day Prep</h3>
+          <p class="agent-card-role"><em>Coach</em> · runs on <strong>Claude</strong></p>
+          <p class="agent-card-desc">Pulls Chuckwalla weather + tire data + your prior session notes. Builds the day's prep brief.</p>
+          
+        </div>
+
+        <div class="agent-card-stats">
+          <div class="agent-card-stat">
+            <span class="agent-card-stat-val">4</span>
+            <span class="t-label-mono">Runs</span>
+          </div>
+          <div class="agent-card-stat">
+            <span class="agent-card-stat-val">100%</span>
+            <span class="t-label-mono">Success</span>
+          </div>
+          <div class="agent-card-stat">
+            <span class="agent-card-stat-val">2w ago</span>
+            <span class="t-label-mono">Last run</span>
+          </div>
+        </div>
+
+        <footer class="agent-card-foot">
+          <button class="btn btn-secondary agent-card-run"><i class="ph ph-play"></i> Resume</button>
+          <a class="agent-card-link" href="agent-detail.html?id=track-day-prep">Open <i class="ph ph-arrow-up-right"></i></a>
+        </footer>
+      </article>
+      <article class="agent-card agent-card-draft">
+        <header class="agent-card-head">
+          <div class="agent-card-status">
+            <span class="agent-status-dot agent-status-draft"></span>
+            <span class="t-label-mono agent-status-label">DRAFT</span>
+          </div>
+          <button class="agent-card-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+        </header>
+        
+        <div class="agent-card-body">
+          <h3 class="agent-card-name">Email Triager</h3>
+          <p class="agent-card-role"><em>Planner</em> · runs on <strong>Claude</strong></p>
+          <p class="agent-card-desc">Sorts inbox by your stated priorities. Flags only what needs you. Drafts replies for the rest.</p>
+          
+        </div>
+
+        <div class="agent-card-stats">
+          <div class="agent-card-stat">
+            <span class="agent-card-stat-val">0</span>
+            <span class="t-label-mono">Runs</span>
+          </div>
+          <div class="agent-card-stat">
+            <span class="agent-card-stat-val">—</span>
+            <span class="t-label-mono">Success</span>
+          </div>
+          <div class="agent-card-stat">
+            <span class="agent-card-stat-val">Never</span>
+            <span class="t-label-mono">Last run</span>
+          </div>
+        </div>
+
+        <footer class="agent-card-foot">
+          <button class="btn btn-secondary agent-card-run"><i class="ph ph-pencil"></i> Finish setup</button>
+          <a class="agent-card-link" href="agent-detail.html?id=email-triager">Open <i class="ph ph-arrow-up-right"></i></a>
+        </footer>
+      </article>
+      </div>
+    </section>
+    <section class="agents-templates" id="templates">
+      <header class="agents-section-head">
+        <div>
+          <h2 class="agents-section-title">Start from a <em>template.</em></h2>
+          <p class="agents-section-deck">Six common roles, pre-wired to your context. Customize from there.</p>
+        </div>
+        <a href="#" class="agents-section-link">Browse the marketplace <i class="ph ph-arrow-up-right"></i></a>
+      </header>
+      <div class="agents-templates-grid">
+        <article class="template-card">
+          <div class="template-card-icon"><i class="ph ph-pencil-line"></i></div>
+          <h3 class="template-card-name">Writing partner</h3>
+          <p class="template-card-desc">Drafts in your voice. Captures your turns of phrase.</p>
+          <div class="template-card-foot">
+            <span class="t-label-mono template-card-tool">Runs on Claude</span>
+            <a href="agent-builder.html?template=writing-partner" class="template-card-link">Use template <i class="ph ph-arrow-right"></i></a>
+          </div>
+        </article>
+        <article class="template-card">
+          <div class="template-card-icon"><i class="ph ph-calendar-check"></i></div>
+          <h3 class="template-card-name">Planner</h3>
+          <p class="template-card-desc">Goals, deadlines, blocks. Held against your calendar.</p>
+          <div class="template-card-foot">
+            <span class="t-label-mono template-card-tool">Runs on Claude</span>
+            <a href="agent-builder.html?template=planner" class="template-card-link">Use template <i class="ph ph-arrow-right"></i></a>
+          </div>
+        </article>
+        <article class="template-card">
+          <div class="template-card-icon"><i class="ph ph-magnifying-glass"></i></div>
+          <h3 class="template-card-name">Researcher</h3>
+          <p class="template-card-desc">Watches a beat. Surfaces what matters to you.</p>
+          <div class="template-card-foot">
+            <span class="t-label-mono template-card-tool">Runs on Perplexity</span>
+            <a href="agent-builder.html?template=researcher" class="template-card-link">Use template <i class="ph ph-arrow-right"></i></a>
+          </div>
+        </article>
+        <article class="template-card">
+          <div class="template-card-icon"><i class="ph ph-target"></i></div>
+          <h3 class="template-card-name">Coach</h3>
+          <p class="template-card-desc">Notices the gap between intention and action.</p>
+          <div class="template-card-foot">
+            <span class="t-label-mono template-card-tool">Runs on Claude</span>
+            <a href="agent-builder.html?template=coach" class="template-card-link">Use template <i class="ph ph-arrow-right"></i></a>
+          </div>
+        </article>
+        <article class="template-card">
+          <div class="template-card-icon"><i class="ph ph-chart-line"></i></div>
+          <h3 class="template-card-name">Analyst</h3>
+          <p class="template-card-desc">Numbers in context. Knows your business model.</p>
+          <div class="template-card-foot">
+            <span class="t-label-mono template-card-tool">Runs on Claude</span>
+            <a href="agent-builder.html?template=analyst" class="template-card-link">Use template <i class="ph ph-arrow-right"></i></a>
+          </div>
+        </article>
+        <article class="template-card">
+          <div class="template-card-icon"><i class="ph ph-envelope"></i></div>
+          <h3 class="template-card-name">Inbox triager</h3>
+          <p class="template-card-desc">Sorts by your priorities, drafts replies for the rest.</p>
+          <div class="template-card-foot">
+            <span class="t-label-mono template-card-tool">Runs on Claude</span>
+            <a href="agent-builder.html?template=inbox-triager" class="template-card-link">Use template <i class="ph ph-arrow-right"></i></a>
+          </div>
+        </article>
+      </div>
+    </section>
+    <section class="agents-why">
+      <h2 class="agents-why-title">Less prompting. <em>More partnering.</em></h2>
+      <div class="agents-why-grid">
+        <article class="why-card">
+          <div class="t-label-mono why-card-num">01</div>
+          <h3 class="why-card-name">Pre-loaded with your context.</h3>
+          <p>Every agent starts with your six-dimension profile. No more re-introducing yourself in every prompt.</p>
+        </article>
+        <article class="why-card">
+          <div class="t-label-mono why-card-num">02</div>
+          <h3 class="why-card-name">Templates for common roles.</h3>
+          <p>Skip the cold-start. Pick a role, customize, ship in under five minutes.</p>
+        </article>
+        <article class="why-card">
+          <div class="t-label-mono why-card-num">03</div>
+          <h3 class="why-card-name">Compose with Expert Libraries.</h3>
+          <p>Stack a Library on top of your context for domain depth. No retraining required.</p>
+        </article>
+      </div>
+    </section>
+  </div>
+</main>
+</div>
+</body>
+</html>
