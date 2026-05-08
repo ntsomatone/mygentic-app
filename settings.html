@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Settings · MyGentic</title>
+<link rel="stylesheet" href="app.css" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+
+<style>
+
+  .app-content { padding: 0; }
+  .settings-page {
+    max-width: var(--w-bleed);
+    margin: 0 auto;
+    padding: var(--s-5) var(--s-6) var(--s-9);
+  }
+  @media (max-width: 900px) {
+    .settings-page { padding: var(--s-4) var(--s-4) var(--s-7); }
+  }
+
+  .atlas-breadcrumb {
+    display: flex; align-items: center; gap: var(--s-2);
+    font-family: var(--f-mono); font-size: 11px;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--ink-mute);
+    padding: var(--s-2) 0 var(--s-4);
+  }
+  .atlas-breadcrumb a { color: var(--ink-mute); }
+  .atlas-breadcrumb a:hover { color: var(--terra); }
+  .atlas-breadcrumb i { font-size: 14px; opacity: 0.6; }
+
+  /* HERO */
+  .settings-hero {
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: var(--s-6);
+    margin-bottom: var(--s-6);
+    max-width: 900px;
+  }
+  .settings-eyebrow { color: var(--terra); margin-bottom: var(--s-3); }
+  .settings-hero-title {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: clamp(40px, 5vw, 60px);
+    line-height: 1.05; letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: var(--s-3);
+  }
+  .settings-hero-title em { font-style: italic; color: var(--terra); }
+  .settings-hero-deck {
+    font-size: 16px; line-height: 1.55;
+    color: var(--ink-soft);
+  }
+  .settings-hero-deck em { font-style: italic; color: var(--terra); }
+
+  /* TWO-COLUMN LAYOUT */
+  .settings-layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: var(--s-6);
+    align-items: flex-start;
+  }
+  @media (max-width: 1000px) {
+    .settings-layout { grid-template-columns: 1fr; }
+    .settings-nav { position: static !important; }
+  }
+
+  /* NAV RAIL */
+  .settings-nav {
+    position: sticky;
+    top: calc(var(--topbar-h) + var(--s-4));
+    display: flex; flex-direction: column;
+    gap: 2px;
+  }
+  .settings-nav-eyebrow {
+    color: var(--ink-mute);
+    margin-bottom: var(--s-2);
+    padding: 0 var(--s-3);
+  }
+  .settings-nav-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 12px;
+    color: var(--ink-soft);
+    font-size: 14px;
+    border-radius: var(--r-sm);
+    border-left: 2px solid transparent;
+  }
+  .settings-nav-item:hover {
+    background: var(--paper-2);
+    color: var(--ink);
+  }
+  .settings-nav-active {
+    background: var(--terra-tint);
+    color: var(--terra-deep);
+    border-left-color: var(--terra);
+  }
+  .settings-nav-item i { font-size: 16px; }
+
+  /* CONTENT */
+  .settings-content {
+    display: flex; flex-direction: column;
+    gap: var(--s-7);
+    min-width: 0;
+  }
+  .settings-section {
+    scroll-margin-top: calc(var(--topbar-h) + var(--s-4));
+  }
+  .settings-section-head {
+    margin-bottom: var(--s-4);
+  }
+  .settings-section-title {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: 28px; line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+  .settings-section-title em { font-style: italic; color: var(--terra); }
+  .settings-section-deck {
+    font-size: 14px; color: var(--ink-mute);
+  }
+
+  .settings-card {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+  }
+  .settings-card-bleed { padding: 0; }
+
+  /* ROWS */
+  .settings-row {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: var(--s-4);
+    align-items: center;
+    padding: var(--s-4);
+    border-bottom: 1px solid var(--rule);
+  }
+  .settings-row:last-child { border-bottom: 0; }
+  @media (max-width: 700px) {
+    .settings-row { grid-template-columns: 1fr; }
+  }
+
+  .settings-label {
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .settings-label-name {
+    font-size: 14px; font-weight: 600;
+    color: var(--ink);
+  }
+  .settings-label-help {
+    font-size: 12px; color: var(--ink-mute);
+    line-height: 1.45;
+  }
+
+  .settings-control {
+    display: flex; gap: 8px; align-items: center;
+    flex-wrap: wrap;
+  }
+  .settings-control-multi { gap: var(--s-3); }
+  .settings-control-pair {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .settings-pair-sep {
+    color: var(--ink-mute); font-size: 13px;
+  }
+
+  .settings-input {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-sm);
+    padding: 8px 12px;
+    font-family: var(--f-body); font-size: 14px;
+    color: var(--ink);
+    min-width: 240px;
+  }
+  .settings-input:focus {
+    outline: none;
+    border-color: var(--terra);
+  }
+  select.settings-input {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='%23999' d='M4 6l4 4 4-4'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 28px;
+    appearance: none;
+  }
+  input[type="time"].settings-input { min-width: 120px; }
+
+  .settings-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-family: var(--f-body); font-size: 12px; font-weight: 500;
+  }
+  .settings-pill i { font-size: 12px; }
+  .settings-pill-verified {
+    background: rgba(79, 175, 111, 0.12);
+    color: #2D7A47;
+  }
+  .settings-pill-active {
+    background: var(--terra-tint);
+    color: var(--terra-deep);
+  }
+
+  .settings-avatar {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: var(--terra);
+    color: white;
+    display: grid; place-items: center;
+    font-family: var(--f-body); font-weight: 600;
+    font-size: 16px;
+  }
+
+  /* SEGMENTED CONTROL */
+  .settings-control-segmented {
+    display: inline-flex;
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    padding: 3px;
+    gap: 2px;
+  }
+  .seg-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 14px;
+    background: transparent;
+    border: 0;
+    border-radius: 999px;
+    font-family: var(--f-body); font-size: 13px; font-weight: 500;
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .seg-btn:hover { color: var(--ink); }
+  .seg-btn-active {
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .seg-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .seg-dot.mode-ask    { background: #71B0E5; }
+  .seg-dot.mode-do     { background: var(--terra); }
+  .seg-dot.mode-notice { background: #B59FF0; }
+
+  /* TOGGLE */
+  .settings-toggle {
+    position: relative;
+    display: inline-block;
+    width: 44px; height: 24px;
+    cursor: pointer;
+  }
+  .settings-toggle input { opacity: 0; width: 0; height: 0; }
+  .settings-toggle-track {
+    position: absolute; inset: 0;
+    background: var(--paper-3);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    transition: background var(--t-fast);
+  }
+  .settings-toggle-track::before {
+    content: '';
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 18px; height: 18px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    transition: transform var(--t-fast);
+  }
+  .settings-toggle input:checked + .settings-toggle-track {
+    background: var(--terra);
+    border-color: var(--terra);
+  }
+  .settings-toggle input:checked + .settings-toggle-track::before {
+    transform: translateX(20px);
+  }
+
+  /* CHECKBOX */
+  .settings-checkbox {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .settings-checkbox input {
+    width: 16px; height: 16px;
+    accent-color: var(--terra);
+  }
+
+  /* SCOPE MATRIX */
+  .scope-matrix-wrap {
+    overflow-x: auto;
+  }
+  .scope-matrix {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .scope-matrix th, .scope-matrix td {
+    padding: var(--s-2) var(--s-3);
+    text-align: center;
+    border-bottom: 1px solid var(--rule);
+  }
+  .scope-matrix tbody tr:last-child td { border-bottom: 0; }
+  .scope-matrix th {
+    background: var(--paper-2);
+    font-family: var(--f-mono); font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+  }
+  .scope-th-tool, .scope-td-tool {
+    text-align: left !important;
+    padding-left: var(--s-4) !important;
+  }
+  .scope-tool-name {
+    font-weight: 600; font-size: 14px;
+    color: var(--ink);
+  }
+  .scope-tool-status {
+    color: #2D7A47;
+    margin-left: 6px;
+    font-size: 10px;
+  }
+  .scope-td-cell { padding: 6px !important; }
+  .scope-cell {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    border: 0;
+    display: grid; place-items: center;
+    cursor: pointer;
+    transition: background var(--t-fast);
+  }
+  .scope-cell i { font-size: 14px; }
+  .scope-cell-on {
+    background: rgba(79, 175, 111, 0.14);
+    color: #2D7A47;
+  }
+  .scope-cell-on:hover { background: rgba(79, 175, 111, 0.24); }
+  .scope-cell-off {
+    background: var(--paper-2);
+    color: var(--ink-mute);
+  }
+  .scope-cell-off:hover { background: var(--paper-3); }
+  .scope-cell-partial {
+    background: rgba(216, 149, 52, 0.14);
+    color: #B07020;
+  }
+
+  .settings-card-foot {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: var(--s-3) var(--s-4);
+    background: var(--paper-2);
+    border-top: 1px solid var(--rule);
+    flex-wrap: wrap; gap: var(--s-2);
+  }
+  .settings-helper { color: var(--ink-mute); }
+
+  /* BILLING */
+  .settings-card-billing { padding: var(--s-5); }
+  .billing-tier-head {
+    display: flex; justify-content: space-between; align-items: start;
+    margin-bottom: var(--s-2);
+  }
+  .billing-tier-eyebrow { color: var(--terra); margin-bottom: 2px; }
+  .billing-tier-name {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: 32px; line-height: 1.1;
+    color: var(--ink);
+  }
+  .billing-tier-name em { font-style: italic; color: var(--terra); }
+  .billing-tier-deck {
+    font-size: 14px; line-height: 1.55;
+    color: var(--ink-soft);
+    max-width: 700px;
+    margin-bottom: var(--s-4);
+  }
+  .billing-tier-usage {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--s-4);
+    padding: var(--s-4);
+    background: var(--paper-2);
+    border-radius: var(--r-md);
+    margin-bottom: var(--s-4);
+  }
+  @media (max-width: 700px) {
+    .billing-tier-usage { grid-template-columns: repeat(2, 1fr); }
+  }
+  .billing-usage-stat { display: flex; flex-direction: column; gap: 2px; }
+  .billing-usage-num {
+    font-family: var(--f-display);
+    font-size: 24px;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .billing-usage-stat .t-label-mono {
+    color: var(--ink-mute);
+  }
+  .billing-tier-foot {
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: var(--s-2);
+  }
+  .settings-link {
+    color: var(--terra);
+    font-size: 13px; font-weight: 500;
+    display: inline-flex; align-items: center; gap: 4px;
+    background: transparent; border: 0;
+    cursor: pointer;
+    font-family: var(--f-body);
+    padding: 0;
+  }
+  .settings-link:hover { color: var(--terra-deep); }
+  .settings-link i { font-size: 13px; }
+
+</style>
+</head>
+<body class="app-shell settings-body">
+<header class="app-topbar">
+  <div class="app-topbar-inner">
+    <label for="navToggle" class="app-burger" aria-label="Open navigation"><i class="ph ph-list"></i></label>
+    <a class="app-brand" href="dashboard.html">My<span class="accent">Gen</span>tic</a>
+    <h1 class="app-page-title">Settings</h1>
+    <div class="app-topbar-actions">
+      <div class="app-topbar-search">
+        <i class="ph ph-magnifying-glass"></i>
+        <input type="text" placeholder="Search your context, agents, libraries…" />
+        <kbd>⌘K</kbd>
+      </div>
+      <button class="app-icon-btn" aria-label="Notifications"><i class="ph ph-bell"></i><span class="dot"></span></button>
+      <button class="app-avatar" aria-label="User menu">NA</button>
+    </div>
+  </div>
+</header>
+<div class="app-layout">
+  <input type="checkbox" id="navToggle" class="app-nav-toggle sr-only" />
+<label for="navToggle" class="app-leftnav-backdrop"></label>
+<nav class="app-leftnav" aria-label="Primary">
+  <div class="app-nav-section-label">Workspace</div>
+      <a href="dashboard.html" class="app-nav-item" data-page="dashboard"><i class="ph ph-gauge"></i><span>Dashboard</span></a>
+      <a href="atlas.html" class="app-nav-item" data-page="atlas"><i class="ph ph-graph"></i><span>Atlas</span></a>
+      <a href="sage.html" class="app-nav-item" data-page="sage"><i class="ph ph-chats-circle"></i><span>Sage</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Context</div>
+      <a href="context.html" class="app-nav-item" data-page="context"><i class="ph ph-stack"></i><span>Context Layers</span></a>
+      <a href="token-compaction.html" class="app-nav-item" data-page="token-compaction"><i class="ph ph-funnel"></i><span>Token Compaction</span></a>
+      <a href="history.html" class="app-nav-item" data-page="history"><i class="ph ph-clock-counter-clockwise"></i><span>History</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Connect</div>
+      <a href="connections.html" class="app-nav-item" data-page="connections"><i class="ph ph-plugs-connected"></i><span>Connections</span></a>
+      <a href="upload-data.html" class="app-nav-item" data-page="upload-data"><i class="ph ph-upload-simple"></i><span>Upload Data</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Build</div>
+      <a href="agents.html" class="app-nav-item" data-page="agents"><i class="ph ph-sparkle"></i><span>Agents</span></a>
+      <a href="marketplace.html" class="app-nav-item" data-page="marketplace"><i class="ph ph-books"></i><span>Expert Libraries</span><span class="nav-badge">New</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Account</div>
+      <a href="export.html" class="app-nav-item" data-page="export"><i class="ph ph-download-simple"></i><span>Export &amp; Data</span></a>
+      <a href="settings.html" class="app-nav-item active" data-page="settings"><i class="ph ph-gear-six"></i><span>Settings</span></a>
+</nav>
+  <main class="app-content">
+  <div class="settings-page">
+    <div class="atlas-breadcrumb">
+      <a href="dashboard.html">Dashboard</a>
+      <i class="ph ph-caret-right"></i>
+      <span>Settings</span>
+    </div>
+    <header class="settings-hero">
+      <div class="t-label-mono settings-eyebrow">Account · Controls · Preferences</div>
+      <h1 class="settings-hero-title"><em>You're</em> in control.</h1>
+      <p class="settings-hero-deck">
+        Profile, permissions, notifications, voice preferences, billing. <em>Granular by default.</em> Most settings come with sensible defaults so you can ignore them. Override anything when you need to.
+      </p>
+    </header>
+    <div class="settings-layout">
+
+      <aside class="settings-nav">
+        <div class="t-label-mono settings-nav-eyebrow">Jump to</div>
+        <a href="#profile" class="settings-nav-item settings-nav-active"><i class="ph ph-user-circle"></i> Profile</a>
+        <a href="#permissions" class="settings-nav-item"><i class="ph ph-shield-check"></i> Permissions</a>
+        <a href="#sage" class="settings-nav-item"><i class="ph ph-sparkle"></i> Sage preferences</a>
+        <a href="#notifications" class="settings-nav-item"><i class="ph ph-bell"></i> Notifications</a>
+        <a href="#billing" class="settings-nav-item"><i class="ph ph-credit-card"></i> Billing &amp; plan</a>
+        <a href="#security" class="settings-nav-item"><i class="ph ph-lock-key"></i> Privacy &amp; security</a>
+        <a href="#advanced" class="settings-nav-item"><i class="ph ph-gear-six"></i> Advanced</a>
+      </aside>
+
+      <div class="settings-content">
+        <section class="settings-section" id="profile">
+          <header class="settings-section-head">
+            <h2 class="settings-section-title">Profile</h2>
+            <p class="settings-section-deck">How you appear in your context, and where we send important things.</p>
+          </header>
+
+          <div class="settings-card">
+            <div class="settings-row">
+              <label class="settings-label">
+                <span class="settings-label-name">Display name</span>
+                <span class="settings-label-help">Used by Sage in conversation, and on shared exports.</span>
+              </label>
+              <div class="settings-control">
+                <input type="text" class="settings-input" value="Nick Aronson" />
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <label class="settings-label">
+                <span class="settings-label-name">Account email</span>
+                <span class="settings-label-help">Where account &amp; billing emails go. Verified.</span>
+              </label>
+              <div class="settings-control">
+                <input type="email" class="settings-input" value="nick@mygentic.io" />
+                <span class="settings-pill settings-pill-verified"><i class="ph ph-seal-check"></i> Verified</span>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <label class="settings-label">
+                <span class="settings-label-name">Time zone</span>
+                <span class="settings-label-help">Used for scheduled agent runs and the daily review.</span>
+              </label>
+              <div class="settings-control">
+                <select class="settings-input">
+                  <option selected>America/Los_Angeles · UTC-8</option>
+                  <option>America/New_York · UTC-5</option>
+                  <option>Europe/London · UTC+0</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <label class="settings-label">
+                <span class="settings-label-name">Avatar</span>
+                <span class="settings-label-help">Initials by default. Upload an image if you want.</span>
+              </label>
+              <div class="settings-control">
+                <div class="settings-avatar">NA</div>
+                <button class="btn btn-secondary">Upload image</button>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="settings-section" id="permissions">
+          <header class="settings-section-head">
+            <h2 class="settings-section-title"><em>Per-AI</em> permission scopes</h2>
+            <p class="settings-section-deck">Limit which dimensions each connected AI can read. Different scopes per tool, per session. Override anytime.</p>
+          </header>
+          <div class="settings-card settings-card-bleed">
+            <div class="scope-matrix-wrap">
+              <table class="scope-matrix">
+                <thead>
+                  <tr>
+                    <th class="scope-th-tool">Tool</th>
+                    <th>Professional</th>
+                    <th>Work Life</th>
+                    <th>Interests</th>
+                    <th>Aesthetic</th>
+                    <th>Consumer</th>
+                    <th>Relationships</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="scope-td-tool">
+                      <span class="scope-tool-name">Claude</span>
+                      <span class="scope-tool-status t-label-mono">LIVE</span>
+                    </td>
+                    <td class="scope-td-cell"><button class="scope-cell scope-cell-on" aria-label="Allowed"><i class="ph ph-check"></i></button></td>
+                    <td class="scope-td-cell"><button class="scope-cell scope-cell-on" aria-label="Allowed"><i class="ph ph-check"></i></button></td>
+                    <td class="scope-td-cell"><button class="scope-cell scope-cell-on" aria-label="Allowed"><i class="ph ph-check"></i></button></td>
+                    <td class="scope-td-cell"><button class="scope-cell scope-cell-on" aria-label="Allowed"><i class="ph ph-check"></i></button></td>
+                    <td class="scope-td-cell"><button class="scope-cell scope-cell-on" aria-label="Allowed"><i class="ph ph-check"></i></button></td>
+                    <td class="scope-td-cell"><button class="scope-cell scope-cell-on" aria-label="Allowed"><i class="ph ph-check"></i></button></td>
+                  </tr>
+                  <tr>
+                    <td class="scope-td-tool">
+                      <span class="scope-tool-name">ChatGPT</span>
+                      <span class="scope-tool-status t-label-mono">LIVE</span>
+                    </td>
+                    <td class="scope-td-cell"><button class="scope-cell scope-cell-on" aria-label="Allowed"><i class="ph ph-check"></i></button></td>
+                    <td class="scope-td-cell"><button class="scope-cell scope-cell-on" aria-label="Allowed"><i class="ph ph-check"></i></button></td>
+                    <td class="scope-td-cell"><button class="scope-cell scope-cell-off" aria-label="Blocked"><i class="ph ph-x"></i></button></td>
+                    <td class="scope-td-cell"><button class="scope-cell scope-cell-on" aria-label="Allowed"><i class="ph ph-check"></i></button></td>
+                    <td class="scope-td-cell"><button class="scope-cell scope-cell-on" aria-label="Allowed"><i class="ph ph-check"></i></button></td>
+                    <td class="scope-td-cell"><button class="scope-cell scope-cell-off" aria-label="Blocked"><i class="ph ph-x"></i></button></td>
+                  </tr>
+                  <tr>
+                    <td class="scope-td-tool">
+                      <span class="scope-tool-name">Perplexity</span>
+                      <span class="scope-tool-status t-label-mono">LIVE</span>
+                    </td>
+                    <td class="scope-td-cell"><button class="scope-cell scope-cell-on" aria-label="Allowed"><i class="ph ph-check"></i></button></td>
+                    <td class="scope-td-cell"><button class="scope-cell scope-cell-on" aria-label="Allowed"><i class="ph ph-check"></i></button></td>
+                    <td class="scope-td-cell"><button class="scope-cell scope-cell-on" aria-label="Allowed"><i class="ph ph-check"></i></button></td>
+                    <td class="scope-td-cell"><button class="scope-cell scope-cell-off" aria-label="Blocked"><i class="ph ph-x"></i></button></td>
+                    <td class="scope-td-cell"><button class="scope-cell scope-cell-off" aria-label="Blocked"><i class="ph ph-x"></i></button></td>
+                    <td class="scope-td-cell"><button class="scope-cell scope-cell-off" aria-label="Blocked"><i class="ph ph-x"></i></button></td>
+                  </tr>
+                  <tr>
+                    <td class="scope-td-tool">
+                      <span class="scope-tool-name">Gemini</span>
+                      <span class="scope-tool-status t-label-mono">LIVE</span>
+                    </td>
+                    <td class="scope-td-cell"><button class="scope-cell scope-cell-on" aria-label="Allowed"><i class="ph ph-check"></i></button></td>
+                    <td class="scope-td-cell"><button class="scope-cell scope-cell-off" aria-label="Blocked"><i class="ph ph-x"></i></button></td>
+                    <td class="scope-td-cell"><button class="scope-cell scope-cell-on" aria-label="Allowed"><i class="ph ph-check"></i></button></td>
+                    <td class="scope-td-cell"><button class="scope-cell scope-cell-on" aria-label="Allowed"><i class="ph ph-check"></i></button></td>
+                    <td class="scope-td-cell"><button class="scope-cell scope-cell-off" aria-label="Blocked"><i class="ph ph-x"></i></button></td>
+                    <td class="scope-td-cell"><button class="scope-cell scope-cell-off" aria-label="Blocked"><i class="ph ph-x"></i></button></td>
+                  </tr>
+                  <tr>
+                    <td class="scope-td-tool">
+                      <span class="scope-tool-name">Cursor</span>
+                      <span class="scope-tool-status t-label-mono">LIVE</span>
+                    </td>
+                    <td class="scope-td-cell"><button class="scope-cell scope-cell-on" aria-label="Allowed"><i class="ph ph-check"></i></button></td>
+                    <td class="scope-td-cell"><button class="scope-cell scope-cell-off" aria-label="Blocked"><i class="ph ph-x"></i></button></td>
+                    <td class="scope-td-cell"><button class="scope-cell scope-cell-off" aria-label="Blocked"><i class="ph ph-x"></i></button></td>
+                    <td class="scope-td-cell"><button class="scope-cell scope-cell-off" aria-label="Blocked"><i class="ph ph-x"></i></button></td>
+                    <td class="scope-td-cell"><button class="scope-cell scope-cell-off" aria-label="Blocked"><i class="ph ph-x"></i></button></td>
+                    <td class="scope-td-cell"><button class="scope-cell scope-cell-off" aria-label="Blocked"><i class="ph ph-x"></i></button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="settings-card-foot">
+              <span class="settings-helper t-label-mono">Click any cell to toggle. Changes apply to the next call.</span>
+              <button class="btn btn-secondary">Reset to defaults</button>
+            </div>
+          </div>
+        </section>
+        <section class="settings-section" id="sage">
+          <header class="settings-section-head">
+            <h2 class="settings-section-title"><em>Sage</em> preferences</h2>
+            <p class="settings-section-deck">How proactive Sage is, what voice it uses, default mode for new conversations.</p>
+          </header>
+
+          <div class="settings-card">
+            <div class="settings-row">
+              <label class="settings-label">
+                <span class="settings-label-name">Default mode</span>
+                <span class="settings-label-help">What mode Sage starts in for new threads. You can switch mid-conversation.</span>
+              </label>
+              <div class="settings-control settings-control-segmented">
+                <button class="seg-btn seg-btn-active"><span class="seg-dot mode-ask"></span> Ask</button>
+                <button class="seg-btn"><span class="seg-dot mode-do"></span> Do</button>
+                <button class="seg-btn"><span class="seg-dot mode-notice"></span> Notice</button>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <label class="settings-label">
+                <span class="settings-label-name">Proactivity</span>
+                <span class="settings-label-help">How often Sage surfaces patterns and gaps without being asked.</span>
+              </label>
+              <div class="settings-control settings-control-segmented">
+                <button class="seg-btn">Quiet</button>
+                <button class="seg-btn seg-btn-active">Balanced</button>
+                <button class="seg-btn">Always-on</button>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <label class="settings-label">
+                <span class="settings-label-name">Voice</span>
+                <span class="settings-label-help">For Talk and Call modes. ElevenLabs voice ID.</span>
+              </label>
+              <div class="settings-control">
+                <select class="settings-input">
+                  <option selected>Sage default · Warm, measured</option>
+                  <option>Editorial · Crisp, neutral</option>
+                  <option>Quiet · Soft, slow</option>
+                </select>
+                <button class="btn btn-secondary"><i class="ph ph-play"></i> Preview</button>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <label class="settings-label">
+                <span class="settings-label-name">Capture by default</span>
+                <span class="settings-label-help">Automatically save Facts &amp; Preferences from conversations into your graph.</span>
+              </label>
+              <div class="settings-control">
+                <label class="settings-toggle">
+                  <input type="checkbox" checked />
+                  <span class="settings-toggle-track"></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <label class="settings-label">
+                <span class="settings-label-name">Confirm before drafting</span>
+                <span class="settings-label-help">Sage asks before writing emails, messages, or other drafts on your behalf.</span>
+              </label>
+              <div class="settings-control">
+                <label class="settings-toggle">
+                  <input type="checkbox" checked />
+                  <span class="settings-toggle-track"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="settings-section" id="notifications">
+          <header class="settings-section-head">
+            <h2 class="settings-section-title">Notifications</h2>
+            <p class="settings-section-deck">When and how Sage reaches you. Off by default, on by your choice.</p>
+          </header>
+
+          <div class="settings-card">
+            <div class="settings-row">
+              <label class="settings-label">
+                <span class="settings-label-name">Daily review</span>
+                <span class="settings-label-help">A short morning brief of what shifted in your context overnight.</span>
+              </label>
+              <div class="settings-control settings-control-multi">
+                <label class="settings-checkbox"><input type="checkbox" checked /> Email</label>
+                <label class="settings-checkbox"><input type="checkbox" /> Push</label>
+                <label class="settings-checkbox"><input type="checkbox" /> SMS</label>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <label class="settings-label">
+                <span class="settings-label-name">Notice mode pings</span>
+                <span class="settings-label-help">When Sage spots a pattern worth surfacing.</span>
+              </label>
+              <div class="settings-control settings-control-multi">
+                <label class="settings-checkbox"><input type="checkbox" checked /> Email</label>
+                <label class="settings-checkbox"><input type="checkbox" checked /> Push</label>
+                <label class="settings-checkbox"><input type="checkbox" /> SMS</label>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <label class="settings-label">
+                <span class="settings-label-name">Agent run results</span>
+                <span class="settings-label-help">When an agent finishes, fails, or needs your review.</span>
+              </label>
+              <div class="settings-control settings-control-multi">
+                <label class="settings-checkbox"><input type="checkbox" checked /> Email</label>
+                <label class="settings-checkbox"><input type="checkbox" checked /> Push</label>
+                <label class="settings-checkbox"><input type="checkbox" /> SMS</label>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <label class="settings-label">
+                <span class="settings-label-name">Quiet hours</span>
+                <span class="settings-label-help">No pushes or SMS during these hours.</span>
+              </label>
+              <div class="settings-control settings-control-pair">
+                <input type="time" class="settings-input" value="22:00" />
+                <span class="settings-pair-sep">to</span>
+                <input type="time" class="settings-input" value="07:00" />
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="settings-section" id="billing">
+          <header class="settings-section-head">
+            <h2 class="settings-section-title">Billing &amp; plan</h2>
+            <p class="settings-section-deck">Current tier, usage this cycle, payment method.</p>
+          </header>
+
+          <div class="settings-card settings-card-billing">
+            <div class="billing-tier">
+              <div class="billing-tier-head">
+                <div>
+                  <div class="t-label-mono billing-tier-eyebrow">Current plan</div>
+                  <h3 class="billing-tier-name">Founder · <em>Beta</em></h3>
+                </div>
+                <span class="settings-pill settings-pill-active">Free during beta</span>
+              </div>
+              <p class="billing-tier-deck">Full access to Sage, all connectors, agent builder, and the Industry Rockstar library. Free until the end of beta.</p>
+              <div class="billing-tier-usage">
+                <div class="billing-usage-stat">
+                  <span class="billing-usage-num">101</span>
+                  <span class="t-label-mono">Agent runs / month</span>
+                </div>
+                <div class="billing-usage-stat">
+                  <span class="billing-usage-num">347</span>
+                  <span class="t-label-mono">Nodes captured</span>
+                </div>
+                <div class="billing-usage-stat">
+                  <span class="billing-usage-num">11</span>
+                  <span class="t-label-mono">Connected sources</span>
+                </div>
+                <div class="billing-usage-stat">
+                  <span class="billing-usage-num">2</span>
+                  <span class="t-label-mono">Active libraries</span>
+                </div>
+              </div>
+              <div class="billing-tier-foot">
+                <button class="settings-link"><span>View pricing tiers</span> <i class="ph ph-arrow-up-right"></i></button>
+                <button class="btn btn-secondary">Manage billing</button>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="settings-section" id="security">
+          <header class="settings-section-head">
+            <h2 class="settings-section-title">Privacy &amp; security</h2>
+            <p class="settings-section-deck">Authentication, sessions, audit log. The basics, plus the receipts.</p>
+          </header>
+
+          <div class="settings-card">
+            <div class="settings-row">
+              <label class="settings-label">
+                <span class="settings-label-name">Two-factor authentication</span>
+                <span class="settings-label-help">Required for billing changes and account deletion.</span>
+              </label>
+              <div class="settings-control">
+                <span class="settings-pill settings-pill-active"><i class="ph ph-check"></i> Enabled</span>
+                <button class="btn btn-secondary">Manage</button>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <label class="settings-label">
+                <span class="settings-label-name">Active sessions</span>
+                <span class="settings-label-help">3 devices signed in. Sign out remotely from any one.</span>
+              </label>
+              <div class="settings-control">
+                <button class="btn btn-secondary">Review sessions</button>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <label class="settings-label">
+                <span class="settings-label-name">Audit log</span>
+                <span class="settings-label-help">Every read, write, and delete. Exportable as CSV.</span>
+              </label>
+              <div class="settings-control">
+                <button class="btn btn-secondary"><i class="ph ph-list-magnifying-glass"></i> Open audit log</button>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <label class="settings-label">
+                <span class="settings-label-name">Data export &amp; deletion</span>
+                <span class="settings-label-help">Walk away with everything. Anytime.</span>
+              </label>
+              <div class="settings-control">
+                <a href="export.html" class="btn btn-secondary"><i class="ph ph-download-simple"></i> Open Export &amp; Data</a>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="settings-section" id="advanced">
+          <header class="settings-section-head">
+            <h2 class="settings-section-title">Advanced</h2>
+            <p class="settings-section-deck">Beta toggles, experimental features, developer tools.</p>
+          </header>
+
+          <div class="settings-card">
+            <div class="settings-row">
+              <label class="settings-label">
+                <span class="settings-label-name">API access</span>
+                <span class="settings-label-help">Programmatic access to your context graph. Personal access tokens.</span>
+              </label>
+              <div class="settings-control">
+                <button class="btn btn-secondary"><i class="ph ph-key"></i> Manage API keys</button>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <label class="settings-label">
+                <span class="settings-label-name">Beta features</span>
+                <span class="settings-label-help">Opt into experimental capabilities before they ship widely.</span>
+              </label>
+              <div class="settings-control">
+                <label class="settings-toggle">
+                  <input type="checkbox" />
+                  <span class="settings-toggle-track"></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <label class="settings-label">
+                <span class="settings-label-name">Developer mode</span>
+                <span class="settings-label-help">Show graph IDs, query inspector, and trace timings.</span>
+              </label>
+              <div class="settings-control">
+                <label class="settings-toggle">
+                  <input type="checkbox" />
+                  <span class="settings-toggle-track"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</main>
+</div>
+</body>
+</html>
