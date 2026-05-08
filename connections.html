@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Connections · MyGentic</title>
+<link rel="stylesheet" href="app.css" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+
+<style>
+
+  .app-content { padding: 0; }
+  .connections-page {
+    max-width: var(--w-bleed);
+    margin: 0 auto;
+    padding: var(--s-5) var(--s-6) var(--s-9);
+  }
+  @media (max-width: 900px) {
+    .connections-page { padding: var(--s-4) var(--s-4) var(--s-7); }
+  }
+
+  .atlas-breadcrumb {
+    display: flex; align-items: center; gap: var(--s-2);
+    font-family: var(--f-mono); font-size: 11px;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--ink-mute);
+    padding: var(--s-2) 0 var(--s-4);
+  }
+  .atlas-breadcrumb a { color: var(--ink-mute); }
+  .atlas-breadcrumb a:hover { color: var(--terra); }
+  .atlas-breadcrumb i { font-size: 14px; opacity: 0.6; }
+
+  /* HERO */
+  .connections-hero {
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: var(--s-6);
+    margin-bottom: var(--s-7);
+    max-width: 1100px;
+  }
+  .connections-eyebrow { color: var(--terra); margin-bottom: var(--s-3); }
+  .connections-hero-title {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: clamp(40px, 5vw, 60px);
+    line-height: 1.05; letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: var(--s-4);
+  }
+  .connections-hero-title em { font-style: italic; }
+  .connections-hero-deck {
+    font-size: 17px; line-height: 1.55;
+    color: var(--ink-soft);
+    max-width: 780px;
+  }
+  .connections-hero-deck strong { color: var(--ink); font-weight: 600; }
+  .connections-hero-deck em { font-style: italic; color: var(--terra); }
+
+  .connections-hero-stats {
+    display: grid;
+    grid-template-columns: repeat(4, auto);
+    gap: var(--s-7);
+    padding-top: var(--s-5);
+  }
+  @media (max-width: 700px) {
+    .connections-hero-stats { grid-template-columns: repeat(2, 1fr); gap: var(--s-4); }
+  }
+  .conn-stat { display: flex; flex-direction: column; gap: 4px; }
+  .conn-stat-num {
+    font-family: var(--f-display);
+    font-size: 28px;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .conn-stat .t-label-mono { color: var(--ink-mute); }
+
+  /* MODES TRIO */
+  .connections-modes {
+    margin-bottom: var(--s-8);
+  }
+  .connections-modes-title {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: clamp(28px, 3vw, 36px);
+    line-height: 1.1; letter-spacing: -0.01em;
+    color: var(--ink);
+    margin-bottom: var(--s-5);
+  }
+  .connections-modes-title em { font-style: italic; }
+  .connections-modes-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s-4);
+  }
+  @media (max-width: 1100px) {
+    .connections-modes-grid { grid-template-columns: 1fr; }
+  }
+  .conn-mode-card {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-top: 4px solid var(--terra);
+    border-radius: var(--r-lg);
+    padding: var(--s-5);
+    display: flex; flex-direction: column; gap: var(--s-2);
+  }
+  .conn-mode-num { color: var(--terra); }
+  .conn-mode-name {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: 26px; line-height: 1.1;
+    color: var(--ink);
+  }
+  .conn-mode-card p {
+    font-size: 14px; line-height: 1.55;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+  .conn-mode-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    color: var(--terra);
+    font-size: 13px; font-weight: 500;
+    margin-top: auto;
+    padding-top: var(--s-2);
+  }
+  .conn-mode-link:hover { color: var(--terra-deep); }
+  .conn-mode-link i { font-size: 14px; }
+
+  /* SOURCE LIST */
+  .connections-list {
+    display: flex; flex-direction: column; gap: var(--s-7);
+    margin-bottom: var(--s-8);
+  }
+  .conn-cat-head {
+    display: flex; justify-content: space-between; align-items: end;
+    padding-bottom: var(--s-3);
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: var(--s-4);
+  }
+  .conn-cat-title {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: 24px; line-height: 1.1;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .conn-cat-blurb {
+    font-size: 14px; color: var(--ink-mute);
+    margin: 0;
+  }
+  .conn-cat-count {
+    display: flex; align-items: baseline; gap: 6px;
+  }
+  .conn-cat-count-num {
+    font-family: var(--f-display);
+    font-size: 22px; color: var(--terra);
+  }
+  .conn-cat-count .t-label-mono { color: var(--ink-mute); }
+
+  .conn-rows { display: flex; flex-direction: column; gap: var(--s-2); }
+
+  .conn-row {
+    display: grid;
+    grid-template-columns: 1fr 280px auto;
+    gap: var(--s-4);
+    align-items: center;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-md);
+    padding: var(--s-4);
+    transition: border-color var(--t-fast), box-shadow var(--t-fast);
+  }
+  .conn-row:hover {
+    border-color: var(--rule-strong);
+  }
+  .conn-row-available {
+    background: var(--paper-2);
+    border-style: dashed;
+  }
+  @media (max-width: 900px) {
+    .conn-row { grid-template-columns: 1fr; }
+    .conn-row-stats { display: none; }
+  }
+
+  /* Status dot */
+  .conn-status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+  .conn-status-live      { background: #4FAF6F; box-shadow: 0 0 6px rgba(79, 175, 111, 0.5); }
+  .conn-status-building  { background: #D89534; box-shadow: 0 0 6px rgba(216, 149, 52, 0.5); animation: pulseGlow 2s ease-in-out infinite; }
+  .conn-status-available { background: var(--ink-mute); opacity: 0.5; }
+  @keyframes pulseGlow {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+  }
+
+  .conn-row-main { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .conn-row-name {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .conn-row-title {
+    font-family: var(--f-body); font-weight: 600;
+    font-size: 15px; color: var(--ink);
+  }
+  .conn-row-status-label {
+    color: var(--ink-mute);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .conn-row-live      .conn-row-status-label { color: #2D7A47; background: rgba(79, 175, 111, 0.12); }
+  .conn-row-building  .conn-row-status-label { color: #B07020; background: rgba(216, 149, 52, 0.12); }
+  .conn-row-available .conn-row-status-label { color: var(--terra-deep); background: var(--terra-tint); }
+
+  .conn-row-desc {
+    font-size: 13px; color: var(--ink-soft);
+  }
+
+  .conn-row-dims {
+    display: flex; flex-wrap: wrap; gap: 4px;
+    margin-top: 2px;
+  }
+  .conn-dim-pill {
+    font-family: var(--f-display); font-style: italic;
+    font-size: 11px; color: var(--terra);
+    background: var(--terra-tint);
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+
+  /* Stats column */
+  .conn-row-stats {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: var(--s-3);
+  }
+  .conn-row-stat { display: flex; flex-direction: column; gap: 2px; }
+  .conn-row-stat-label { color: var(--ink-mute); }
+  .conn-row-stat-val {
+    font-size: 13px; font-weight: 500; color: var(--ink);
+  }
+
+  /* Actions */
+  .conn-row-actions { display: flex; gap: 6px; align-items: center; }
+  .conn-row-action {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px;
+    border-radius: var(--r-sm);
+    font-family: var(--f-body); font-size: 13px; font-weight: 500;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background var(--t-fast), border-color var(--t-fast);
+  }
+  .conn-row-action-primary {
+    background: var(--terra);
+    color: white;
+  }
+  .conn-row-action-primary:hover { background: var(--terra-deep); }
+  .conn-row-action-secondary {
+    background: var(--paper-2);
+    border-color: var(--rule);
+    color: var(--ink-soft);
+    width: 36px; height: 36px;
+    padding: 0; justify-content: center;
+  }
+  .conn-row-action-secondary:hover {
+    background: var(--paper-3);
+    color: var(--ink);
+  }
+  .conn-row-action-menu {
+    width: 32px; height: 36px;
+    background: transparent;
+    color: var(--ink-mute);
+    padding: 0; justify-content: center;
+  }
+  .conn-row-action-menu:hover {
+    background: var(--paper-2);
+    color: var(--ink);
+  }
+  .conn-row-action i { font-size: 14px; }
+
+  /* TRUST STRIP */
+  .connections-trust {
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    padding: var(--s-5) var(--s-6);
+  }
+  .connections-trust-eyebrow {
+    color: var(--terra);
+    margin-bottom: var(--s-3);
+  }
+  .connections-trust-list {
+    list-style: none; padding: 0; margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--s-4) var(--s-6);
+  }
+  @media (max-width: 700px) {
+    .connections-trust-list { grid-template-columns: 1fr; }
+  }
+  .connections-trust-list li {
+    display: flex; align-items: flex-start; gap: var(--s-2);
+    font-size: 14px; line-height: 1.5;
+    color: var(--ink-soft);
+  }
+  .connections-trust-list li i {
+    color: var(--terra);
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .connections-trust-list strong {
+    color: var(--ink); font-weight: 600;
+  }
+
+</style>
+</head>
+<body class="app-shell connections-body">
+<header class="app-topbar">
+  <div class="app-topbar-inner">
+    <label for="navToggle" class="app-burger" aria-label="Open navigation"><i class="ph ph-list"></i></label>
+    <a class="app-brand" href="dashboard.html">My<span class="accent">Gen</span>tic</a>
+    <h1 class="app-page-title">Connections</h1>
+    <div class="app-topbar-actions">
+      <div class="app-topbar-search">
+        <i class="ph ph-magnifying-glass"></i>
+        <input type="text" placeholder="Search your context, agents, libraries…" />
+        <kbd>⌘K</kbd>
+      </div>
+      <button class="app-icon-btn" aria-label="Notifications"><i class="ph ph-bell"></i><span class="dot"></span></button>
+      <button class="app-avatar" aria-label="User menu">NA</button>
+    </div>
+  </div>
+</header>
+<div class="app-layout">
+  <input type="checkbox" id="navToggle" class="app-nav-toggle sr-only" />
+<label for="navToggle" class="app-leftnav-backdrop"></label>
+<nav class="app-leftnav" aria-label="Primary">
+  <div class="app-nav-section-label">Workspace</div>
+      <a href="dashboard.html" class="app-nav-item" data-page="dashboard"><i class="ph ph-gauge"></i><span>Dashboard</span></a>
+      <a href="atlas.html" class="app-nav-item" data-page="atlas"><i class="ph ph-graph"></i><span>Atlas</span></a>
+      <a href="sage.html" class="app-nav-item" data-page="sage"><i class="ph ph-chats-circle"></i><span>Sage</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Context</div>
+      <a href="context.html" class="app-nav-item" data-page="context"><i class="ph ph-stack"></i><span>Context Layers</span></a>
+      <a href="token-compaction.html" class="app-nav-item" data-page="token-compaction"><i class="ph ph-funnel"></i><span>Token Compaction</span></a>
+      <a href="history.html" class="app-nav-item" data-page="history"><i class="ph ph-clock-counter-clockwise"></i><span>History</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Connect</div>
+      <a href="connections.html" class="app-nav-item active" data-page="connections"><i class="ph ph-plugs-connected"></i><span>Connections</span></a>
+      <a href="upload-data.html" class="app-nav-item" data-page="upload-data"><i class="ph ph-upload-simple"></i><span>Upload Data</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Build</div>
+      <a href="agents.html" class="app-nav-item" data-page="agents"><i class="ph ph-sparkle"></i><span>Agents</span></a>
+      <a href="marketplace.html" class="app-nav-item" data-page="marketplace"><i class="ph ph-books"></i><span>Expert Libraries</span><span class="nav-badge">New</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Account</div>
+      <a href="export.html" class="app-nav-item" data-page="export"><i class="ph ph-download-simple"></i><span>Export &amp; Data</span></a>
+      <a href="settings.html" class="app-nav-item" data-page="settings"><i class="ph ph-gear-six"></i><span>Settings</span></a>
+</nav>
+  <main class="app-content">
+  <div class="connections-page">
+    <div class="atlas-breadcrumb">
+      <a href="dashboard.html">Dashboard</a>
+      <i class="ph ph-caret-right"></i>
+      <span>Connections</span>
+    </div>
+    <header class="connections-hero">
+      <div class="t-label-mono connections-eyebrow">Stay current · Active connectors</div>
+      <h1 class="connections-hero-title">Pulls context from <em>where you already live.</em></h1>
+      <p class="connections-hero-deck">
+        Gmail, Calendar, Drive, Notion, voice memos, and more. <strong>Connect once.</strong> Context flows in automatically. <em>OAuth-only, read-only by default,</em> scoped per connector. You stay in control of what's pulled.
+      </p>
+      <div class="connections-hero-stats">
+        <div class="conn-stat">
+          <span class="conn-stat-num">11</span>
+          <span class="t-label-mono">Connected</span>
+        </div>
+        <div class="conn-stat">
+          <span class="conn-stat-num">347</span>
+          <span class="t-label-mono">Nodes captured</span>
+        </div>
+        <div class="conn-stat">
+          <span class="conn-stat-num">6</span>
+          <span class="t-label-mono">Dimensions covered</span>
+        </div>
+        <div class="conn-stat">
+          <span class="conn-stat-num">4 min</span>
+          <span class="t-label-mono">Last sync</span>
+        </div>
+      </div>
+    </header>
+    <section class="connections-modes">
+      <h2 class="connections-modes-title">Three ways context lands. <em>Your call.</em></h2>
+      <div class="connections-modes-grid">
+        <article class="conn-mode-card">
+          <div class="t-label-mono conn-mode-num">01 · Live connectors</div>
+          <h3 class="conn-mode-name">Read-only OAuth.</h3>
+          <p>Gmail, Slack, Notion, Drive, Calendar — pull context as you live, scoped to what you allow.</p>
+        </article>
+        <article class="conn-mode-card">
+          <div class="t-label-mono conn-mode-num">02 · Upload & forget</div>
+          <h3 class="conn-mode-name">Drop documents.</h3>
+          <p>Transcripts, exports, PDFs. We extract structured context and merge into your graph.</p>
+          <a href="upload-data.html" class="conn-mode-link">Upload data <i class="ph ph-arrow-right"></i></a>
+        </article>
+        <article class="conn-mode-card">
+          <div class="t-label-mono conn-mode-num">03 · Direct via Sage</div>
+          <h3 class="conn-mode-name">Talk it through.</h3>
+          <p>Beliefs, preferences, judgement aren't in your inbox. Sage interviews capture what only lives in your head.</p>
+          <a href="sage.html" class="conn-mode-link">Open Sage <i class="ph ph-arrow-right"></i></a>
+        </article>
+      </div>
+    </section>
+    <section class="connections-list">
+      <div class="conn-cat">
+        <header class="conn-cat-head">
+          <div>
+            <h3 class="conn-cat-title">Connected sources</h3>
+            <p class="conn-cat-blurb">OAuth-only, read-only by default. Sage pulls context as you live.</p>
+          </div>
+          <div class="conn-cat-count">
+            <span class="conn-cat-count-num">4</span>
+            <span class="t-label-mono">Live</span>
+          </div>
+        </header>
+        <div class="conn-rows">
+      <article class="conn-row conn-row-live">
+        <div class="conn-row-main">
+          <div class="conn-row-name">
+            <span class="conn-status-dot conn-status-live"></span>
+            <span class="conn-row-title">LinkedIn</span>
+            <span class="conn-row-status-label t-label-mono">LIVE</span>
+          </div>
+          <div class="conn-row-desc">Profile, roles, network</div>
+          <div class="conn-row-dims"><span class="conn-dim-pill">Professional</span> <span class="conn-dim-pill">Relationships</span></div>
+        </div>
+        <div class="conn-row-stats">
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Captured</span>
+            <span class="conn-row-stat-val">42 nodes</span>
+          </div>
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Last sync</span>
+            <span class="conn-row-stat-val">12 min ago</span>
+          </div>
+        </div>
+        <div class="conn-row-actions">
+          <button class="conn-row-action conn-row-action-secondary"><i class="ph ph-pause"></i></button>
+          <button class="conn-row-action conn-row-action-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+        </div>
+      </article>
+      <article class="conn-row conn-row-live">
+        <div class="conn-row-main">
+          <div class="conn-row-name">
+            <span class="conn-status-dot conn-status-live"></span>
+            <span class="conn-row-title">Gmail</span>
+            <span class="conn-row-status-label t-label-mono">LIVE</span>
+          </div>
+          <div class="conn-row-desc">Threads, contacts, drafts</div>
+          <div class="conn-row-dims"><span class="conn-dim-pill">Professional</span> <span class="conn-dim-pill">Work Life</span> <span class="conn-dim-pill">Relationships</span></div>
+        </div>
+        <div class="conn-row-stats">
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Captured</span>
+            <span class="conn-row-stat-val">68 nodes</span>
+          </div>
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Last sync</span>
+            <span class="conn-row-stat-val">4 min ago</span>
+          </div>
+        </div>
+        <div class="conn-row-actions">
+          <button class="conn-row-action conn-row-action-secondary"><i class="ph ph-pause"></i></button>
+          <button class="conn-row-action conn-row-action-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+        </div>
+      </article>
+      <article class="conn-row conn-row-live">
+        <div class="conn-row-main">
+          <div class="conn-row-name">
+            <span class="conn-status-dot conn-status-live"></span>
+            <span class="conn-row-title">Google Calendar</span>
+            <span class="conn-row-status-label t-label-mono">LIVE</span>
+          </div>
+          <div class="conn-row-desc">Events, recurring blocks, attendees</div>
+          <div class="conn-row-dims"><span class="conn-dim-pill">Work Life</span> <span class="conn-dim-pill">Relationships</span></div>
+        </div>
+        <div class="conn-row-stats">
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Captured</span>
+            <span class="conn-row-stat-val">29 nodes</span>
+          </div>
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Last sync</span>
+            <span class="conn-row-stat-val">8 min ago</span>
+          </div>
+        </div>
+        <div class="conn-row-actions">
+          <button class="conn-row-action conn-row-action-secondary"><i class="ph ph-pause"></i></button>
+          <button class="conn-row-action conn-row-action-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+        </div>
+      </article>
+      <article class="conn-row conn-row-live">
+        <div class="conn-row-main">
+          <div class="conn-row-name">
+            <span class="conn-status-dot conn-status-live"></span>
+            <span class="conn-row-title">Google Drive</span>
+            <span class="conn-row-status-label t-label-mono">LIVE</span>
+          </div>
+          <div class="conn-row-desc">Docs, decks, sheets</div>
+          <div class="conn-row-dims"><span class="conn-dim-pill">Professional</span> <span class="conn-dim-pill">Work Life</span></div>
+        </div>
+        <div class="conn-row-stats">
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Captured</span>
+            <span class="conn-row-stat-val">35 nodes</span>
+          </div>
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Last sync</span>
+            <span class="conn-row-stat-val">22 min ago</span>
+          </div>
+        </div>
+        <div class="conn-row-actions">
+          <button class="conn-row-action conn-row-action-secondary"><i class="ph ph-pause"></i></button>
+          <button class="conn-row-action conn-row-action-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+        </div>
+      </article>
+      <article class="conn-row conn-row-building">
+        <div class="conn-row-main">
+          <div class="conn-row-name">
+            <span class="conn-status-dot conn-status-building"></span>
+            <span class="conn-row-title">Notion</span>
+            <span class="conn-row-status-label t-label-mono">BUILDING</span>
+          </div>
+          <div class="conn-row-desc">Personal workspace, OKRs</div>
+          <div class="conn-row-dims"><span class="conn-dim-pill">Professional</span> <span class="conn-dim-pill">Work Life</span></div>
+        </div>
+        <div class="conn-row-stats">
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Captured</span>
+            <span class="conn-row-stat-val">8 nodes</span>
+          </div>
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Last sync</span>
+            <span class="conn-row-stat-val">syncing…</span>
+          </div>
+        </div>
+        <div class="conn-row-actions">
+          <button class="conn-row-action conn-row-action-secondary"><i class="ph ph-arrows-clockwise"></i></button>
+          <button class="conn-row-action conn-row-action-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+        </div>
+      </article>
+      <article class="conn-row conn-row-available">
+        <div class="conn-row-main">
+          <div class="conn-row-name">
+            <span class="conn-status-dot conn-status-available"></span>
+            <span class="conn-row-title">Slack</span>
+            <span class="conn-row-status-label t-label-mono">CONNECT</span>
+          </div>
+          <div class="conn-row-desc">Team threads, DMs, channels</div>
+          
+        </div>
+        <div class="conn-row-stats">
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Captured</span>
+            <span class="conn-row-stat-val">—</span>
+          </div>
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Last sync</span>
+            <span class="conn-row-stat-val">—</span>
+          </div>
+        </div>
+        <div class="conn-row-actions">
+          <button class="conn-row-action conn-row-action-primary">Connect <i class="ph ph-arrow-right"></i></button>
+          <button class="conn-row-action conn-row-action-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+        </div>
+      </article>
+      <article class="conn-row conn-row-available">
+        <div class="conn-row-main">
+          <div class="conn-row-name">
+            <span class="conn-status-dot conn-status-available"></span>
+            <span class="conn-row-title">GitHub</span>
+            <span class="conn-row-status-label t-label-mono">CONNECT</span>
+          </div>
+          <div class="conn-row-desc">Repos, commits, PRs</div>
+          
+        </div>
+        <div class="conn-row-stats">
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Captured</span>
+            <span class="conn-row-stat-val">—</span>
+          </div>
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Last sync</span>
+            <span class="conn-row-stat-val">—</span>
+          </div>
+        </div>
+        <div class="conn-row-actions">
+          <button class="conn-row-action conn-row-action-primary">Connect <i class="ph ph-arrow-right"></i></button>
+          <button class="conn-row-action conn-row-action-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+        </div>
+      </article>
+      <article class="conn-row conn-row-available">
+        <div class="conn-row-main">
+          <div class="conn-row-name">
+            <span class="conn-status-dot conn-status-available"></span>
+            <span class="conn-row-title">Zoom</span>
+            <span class="conn-row-status-label t-label-mono">CONNECT</span>
+          </div>
+          <div class="conn-row-desc">Meeting recordings, transcripts</div>
+          
+        </div>
+        <div class="conn-row-stats">
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Captured</span>
+            <span class="conn-row-stat-val">—</span>
+          </div>
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Last sync</span>
+            <span class="conn-row-stat-val">—</span>
+          </div>
+        </div>
+        <div class="conn-row-actions">
+          <button class="conn-row-action conn-row-action-primary">Connect <i class="ph ph-arrow-right"></i></button>
+          <button class="conn-row-action conn-row-action-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+        </div>
+      </article>
+        </div>
+      </div>
+      <div class="conn-cat">
+        <header class="conn-cat-head">
+          <div>
+            <h3 class="conn-cat-title">AI tools · MCP</h3>
+            <p class="conn-cat-blurb">Every tool gets the same brief — your context, scoped per call.</p>
+          </div>
+          <div class="conn-cat-count">
+            <span class="conn-cat-count-num">4</span>
+            <span class="t-label-mono">Live</span>
+          </div>
+        </header>
+        <div class="conn-rows">
+      <article class="conn-row conn-row-live">
+        <div class="conn-row-main">
+          <div class="conn-row-name">
+            <span class="conn-status-dot conn-status-live"></span>
+            <span class="conn-row-title">Claude</span>
+            <span class="conn-row-status-label t-label-mono">LIVE</span>
+          </div>
+          <div class="conn-row-desc">Claude Desktop + Web</div>
+          
+        </div>
+        <div class="conn-row-stats">
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Captured</span>
+            <span class="conn-row-stat-val">Last: 14m</span>
+          </div>
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Last sync</span>
+            <span class="conn-row-stat-val">—</span>
+          </div>
+        </div>
+        <div class="conn-row-actions">
+          <button class="conn-row-action conn-row-action-secondary"><i class="ph ph-pause"></i></button>
+          <button class="conn-row-action conn-row-action-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+        </div>
+      </article>
+      <article class="conn-row conn-row-live">
+        <div class="conn-row-main">
+          <div class="conn-row-name">
+            <span class="conn-status-dot conn-status-live"></span>
+            <span class="conn-row-title">ChatGPT</span>
+            <span class="conn-row-status-label t-label-mono">LIVE</span>
+          </div>
+          <div class="conn-row-desc">GPT-5 + GPT-4o</div>
+          
+        </div>
+        <div class="conn-row-stats">
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Captured</span>
+            <span class="conn-row-stat-val">Last: 38m</span>
+          </div>
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Last sync</span>
+            <span class="conn-row-stat-val">—</span>
+          </div>
+        </div>
+        <div class="conn-row-actions">
+          <button class="conn-row-action conn-row-action-secondary"><i class="ph ph-pause"></i></button>
+          <button class="conn-row-action conn-row-action-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+        </div>
+      </article>
+      <article class="conn-row conn-row-live">
+        <div class="conn-row-main">
+          <div class="conn-row-name">
+            <span class="conn-status-dot conn-status-live"></span>
+            <span class="conn-row-title">Perplexity</span>
+            <span class="conn-row-status-label t-label-mono">LIVE</span>
+          </div>
+          <div class="conn-row-desc">Pro search + Spaces</div>
+          
+        </div>
+        <div class="conn-row-stats">
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Captured</span>
+            <span class="conn-row-stat-val">Last: 1h</span>
+          </div>
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Last sync</span>
+            <span class="conn-row-stat-val">—</span>
+          </div>
+        </div>
+        <div class="conn-row-actions">
+          <button class="conn-row-action conn-row-action-secondary"><i class="ph ph-pause"></i></button>
+          <button class="conn-row-action conn-row-action-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+        </div>
+      </article>
+      <article class="conn-row conn-row-live">
+        <div class="conn-row-main">
+          <div class="conn-row-name">
+            <span class="conn-status-dot conn-status-live"></span>
+            <span class="conn-row-title">Gemini</span>
+            <span class="conn-row-status-label t-label-mono">LIVE</span>
+          </div>
+          <div class="conn-row-desc">Gemini 2.5</div>
+          
+        </div>
+        <div class="conn-row-stats">
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Captured</span>
+            <span class="conn-row-stat-val">Last: 3h</span>
+          </div>
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Last sync</span>
+            <span class="conn-row-stat-val">—</span>
+          </div>
+        </div>
+        <div class="conn-row-actions">
+          <button class="conn-row-action conn-row-action-secondary"><i class="ph ph-pause"></i></button>
+          <button class="conn-row-action conn-row-action-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+        </div>
+      </article>
+      <article class="conn-row conn-row-available">
+        <div class="conn-row-main">
+          <div class="conn-row-name">
+            <span class="conn-status-dot conn-status-available"></span>
+            <span class="conn-row-title">Cursor</span>
+            <span class="conn-row-status-label t-label-mono">CONNECT</span>
+          </div>
+          <div class="conn-row-desc">Code IDE assistant</div>
+          
+        </div>
+        <div class="conn-row-stats">
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Captured</span>
+            <span class="conn-row-stat-val">—</span>
+          </div>
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Last sync</span>
+            <span class="conn-row-stat-val">—</span>
+          </div>
+        </div>
+        <div class="conn-row-actions">
+          <button class="conn-row-action conn-row-action-primary">Connect <i class="ph ph-arrow-right"></i></button>
+          <button class="conn-row-action conn-row-action-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+        </div>
+      </article>
+        </div>
+      </div>
+      <div class="conn-cat">
+        <header class="conn-cat-head">
+          <div>
+            <h3 class="conn-cat-title">Voice & live capture</h3>
+            <p class="conn-cat-blurb">For the things that only live in your head, until they don't.</p>
+          </div>
+          <div class="conn-cat-count">
+            <span class="conn-cat-count-num">2</span>
+            <span class="t-label-mono">Live</span>
+          </div>
+        </header>
+        <div class="conn-rows">
+      <article class="conn-row conn-row-live">
+        <div class="conn-row-main">
+          <div class="conn-row-name">
+            <span class="conn-status-dot conn-status-live"></span>
+            <span class="conn-row-title">iOS Voice Memos</span>
+            <span class="conn-row-status-label t-label-mono">LIVE</span>
+          </div>
+          <div class="conn-row-desc">Auto-transcribed memos</div>
+          <div class="conn-row-dims"><span class="conn-dim-pill">Interests</span> <span class="conn-dim-pill">Work Life</span></div>
+        </div>
+        <div class="conn-row-stats">
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Captured</span>
+            <span class="conn-row-stat-val">47 nodes</span>
+          </div>
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Last sync</span>
+            <span class="conn-row-stat-val">2h ago</span>
+          </div>
+        </div>
+        <div class="conn-row-actions">
+          <button class="conn-row-action conn-row-action-secondary"><i class="ph ph-pause"></i></button>
+          <button class="conn-row-action conn-row-action-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+        </div>
+      </article>
+      <article class="conn-row conn-row-available">
+        <div class="conn-row-main">
+          <div class="conn-row-name">
+            <span class="conn-status-dot conn-status-available"></span>
+            <span class="conn-row-title">Wispr Flow</span>
+            <span class="conn-row-status-label t-label-mono">CONNECT</span>
+          </div>
+          <div class="conn-row-desc">Voice-to-text capture</div>
+          
+        </div>
+        <div class="conn-row-stats">
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Captured</span>
+            <span class="conn-row-stat-val">—</span>
+          </div>
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Last sync</span>
+            <span class="conn-row-stat-val">—</span>
+          </div>
+        </div>
+        <div class="conn-row-actions">
+          <button class="conn-row-action conn-row-action-primary">Connect <i class="ph ph-arrow-right"></i></button>
+          <button class="conn-row-action conn-row-action-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+        </div>
+      </article>
+      <article class="conn-row conn-row-live">
+        <div class="conn-row-main">
+          <div class="conn-row-name">
+            <span class="conn-status-dot conn-status-live"></span>
+            <span class="conn-row-title">Sage Capture</span>
+            <span class="conn-row-status-label t-label-mono">LIVE</span>
+          </div>
+          <div class="conn-row-desc">In-conversation captures</div>
+          <div class="conn-row-dims"><span class="conn-dim-pill">Professional</span> <span class="conn-dim-pill">Work Life</span> <span class="conn-dim-pill">Aesthetic</span></div>
+        </div>
+        <div class="conn-row-stats">
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Captured</span>
+            <span class="conn-row-stat-val">87 nodes</span>
+          </div>
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Last sync</span>
+            <span class="conn-row-stat-val">live</span>
+          </div>
+        </div>
+        <div class="conn-row-actions">
+          <button class="conn-row-action conn-row-action-secondary"><i class="ph ph-pause"></i></button>
+          <button class="conn-row-action conn-row-action-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+        </div>
+      </article>
+        </div>
+      </div>
+      <div class="conn-cat">
+        <header class="conn-cat-head">
+          <div>
+            <h3 class="conn-cat-title">Documents</h3>
+            <p class="conn-cat-blurb">Uploaded files we extracted into structured nodes.</p>
+          </div>
+          <div class="conn-cat-count">
+            <span class="conn-cat-count-num">2</span>
+            <span class="t-label-mono">Live</span>
+          </div>
+        </header>
+        <div class="conn-rows">
+      <article class="conn-row conn-row-live">
+        <div class="conn-row-main">
+          <div class="conn-row-name">
+            <span class="conn-status-dot conn-status-live"></span>
+            <span class="conn-row-title">Resume.pdf</span>
+            <span class="conn-row-status-label t-label-mono">LIVE</span>
+          </div>
+          <div class="conn-row-desc">CV, March 2026</div>
+          <div class="conn-row-dims"><span class="conn-dim-pill">Professional</span></div>
+        </div>
+        <div class="conn-row-stats">
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Captured</span>
+            <span class="conn-row-stat-val">18 nodes</span>
+          </div>
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Last sync</span>
+            <span class="conn-row-stat-val">5d ago</span>
+          </div>
+        </div>
+        <div class="conn-row-actions">
+          <button class="conn-row-action conn-row-action-secondary"><i class="ph ph-pause"></i></button>
+          <button class="conn-row-action conn-row-action-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+        </div>
+      </article>
+      <article class="conn-row conn-row-live">
+        <div class="conn-row-main">
+          <div class="conn-row-name">
+            <span class="conn-status-dot conn-status-live"></span>
+            <span class="conn-row-title">M2 maintenance log</span>
+            <span class="conn-row-status-label t-label-mono">LIVE</span>
+          </div>
+          <div class="conn-row-desc">Service records, mods</div>
+          <div class="conn-row-dims"><span class="conn-dim-pill">Interests</span></div>
+        </div>
+        <div class="conn-row-stats">
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Captured</span>
+            <span class="conn-row-stat-val">6 nodes</span>
+          </div>
+          <div class="conn-row-stat">
+            <span class="t-label-mono conn-row-stat-label">Last sync</span>
+            <span class="conn-row-stat-val">2w ago</span>
+          </div>
+        </div>
+        <div class="conn-row-actions">
+          <button class="conn-row-action conn-row-action-secondary"><i class="ph ph-pause"></i></button>
+          <button class="conn-row-action conn-row-action-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+        </div>
+      </article>
+        </div>
+      </div>
+    </section>
+    <section class="connections-trust">
+      <div class="t-label-mono connections-trust-eyebrow">How we treat your data</div>
+      <ul class="connections-trust-list">
+        <li><i class="ph ph-shield-check"></i> <span><strong>OAuth-only</strong> — credentials never touch our servers.</span></li>
+        <li><i class="ph ph-eye"></i> <span><strong>Read-only by default</strong> — write scopes opt-in only.</span></li>
+        <li><i class="ph ph-sliders-horizontal"></i> <span><strong>Per-connector scoping</strong> — granular control of what flows in.</span></li>
+        <li><i class="ph ph-export"></i> <span><strong>Export anytime</strong> — your context is yours. Always.</span></li>
+      </ul>
+    </section>
+  </div>
+</main>
+</div>
+</body>
+</html>
