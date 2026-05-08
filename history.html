@@ -10,15 +10,16 @@
 <style>
 
   .app-content { padding: 0; }
-  .hist-page {
-    max-width: 1280px;
+  .history-page {
+    max-width: var(--w-bleed);
     margin: 0 auto;
     padding: var(--s-5) var(--s-6) var(--s-9);
   }
   @media (max-width: 900px) {
-    .hist-page { padding: var(--s-4) var(--s-4) var(--s-7); }
+    .history-page { padding: var(--s-4) var(--s-4) var(--s-7); }
   }
 
+  /* Breadcrumb */
   .atlas-breadcrumb {
     display: flex; align-items: center; gap: var(--s-2);
     font-family: var(--f-mono); font-size: 11px;
@@ -31,111 +32,81 @@
   .atlas-breadcrumb i { font-size: 14px; opacity: 0.6; }
 
   /* Hero */
-  .hist-hero {
+  .history-hero {
     border-bottom: 1px solid var(--rule);
-    padding-bottom: var(--s-6);
-    margin-bottom: var(--s-6);
-    max-width: 880px;
+    padding-bottom: var(--s-5);
+    margin-bottom: var(--s-5);
+    max-width: 980px;
   }
-  .hist-eyebrow { color: var(--terra); margin-bottom: var(--s-3); }
-  .hist-title {
+  .history-eyebrow { color: var(--terra); margin-bottom: var(--s-3); }
+  .history-hero-title {
     font-family: var(--f-display); font-weight: 400;
-    font-size: clamp(40px, 5vw, 60px);
-    line-height: 1.05; letter-spacing: -0.02em;
+    font-size: clamp(40px, 5vw, 64px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
     color: var(--ink);
     margin-bottom: var(--s-3);
   }
-  .hist-title em { font-style: italic; }
-  .hist-deck {
-    font-size: 17px; line-height: 1.55;
+  .history-hero-title em { font-style: italic; }
+  .history-hero-deck {
+    font-size: 16px; line-height: 1.55;
     color: var(--ink-soft);
     max-width: 720px;
   }
-  .hist-deck em { font-style: italic; color: var(--terra); }
+  .history-hero-deck em {
+    font-family: var(--f-display); font-style: italic;
+    color: var(--terra);
+  }
 
-  /* Stats strip */
-  .hist-stats {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--s-3);
+  /* Controls bar */
+  .history-controls {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: var(--s-4);
+    flex-wrap: wrap;
+    padding: var(--s-3) 0;
     margin-bottom: var(--s-5);
-  }
-  @media (max-width: 900px) { .hist-stats { grid-template-columns: repeat(2, 1fr); } }
-
-  .hist-stat {
-    background: var(--paper);
-    border: 1px solid var(--rule);
-    border-radius: var(--r-lg);
-    padding: var(--s-4);
-  }
-  .hist-stat .t-label-mono { color: var(--ink-mute); margin-bottom: var(--s-2); }
-  .hist-stat-num {
-    font-family: var(--f-display); font-weight: 400;
-    font-size: 36px; line-height: 1;
-    color: var(--ink);
-    margin-bottom: 4px;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .hist-stat-num .hist-dot {
-    width: 10px; height: 10px;
-  }
-  .hist-stat-label {
-    font-size: 13px; color: var(--ink-soft);
-  }
-
-  /* Mode dots */
-  .hist-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    display: inline-block;
-    flex-shrink: 0;
-  }
-  .hist-dot-ask { background: #5BA3D0; }      /* sage blue, used here on light surface */
-  .hist-dot-do { background: var(--terra); }
-  .hist-dot-notice { background: #B59FF0; }   /* lavender */
-
-  /* Filter strip */
-  .hist-filters {
-    display: flex; flex-wrap: wrap;
-    align-items: center; justify-content: space-between;
-    gap: var(--s-3);
-    padding: var(--s-3) 0 var(--s-4);
     border-bottom: 1px solid var(--rule);
-    margin-bottom: var(--s-5);
   }
-  .hist-filters-left {
-    display: flex; flex-wrap: wrap; gap: var(--s-3);
+  .history-filters {
+    display: flex; gap: 6px; flex-wrap: wrap;
   }
-  .hist-filter-group {
-    display: inline-flex; gap: 4px;
+  .history-filter {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px;
     background: var(--paper);
     border: 1px solid var(--rule);
     border-radius: 999px;
-    padding: 3px;
-  }
-  .hist-filter {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 5px 12px;
-    background: transparent;
     color: var(--ink-soft);
-    border: 0;
-    border-radius: 999px;
     font-family: var(--f-body);
     font-size: 12px; font-weight: 500;
     cursor: pointer;
-    transition: background var(--t-fast), color var(--t-fast);
+    transition: background var(--t-fast), border-color var(--t-fast);
   }
-  .hist-filter:hover { color: var(--ink); }
-  .hist-filter-active {
+  .history-filter:hover {
     background: var(--paper-3);
-    color: var(--ink);
+    border-color: var(--rule-strong);
   }
-  .hist-filter i { font-size: 13px; opacity: 0.7; }
+  .history-filter-active {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+  .history-filter-active:hover {
+    background: var(--ink);
+    border-color: var(--ink);
+  }
+  .history-filter i { font-size: 13px; }
+  .filter-count {
+    font-family: var(--f-mono); font-size: 10px;
+    color: var(--ink-mute);
+    margin-left: 2px;
+  }
+  .history-filter-active .filter-count { color: rgba(255,255,255,0.5); }
 
-  .hist-filters-right {
-    display: flex; gap: var(--s-3); align-items: center;
+  .history-actions {
+    display: flex; align-items: center; gap: var(--s-2);
   }
-  .hist-search {
+  .history-search {
     display: flex; align-items: center; gap: 6px;
     padding: 6px 12px;
     background: var(--paper);
@@ -143,164 +114,195 @@
     border-radius: 999px;
     width: 220px;
   }
-  .hist-search i { color: var(--ink-mute); font-size: 14px; }
-  .hist-search input {
-    flex: 1;
-    background: transparent;
-    border: 0; outline: 0;
-    font-size: 13px;
+  .history-search input {
+    flex: 1; background: transparent; border: 0; outline: 0;
+    font-family: var(--f-body); font-size: 13px;
     color: var(--ink);
-    font-family: var(--f-body);
   }
-  .hist-search input::placeholder { color: var(--ink-mute); }
+  .history-search input::placeholder { color: var(--ink-mute); }
+  .history-search i { color: var(--ink-mute); font-size: 14px; }
 
-  .hist-export-btn {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 7px 14px;
-    background: var(--paper);
-    border: 1px solid var(--rule);
-    color: var(--ink-soft);
-    border-radius: 999px;
-    font-family: var(--f-body);
-    font-size: 12px; font-weight: 500;
-    cursor: pointer;
-    transition: background var(--t-fast), color var(--t-fast);
+  .btn-sm {
+    padding: 6px 12px; font-size: 12px;
   }
-  .hist-export-btn:hover { background: var(--paper-3); color: var(--ink); }
-  .hist-export-btn i { font-size: 14px; }
+
+  /* Event dot colors — these are also used in filter pills */
+  .event-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+  .event-dot-sage    { background: #5BA3D0; }
+  .event-dot-capture { background: var(--terra); }
+  .event-dot-ingest  { background: #D89534; }
+  .event-dot-deepen  { background: #B8552E; }
+  .event-dot-agent   { background: #7C9C5E; }
+  .event-dot-library { background: #C97956; }
+  .event-dot-merge   { background: #B59FF0; }
 
   /* Timeline */
-  .hist-timeline {
-    margin-bottom: var(--s-7);
-  }
-  .hist-day-group {
-    margin-bottom: var(--s-6);
-  }
-  .hist-day-marker {
-    display: flex; align-items: center; gap: var(--s-3);
-    padding: var(--s-2) 0;
-    margin-bottom: var(--s-3);
-    position: sticky; top: var(--topbar-h);
-    background: var(--paper-2);
-    z-index: 2;
-  }
-  .hist-day-label {
-    font-family: var(--f-display); font-weight: 400;
-    font-size: 24px; line-height: 1;
-    color: var(--ink);
-  }
-  .hist-day-date {
-    color: var(--ink-mute);
-  }
-  .hist-day-dot {
-    flex: 1; height: 1px;
-    background: var(--rule);
-    margin-left: var(--s-2);
+  .history-timeline {
+    display: flex; flex-direction: column;
+    gap: var(--s-6);
   }
 
-  /* Entries */
-  .hist-day-entries {
+  .history-day-head {
+    padding: var(--s-2) 0 var(--s-3);
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: var(--s-3);
+  }
+  .history-day-head .t-label-mono {
+    color: var(--ink-mute);
+    font-weight: 600;
+  }
+
+  .history-day-events {
     display: flex; flex-direction: column;
     gap: var(--s-3);
   }
 
-  .hist-entry {
+  .history-event {
     display: grid;
-    grid-template-columns: 110px 70px 1fr;
+    grid-template-columns: 32px 80px 1fr;
     gap: var(--s-3);
-    align-items: start;
+    align-items: stretch;
+    position: relative;
   }
-  @media (max-width: 900px) {
-    .hist-entry { grid-template-columns: 1fr; gap: var(--s-1); }
-    .hist-entry-time, .hist-entry-mode { display: inline-block; }
-  }
-
-  .hist-entry-time { padding-top: var(--s-3); }
-  .hist-entry-time .t-label-mono { color: var(--ink-mute); }
-
-  .hist-entry-mode {
-    display: flex; align-items: center; gap: 6px;
-    padding-top: var(--s-3);
-  }
-  .hist-entry-mode .t-label-mono {
-    font-weight: 500;
-    color: var(--ink-soft);
+  @media (max-width: 700px) {
+    .history-event { grid-template-columns: 24px 1fr; }
+    .history-event-time { display: none; }
   }
 
-  .hist-entry-card {
+  /* Rail dot + line */
+  .history-event-rail {
+    display: flex; flex-direction: column; align-items: center;
+    padding-top: 16px;
+  }
+  .history-event-rail .event-dot {
+    width: 10px; height: 10px;
+    border: 2px solid var(--paper);
+    box-shadow: 0 0 0 1px currentColor;
+  }
+  .event-rail-line {
+    flex: 1;
+    width: 1px;
+    background: var(--rule);
+    margin-top: 6px;
+  }
+  .history-day-events .history-event:last-child .event-rail-line {
+    background: transparent;
+  }
+
+  /* Time column */
+  .history-event-time {
+    padding-top: 16px;
+  }
+  .history-event-time .t-label-mono {
+    color: var(--ink-mute);
+  }
+
+  /* Event card */
+  .history-event-card {
     background: var(--paper);
     border: 1px solid var(--rule);
-    border-radius: var(--r-md);
+    border-radius: var(--r-lg);
     padding: var(--s-3) var(--s-4);
-    border-left: 3px solid var(--rule);
-    transition: background var(--t-fast), border-color var(--t-fast);
-    cursor: pointer;
+    transition: border-color var(--t-fast), background var(--t-fast);
   }
-  .hist-entry-card:hover {
-    background: color-mix(in srgb, var(--paper-3) 60%, var(--paper));
+  .history-event-card:hover {
+    border-color: var(--rule-strong);
+    background: var(--paper-2);
   }
-  .hist-entry-ask .hist-entry-card { border-left-color: #5BA3D0; }
-  .hist-entry-do .hist-entry-card { border-left-color: var(--terra); }
-  .hist-entry-notice .hist-entry-card { border-left-color: #B59FF0; }
 
-  .hist-entry-head {
-    display: flex; align-items: baseline; justify-content: space-between;
-    gap: var(--s-3);
-    margin-bottom: var(--s-1);
-  }
-  .hist-entry-title {
-    font-family: var(--f-body);
-    font-size: 15px; font-weight: 600;
-    color: var(--ink);
-    line-height: 1.3;
-  }
-  .hist-entry-kind {
-    font-family: var(--f-mono); font-size: 10px;
-    color: var(--ink-mute);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    background: var(--paper-3);
-    padding: 2px 8px;
-    border-radius: 999px;
-    flex-shrink: 0;
-  }
-  .hist-entry-body {
-    font-size: 14px; line-height: 1.5;
-    color: var(--ink-soft);
+  .event-card-head {
+    display: flex; justify-content: space-between; align-items: flex-start;
     margin-bottom: var(--s-2);
   }
-  .hist-entry-body em {
-    font-style: italic;
-    color: var(--terra);
+  .event-card-eyebrow {
+    display: flex; align-items: center; gap: 6px;
+    font-family: var(--f-mono); font-size: 10px;
+    color: var(--ink-mute); letter-spacing: 0.06em;
+    text-transform: uppercase;
   }
-  .hist-entry-foot {
+  .event-card-eyebrow i { font-size: 13px; }
+  .event-card-divider { opacity: 0.4; }
+  .event-card-dim {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .event-card-menu {
+    color: var(--ink-mute);
+    width: 24px; height: 24px;
+    border-radius: 4px;
+    display: grid; place-items: center;
+    transition: background var(--t-fast);
+  }
+  .event-card-menu:hover { background: var(--paper-3); color: var(--ink); }
+  .event-card-menu i { font-size: 16px; }
+
+  .event-card-title {
+    font-family: var(--f-body);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: var(--s-1);
+    line-height: 1.3;
+  }
+  .event-card-body {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    margin-bottom: var(--s-3);
+  }
+
+  .event-card-foot {
     display: flex; justify-content: space-between; align-items: center;
     padding-top: var(--s-2);
-    border-top: 1px dashed var(--rule);
-    flex-wrap: wrap; gap: var(--s-2);
-  }
-  .hist-entry-source { color: var(--ink-mute); }
-  .hist-entry-meta { color: var(--terra-deep); }
-
-  /* Foot */
-  .hist-foot {
-    display: flex; flex-direction: column; align-items: center;
-    gap: var(--s-3);
-    padding-top: var(--s-5);
     border-top: 1px solid var(--rule);
   }
-  .hist-foot-meta {
-    display: flex; gap: var(--s-2); align-items: center;
-    color: var(--ink-mute);
-    font-size: 12px;
-  }
-  .hist-foot-link {
-    color: var(--terra);
+  .event-card-meta { color: var(--ink-mute); }
+  .event-card-link {
     display: inline-flex; align-items: center; gap: 4px;
-    font-family: var(--f-body);
+    font-family: var(--f-body); font-size: 12px; font-weight: 500;
+    color: var(--ink);
   }
-  .hist-foot-link:hover { color: var(--terra-deep); }
-  .hist-foot-link i { font-size: 12px; }
+  .event-card-link:hover { color: var(--terra); }
+  .event-card-link i { font-size: 13px; }
+
+  /* Event-type left accent */
+  .event-sage    .history-event-card { border-left: 2px solid #5BA3D0; }
+  .event-capture .history-event-card { border-left: 2px solid var(--terra); }
+  .event-ingest  .history-event-card { border-left: 2px solid #D89534; }
+  .event-deepen  .history-event-card { border-left: 2px solid #B8552E; }
+  .event-agent   .history-event-card { border-left: 2px solid #7C9C5E; }
+  .event-library .history-event-card { border-left: 2px solid #C97956; }
+  .event-merge   .history-event-card { border-left: 2px solid #B59FF0; }
+
+  /* Foot */
+  .history-foot {
+    margin-top: var(--s-7);
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    padding: var(--s-6);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: var(--s-4);
+  }
+  .history-foot-title {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: 28px; letter-spacing: -0.01em; line-height: 1.1;
+    color: var(--ink);
+    margin-bottom: var(--s-2);
+  }
+  .history-foot p {
+    font-size: 15px; color: var(--ink-soft); line-height: 1.5;
+    max-width: 540px;
+  }
+  .history-foot p em { font-style: italic; color: var(--terra); }
+  .history-foot-actions {
+    display: flex; gap: var(--s-3); flex-wrap: wrap;
+  }
 
 </style>
 </head>
@@ -347,321 +349,481 @@
       <a href="export.html" class="app-nav-item" data-page="export"><i class="ph ph-download-simple"></i><span>Export &amp; Data</span></a>
       <a href="settings.html" class="app-nav-item" data-page="settings"><i class="ph ph-gear-six"></i><span>Settings</span></a>
 </nav>
-  <main class="app-content">
-  <div class="hist-page">
+  <main class="app-content history-content">
+  <div class="history-page">
     <div class="atlas-breadcrumb">
       <a href="dashboard.html">Dashboard</a>
       <i class="ph ph-caret-right"></i>
       <span>History</span>
     </div>
-    <header class="hist-hero">
-      <div class="t-label-mono hist-eyebrow">Sage Activity Log</div>
-      <h1 class="hist-title">Your <em>story</em>, replayed.</h1>
-      <p class="hist-deck">
-        Every Sage session, every action taken on your behalf, every belief surfaced. <em>The audit trail of your context layer.</em>
+    <header class="history-hero">
+      <div class="t-label-mono history-eyebrow">Everything Sage has noticed</div>
+      <h1 class="history-hero-title">Your <em>history.</em></h1>
+      <p class="history-hero-deck">
+        Every conversation, capture, ingestion, and decision Sage has surfaced about you.
+        <em>Filter by what matters.</em> Export anything. Rewind anytime.
       </p>
     </header>
-    <section class="hist-stats">
-      <div class="hist-stat">
-        <div class="t-label-mono">This Week</div>
-        <div class="hist-stat-num">47</div>
-        <div class="hist-stat-label">Total events</div>
+    <div class="history-controls">
+      <div class="history-filters">
+        <button class="history-filter history-filter-active">
+          <i class="ph ph-list"></i> All <span class="filter-count">142</span>
+        </button>
+        <button class="history-filter">
+          <span class="event-dot event-dot-sage"></span> Sage <span class="filter-count">38</span>
+        </button>
+        <button class="history-filter">
+          <span class="event-dot event-dot-capture"></span> Captures <span class="filter-count">47</span>
+        </button>
+        <button class="history-filter">
+          <span class="event-dot event-dot-ingest"></span> Ingestions <span class="filter-count">29</span>
+        </button>
+        <button class="history-filter">
+          <span class="event-dot event-dot-deepen"></span> Deepenings <span class="filter-count">14</span>
+        </button>
+        <button class="history-filter">
+          <span class="event-dot event-dot-agent"></span> Agent runs <span class="filter-count">9</span>
+        </button>
+        <button class="history-filter">
+          <span class="event-dot event-dot-library"></span> Libraries <span class="filter-count">3</span>
+        </button>
+        <button class="history-filter">
+          <span class="event-dot event-dot-merge"></span> Merges <span class="filter-count">2</span>
+        </button>
       </div>
-      <div class="hist-stat">
-        <div class="t-label-mono">Asked</div>
-        <div class="hist-stat-num"><span class="hist-dot hist-dot-ask"></span>23</div>
-        <div class="hist-stat-label">Conversations</div>
-      </div>
-      <div class="hist-stat">
-        <div class="t-label-mono">Done</div>
-        <div class="hist-stat-num"><span class="hist-dot hist-dot-do"></span>11</div>
-        <div class="hist-stat-label">Actions taken</div>
-      </div>
-      <div class="hist-stat">
-        <div class="t-label-mono">Noticed</div>
-        <div class="hist-stat-num"><span class="hist-dot hist-dot-notice"></span>13</div>
-        <div class="hist-stat-label">Insights surfaced</div>
-      </div>
-    </section>
-    <section class="hist-filters">
-      <div class="hist-filters-left">
-        <div class="hist-filter-group">
-          <button class="hist-filter hist-filter-active">All modes</button>
-          <button class="hist-filter"><span class="hist-dot hist-dot-ask"></span>Ask</button>
-          <button class="hist-filter"><span class="hist-dot hist-dot-do"></span>Do</button>
-          <button class="hist-filter"><span class="hist-dot hist-dot-notice"></span>Notice</button>
-        </div>
-        <div class="hist-filter-group">
-          <button class="hist-filter hist-filter-active">All dimensions</button>
-          <button class="hist-filter"><i class="ph ph-briefcase"></i>Professional</button>
-          <button class="hist-filter"><i class="ph ph-coffee"></i>Work Life</button>
-          <button class="hist-filter"><i class="ph ph-compass"></i>Interests</button>
-          <button class="hist-filter">+3 more</button>
-        </div>
-      </div>
-      <div class="hist-filters-right">
-        <div class="hist-search">
+      <div class="history-actions">
+        <div class="history-search">
           <i class="ph ph-magnifying-glass"></i>
-          <input type="text" placeholder="Search history…" />
+          <input type="search" placeholder="Search history…">
         </div>
-        <button class="hist-export-btn"><i class="ph ph-download-simple"></i>Export</button>
+        <button class="btn btn-secondary btn-sm"><i class="ph ph-download-simple"></i> Export</button>
       </div>
-    </section>
-    <section class="hist-timeline">
-      <div class="hist-day-group">
-        <div class="hist-day-marker">
-          <span class="hist-day-label">Today</span>
-          <span class="t-label-mono hist-day-date">May 7, 2026</span>
-          <span class="hist-day-dot"></span>
+    </div>
+    <div class="history-timeline">
+      <section class="history-day">
+        <div class="history-day-head"><span class="t-label-mono">TODAY · MAY 7</span></div>
+        <div class="history-day-events">
+          <article class="history-event event-sage">
+            <div class="history-event-rail">
+              <span class="event-dot event-dot-sage"></span>
+              <span class="event-rail-line"></span>
+            </div>
+            <div class="history-event-time">
+              <span class="t-label-mono">10:42 AM</span>
+            </div>
+            <div class="history-event-card">
+              <div class="event-card-head">
+                <div class="event-card-eyebrow">
+                  <i class="ph ph-chats-circle"></i>
+                  <span class="t-label-mono">Sage</span>
+                  <span class="event-card-divider">·</span>
+                  <span class="event-card-dim">Work Life</span>
+                </div>
+                <button class="event-card-menu" aria-label="Event menu"><i class="ph ph-dots-three"></i></button>
+              </div>
+              <h3 class="event-card-title">Workspace setup</h3>
+              <p class="event-card-body">Captured: direct, brief, no flattery, commas over em-dashes, warmth reserved for relationships that earn it.</p>
+              <div class="event-card-foot">
+                <span class="t-label-mono event-card-meta">8 turns · 3 facts · 1 belief</span>
+                <a class="event-card-link" href="#">Open <i class="ph ph-arrow-up-right"></i></a>
+              </div>
+            </div>
+          </article>
+          <article class="history-event event-deepen">
+            <div class="history-event-rail">
+              <span class="event-dot event-dot-deepen"></span>
+              <span class="event-rail-line"></span>
+            </div>
+            <div class="history-event-time">
+              <span class="t-label-mono">10:38 AM</span>
+            </div>
+            <div class="history-event-card">
+              <div class="event-card-head">
+                <div class="event-card-eyebrow">
+                  <i class="ph ph-arrow-up"></i>
+                  <span class="t-label-mono">Deepening</span>
+                  <span class="event-card-divider">·</span>
+                  <span class="event-card-dim">Communication</span>
+                </div>
+                <button class="event-card-menu" aria-label="Event menu"><i class="ph ph-dots-three"></i></button>
+              </div>
+              <h3 class="event-card-title">Promoted to Layer 03</h3>
+              <p class="event-card-body">Tone preferences moved from Beliefs to Preferences. Sage confirmed across two separate conversations.</p>
+              <div class="event-card-foot">
+                <span class="t-label-mono event-card-meta">Layer 02 → Layer 03 · Confidence 0.91</span>
+                <a class="event-card-link" href="#">Open <i class="ph ph-arrow-up-right"></i></a>
+              </div>
+            </div>
+          </article>
+          <article class="history-event event-ingest">
+            <div class="history-event-rail">
+              <span class="event-dot event-dot-ingest"></span>
+              <span class="event-rail-line"></span>
+            </div>
+            <div class="history-event-time">
+              <span class="t-label-mono">9:14 AM</span>
+            </div>
+            <div class="history-event-card">
+              <div class="event-card-head">
+                <div class="event-card-eyebrow">
+                  <i class="ph ph-arrow-down-right"></i>
+                  <span class="t-label-mono">Ingestion</span>
+                  <span class="event-card-divider">·</span>
+                  <span class="event-card-dim">Work Life</span>
+                </div>
+                <button class="event-card-menu" aria-label="Event menu"><i class="ph ph-dots-three"></i></button>
+              </div>
+              <h3 class="event-card-title">Calendar synced</h3>
+              <p class="event-card-body">12 events from this week added. 4 deep-work blocks identified, 3 of which were broken by Slack interruptions.</p>
+              <div class="event-card-foot">
+                <span class="t-label-mono event-card-meta">Google Calendar · 12 events</span>
+                <a class="event-card-link" href="#">Open <i class="ph ph-arrow-up-right"></i></a>
+              </div>
+            </div>
+          </article>
+          <article class="history-event event-capture">
+            <div class="history-event-rail">
+              <span class="event-dot event-dot-capture"></span>
+              <span class="event-rail-line"></span>
+            </div>
+            <div class="history-event-time">
+              <span class="t-label-mono">8:47 AM</span>
+            </div>
+            <div class="history-event-card">
+              <div class="event-card-head">
+                <div class="event-card-eyebrow">
+                  <i class="ph ph-note-pencil"></i>
+                  <span class="t-label-mono">Capture</span>
+                  <span class="event-card-divider">·</span>
+                  <span class="event-card-dim">Interests</span>
+                </div>
+                <button class="event-card-menu" aria-label="Event menu"><i class="ph ph-dots-three"></i></button>
+              </div>
+              <h3 class="event-card-title">Track day prep notes</h3>
+              <p class="event-card-body">Quick capture from voice memo: tire pressures for Chuckwalla — 32F/30R cold, drop 2psi after first session.</p>
+              <div class="event-card-foot">
+                <span class="t-label-mono event-card-meta">iOS Voice Memos · 47 sec</span>
+                <a class="event-card-link" href="#">Open <i class="ph ph-arrow-up-right"></i></a>
+              </div>
+            </div>
+          </article>
         </div>
-        <div class="hist-day-entries">
-      <article class="hist-entry hist-entry-ask">
-        <div class="hist-entry-time">
-          <span class="t-label-mono">12 min ago</span>
+      </section>
+      <section class="history-day">
+        <div class="history-day-head"><span class="t-label-mono">YESTERDAY · MAY 6</span></div>
+        <div class="history-day-events">
+          <article class="history-event event-agent">
+            <div class="history-event-rail">
+              <span class="event-dot event-dot-agent"></span>
+              <span class="event-rail-line"></span>
+            </div>
+            <div class="history-event-time">
+              <span class="t-label-mono">5:22 PM</span>
+            </div>
+            <div class="history-event-card">
+              <div class="event-card-head">
+                <div class="event-card-eyebrow">
+                  <i class="ph ph-sparkle"></i>
+                  <span class="t-label-mono">Agent</span>
+                  <span class="event-card-divider">·</span>
+                  <span class="event-card-dim">Professional</span>
+                </div>
+                <button class="event-card-menu" aria-label="Event menu"><i class="ph ph-dots-three"></i></button>
+              </div>
+              <h3 class="event-card-title">Investor reply drafted</h3>
+              <p class="event-card-body">Agent drafted reply to Aurora Capital follow-up question on revenue projections. Flagged for review.</p>
+              <div class="event-card-foot">
+                <span class="t-label-mono event-card-meta">Run 0.8s · 1,247 tokens · Awaiting approval</span>
+                <a class="event-card-link" href="#">Open <i class="ph ph-arrow-up-right"></i></a>
+              </div>
+            </div>
+          </article>
+          <article class="history-event event-sage">
+            <div class="history-event-rail">
+              <span class="event-dot event-dot-sage"></span>
+              <span class="event-rail-line"></span>
+            </div>
+            <div class="history-event-time">
+              <span class="t-label-mono">3:10 PM</span>
+            </div>
+            <div class="history-event-card">
+              <div class="event-card-head">
+                <div class="event-card-eyebrow">
+                  <i class="ph ph-chats-circle"></i>
+                  <span class="t-label-mono">Sage</span>
+                  <span class="event-card-divider">·</span>
+                  <span class="event-card-dim">Aesthetic</span>
+                </div>
+                <button class="event-card-menu" aria-label="Event menu"><i class="ph ph-dots-three"></i></button>
+              </div>
+              <h3 class="event-card-title">Aesthetic preferences</h3>
+              <p class="event-card-body">Walked through brand affinities for personal site refresh. Captured: editorial serif, warm palette, generous whitespace.</p>
+              <div class="event-card-foot">
+                <span class="t-label-mono event-card-meta">14 turns · 9 facts · 4 beliefs</span>
+                <a class="event-card-link" href="#">Open <i class="ph ph-arrow-up-right"></i></a>
+              </div>
+            </div>
+          </article>
+          <article class="history-event event-library">
+            <div class="history-event-rail">
+              <span class="event-dot event-dot-library"></span>
+              <span class="event-rail-line"></span>
+            </div>
+            <div class="history-event-time">
+              <span class="t-label-mono">11:55 AM</span>
+            </div>
+            <div class="history-event-card">
+              <div class="event-card-head">
+                <div class="event-card-eyebrow">
+                  <i class="ph ph-books"></i>
+                  <span class="t-label-mono">Library</span>
+                  <span class="event-card-divider">·</span>
+                  <span class="event-card-dim">Professional</span>
+                </div>
+                <button class="event-card-menu" aria-label="Event menu"><i class="ph ph-dots-three"></i></button>
+              </div>
+              <h3 class="event-card-title">Founder OS · activated</h3>
+              <p class="event-card-body">Layered Founder OS expert library on top of Professional dimension. Operating frameworks now available to agents.</p>
+              <div class="event-card-foot">
+                <span class="t-label-mono event-card-meta">Industry Rockstar · 187 frameworks</span>
+                <a class="event-card-link" href="#">Open <i class="ph ph-arrow-up-right"></i></a>
+              </div>
+            </div>
+          </article>
+          <article class="history-event event-ingest">
+            <div class="history-event-rail">
+              <span class="event-dot event-dot-ingest"></span>
+              <span class="event-rail-line"></span>
+            </div>
+            <div class="history-event-time">
+              <span class="t-label-mono">9:30 AM</span>
+            </div>
+            <div class="history-event-card">
+              <div class="event-card-head">
+                <div class="event-card-eyebrow">
+                  <i class="ph ph-arrow-down-right"></i>
+                  <span class="t-label-mono">Ingestion</span>
+                  <span class="event-card-divider">·</span>
+                  <span class="event-card-dim">Work Life</span>
+                </div>
+                <button class="event-card-menu" aria-label="Event menu"><i class="ph ph-dots-three"></i></button>
+              </div>
+              <h3 class="event-card-title">LinkedIn updated</h3>
+              <p class="event-card-body">42 nodes from your LinkedIn profile added or updated. New role at MyGentic now reflected.</p>
+              <div class="event-card-foot">
+                <span class="t-label-mono event-card-meta">LinkedIn · 42 nodes</span>
+                <a class="event-card-link" href="#">Open <i class="ph ph-arrow-up-right"></i></a>
+              </div>
+            </div>
+          </article>
         </div>
-        <div class="hist-entry-mode">
-          <span class="hist-dot hist-dot-ask"></span>
-          <span class="t-label-mono">ASK</span>
+      </section>
+      <section class="history-day">
+        <div class="history-day-head"><span class="t-label-mono">2 DAYS AGO · MAY 5</span></div>
+        <div class="history-day-events">
+          <article class="history-event event-merge">
+            <div class="history-event-rail">
+              <span class="event-dot event-dot-merge"></span>
+              <span class="event-rail-line"></span>
+            </div>
+            <div class="history-event-time">
+              <span class="t-label-mono">7:48 PM</span>
+            </div>
+            <div class="history-event-card">
+              <div class="event-card-head">
+                <div class="event-card-eyebrow">
+                  <i class="ph ph-git-merge"></i>
+                  <span class="t-label-mono">Merge</span>
+                  <span class="event-card-divider">·</span>
+                  <span class="event-card-dim">Relationships</span>
+                </div>
+                <button class="event-card-menu" aria-label="Event menu"><i class="ph ph-dots-three"></i></button>
+              </div>
+              <h3 class="event-card-title">Reconciled co-founder roles</h3>
+              <p class="event-card-body">Sage noticed two slightly different framings of Kane's role across threads. Merged into single canonical fact.</p>
+              <div class="event-card-foot">
+                <span class="t-label-mono event-card-meta">Confidence 0.88 · 2 sources reconciled</span>
+                <a class="event-card-link" href="#">Open <i class="ph ph-arrow-up-right"></i></a>
+              </div>
+            </div>
+          </article>
+          <article class="history-event event-sage">
+            <div class="history-event-rail">
+              <span class="event-dot event-dot-sage"></span>
+              <span class="event-rail-line"></span>
+            </div>
+            <div class="history-event-time">
+              <span class="t-label-mono">2:14 PM</span>
+            </div>
+            <div class="history-event-card">
+              <div class="event-card-head">
+                <div class="event-card-eyebrow">
+                  <i class="ph ph-chats-circle"></i>
+                  <span class="t-label-mono">Sage</span>
+                  <span class="event-card-divider">·</span>
+                  <span class="event-card-dim">Work Life</span>
+                </div>
+                <button class="event-card-menu" aria-label="Event menu"><i class="ph ph-dots-three"></i></button>
+              </div>
+              <h3 class="event-card-title">Goal drift</h3>
+              <p class="event-card-body">Notice mode flagged: MVP ship date slipping. You've let meetings overwrite three deep-work blocks this week.</p>
+              <div class="event-card-foot">
+                <span class="t-label-mono event-card-meta">6 turns · 2 patterns surfaced</span>
+                <a class="event-card-link" href="#">Open <i class="ph ph-arrow-up-right"></i></a>
+              </div>
+            </div>
+          </article>
+          <article class="history-event event-capture">
+            <div class="history-event-rail">
+              <span class="event-dot event-dot-capture"></span>
+              <span class="event-rail-line"></span>
+            </div>
+            <div class="history-event-time">
+              <span class="t-label-mono">10:01 AM</span>
+            </div>
+            <div class="history-event-card">
+              <div class="event-card-head">
+                <div class="event-card-eyebrow">
+                  <i class="ph ph-note-pencil"></i>
+                  <span class="t-label-mono">Capture</span>
+                  <span class="event-card-divider">·</span>
+                  <span class="event-card-dim">Consumer</span>
+                </div>
+                <button class="event-card-menu" aria-label="Event menu"><i class="ph ph-dots-three"></i></button>
+              </div>
+              <h3 class="event-card-title">EV charging tariffs</h3>
+              <p class="event-card-body">Notes from PG&E rate research — EV2-A peak/off-peak break-even calculation for home charging.</p>
+              <div class="event-card-foot">
+                <span class="t-label-mono event-card-meta">Manual capture · 12 nodes</span>
+                <a class="event-card-link" href="#">Open <i class="ph ph-arrow-up-right"></i></a>
+              </div>
+            </div>
+          </article>
         </div>
-        <div class="hist-entry-card hist-entry-card-thread">
-          <div class="hist-entry-head">
-            <h3 class="hist-entry-title">Workspace setup</h3>
-            <span class="hist-entry-kind">thread</span>
-          </div>
-          <p class="hist-entry-body">Sage walked you through preferred tone and captured: <em>direct, brief, no flattery, commas over em-dashes</em>.</p>
-          <div class="hist-entry-foot">
-            <span class="t-label-mono hist-entry-source">Sage thread · 8 turns</span>
-            <span class="t-label-mono hist-entry-meta">Layer 03 · Preferences</span>
-          </div>
+      </section>
+      <section class="history-day">
+        <div class="history-day-head"><span class="t-label-mono">5 DAYS AGO · MAY 2</span></div>
+        <div class="history-day-events">
+          <article class="history-event event-sage">
+            <div class="history-event-rail">
+              <span class="event-dot event-dot-sage"></span>
+              <span class="event-rail-line"></span>
+            </div>
+            <div class="history-event-time">
+              <span class="t-label-mono">4:33 PM</span>
+            </div>
+            <div class="history-event-card">
+              <div class="event-card-head">
+                <div class="event-card-eyebrow">
+                  <i class="ph ph-chats-circle"></i>
+                  <span class="t-label-mono">Sage</span>
+                  <span class="event-card-divider">·</span>
+                  <span class="event-card-dim">Interests</span>
+                </div>
+                <button class="event-card-menu" aria-label="Event menu"><i class="ph ph-dots-three"></i></button>
+              </div>
+              <h3 class="event-card-title">Travel patterns</h3>
+              <p class="event-card-body">Captured travel cadence and preferences. Surfaced belief: long stays over week-long sprints, preferred shoulder seasons.</p>
+              <div class="event-card-foot">
+                <span class="t-label-mono event-card-meta">6 turns · 4 facts · 2 prefs</span>
+                <a class="event-card-link" href="#">Open <i class="ph ph-arrow-up-right"></i></a>
+              </div>
+            </div>
+          </article>
+          <article class="history-event event-agent">
+            <div class="history-event-rail">
+              <span class="event-dot event-dot-agent"></span>
+              <span class="event-rail-line"></span>
+            </div>
+            <div class="history-event-time">
+              <span class="t-label-mono">1:00 PM</span>
+            </div>
+            <div class="history-event-card">
+              <div class="event-card-head">
+                <div class="event-card-eyebrow">
+                  <i class="ph ph-sparkle"></i>
+                  <span class="t-label-mono">Agent</span>
+                  <span class="event-card-divider">·</span>
+                  <span class="event-card-dim">Work Life</span>
+                </div>
+                <button class="event-card-menu" aria-label="Event menu"><i class="ph ph-dots-three"></i></button>
+              </div>
+              <h3 class="event-card-title">Weekly review prepared</h3>
+              <p class="event-card-body">Agent assembled weekly OKR review across Calendar + Notion + email threads. Saved to Atlas as a brief.</p>
+              <div class="event-card-foot">
+                <span class="t-label-mono event-card-meta">Run 1.4s · 3,891 tokens · Done</span>
+                <a class="event-card-link" href="#">Open <i class="ph ph-arrow-up-right"></i></a>
+              </div>
+            </div>
+          </article>
         </div>
-      </article>
-      <article class="hist-entry hist-entry-do">
-        <div class="hist-entry-time">
-          <span class="t-label-mono">2h ago</span>
+      </section>
+      <section class="history-day">
+        <div class="history-day-head"><span class="t-label-mono">LAST WEEK · APR 28 → MAY 1</span></div>
+        <div class="history-day-events">
+          <article class="history-event event-library">
+            <div class="history-event-rail">
+              <span class="event-dot event-dot-library"></span>
+              <span class="event-rail-line"></span>
+            </div>
+            <div class="history-event-time">
+              <span class="t-label-mono">Tue</span>
+            </div>
+            <div class="history-event-card">
+              <div class="event-card-head">
+                <div class="event-card-eyebrow">
+                  <i class="ph ph-books"></i>
+                  <span class="t-label-mono">Library</span>
+                  <span class="event-card-divider">·</span>
+                  <span class="event-card-dim">Aesthetic</span>
+                </div>
+                <button class="event-card-menu" aria-label="Event menu"><i class="ph ph-dots-three"></i></button>
+              </div>
+              <h3 class="event-card-title">Industry Rockstar · activated</h3>
+              <p class="event-card-body">Added Industry Rockstar library. Now informs all agent runs that touch design, branding, and content.</p>
+              <div class="event-card-foot">
+                <span class="t-label-mono event-card-meta">94 frameworks · Active</span>
+                <a class="event-card-link" href="#">Open <i class="ph ph-arrow-up-right"></i></a>
+              </div>
+            </div>
+          </article>
+          <article class="history-event event-sage">
+            <div class="history-event-rail">
+              <span class="event-dot event-dot-sage"></span>
+              <span class="event-rail-line"></span>
+            </div>
+            <div class="history-event-time">
+              <span class="t-label-mono">Mon</span>
+            </div>
+            <div class="history-event-card">
+              <div class="event-card-head">
+                <div class="event-card-eyebrow">
+                  <i class="ph ph-chats-circle"></i>
+                  <span class="t-label-mono">Sage</span>
+                  <span class="event-card-divider">·</span>
+                  <span class="event-card-dim">Work Life</span>
+                </div>
+                <button class="event-card-menu" aria-label="Event menu"><i class="ph ph-dots-three"></i></button>
+              </div>
+              <h3 class="event-card-title">Daily focus blocks</h3>
+              <p class="event-card-body">Captured your default deep-work cadence: 9–11 AM Tue/Thu/Fri. Sage will defend these by default starting next week.</p>
+              <div class="event-card-foot">
+                <span class="t-label-mono event-card-meta">9 turns · 5 prefs</span>
+                <a class="event-card-link" href="#">Open <i class="ph ph-arrow-up-right"></i></a>
+              </div>
+            </div>
+          </article>
         </div>
-        <div class="hist-entry-mode">
-          <span class="hist-dot hist-dot-do"></span>
-          <span class="t-label-mono">DO</span>
-        </div>
-        <div class="hist-entry-card hist-entry-card-action">
-          <div class="hist-entry-head">
-            <h3 class="hist-entry-title">Drafted reply to investor thread</h3>
-            <span class="hist-entry-kind">action</span>
-          </div>
-          <p class="hist-entry-body">Drafted your follow-up to Kane on yesterday's pricing thread, <em>matched to the warm, direct tone you use for internal threads</em>.</p>
-          <div class="hist-entry-foot">
-            <span class="t-label-mono hist-entry-source">Drew from Communication + Work Life</span>
-            <span class="t-label-mono hist-entry-meta">Pending your review</span>
-          </div>
-        </div>
-      </article>
-      <article class="hist-entry hist-entry-notice">
-        <div class="hist-entry-time">
-          <span class="t-label-mono">5h ago</span>
-        </div>
-        <div class="hist-entry-mode">
-          <span class="hist-dot hist-dot-notice"></span>
-          <span class="t-label-mono">NOTICE</span>
-        </div>
-        <div class="hist-entry-card hist-entry-card-insight">
-          <div class="hist-entry-head">
-            <h3 class="hist-entry-title">Goal drift detected</h3>
-            <span class="hist-entry-kind">insight</span>
-          </div>
-          <p class="hist-entry-body">You set a goal to ship the MVP by month's end, but you've let meetings overwrite that block <em>three times this week</em>.</p>
-          <div class="hist-entry-foot">
-            <span class="t-label-mono hist-entry-source">Watched Goals vs Calendar</span>
-            <span class="t-label-mono hist-entry-meta">Surfaced for your attention</span>
-          </div>
-        </div>
-      </article>
-        </div>
+      </section>
+    </div>
+    <section class="history-foot">
+      <div class="history-foot-text">
+        <h3 class="history-foot-title">Want all of it?</h3>
+        <p>You own this history. Export to JSON, CSV, or a shareable archive. <em>Built once. Used everywhere. Yours forever.</em></p>
       </div>
-      <div class="hist-day-group">
-        <div class="hist-day-marker">
-          <span class="hist-day-label">Yesterday</span>
-          <span class="t-label-mono hist-day-date">May 6, 2026</span>
-          <span class="hist-day-dot"></span>
-        </div>
-        <div class="hist-day-entries">
-      <article class="hist-entry hist-entry-ask">
-        <div class="hist-entry-time">
-          <span class="t-label-mono">Yesterday · 6:42 PM</span>
-        </div>
-        <div class="hist-entry-mode">
-          <span class="hist-dot hist-dot-ask"></span>
-          <span class="t-label-mono">ASK</span>
-        </div>
-        <div class="hist-entry-card hist-entry-card-thread">
-          <div class="hist-entry-head">
-            <h3 class="hist-entry-title">Aesthetic preferences · session 2</h3>
-            <span class="hist-entry-kind">thread</span>
-          </div>
-          <p class="hist-entry-body">Three brands felt like 'you' right now. Sage asked about adjacent influences and captured taste vectors across <em>furniture, typography, and clothing</em>.</p>
-          <div class="hist-entry-foot">
-            <span class="t-label-mono hist-entry-source">Sage thread · 14 turns</span>
-            <span class="t-label-mono hist-entry-meta">Layer 02 · Beliefs</span>
-          </div>
-        </div>
-      </article>
-      <article class="hist-entry hist-entry-do">
-        <div class="hist-entry-time">
-          <span class="t-label-mono">Yesterday · 3:15 PM</span>
-        </div>
-        <div class="hist-entry-mode">
-          <span class="hist-dot hist-dot-do"></span>
-          <span class="t-label-mono">DO</span>
-        </div>
-        <div class="hist-entry-card hist-entry-card-capture">
-          <div class="hist-entry-head">
-            <h3 class="hist-entry-title">Captured 4 receipts from Gmail</h3>
-            <span class="hist-entry-kind">capture</span>
-          </div>
-          <p class="hist-entry-body">Pulled receipts from Stripe, Apple, and Wise. Categorized <em>tools, equipment, food</em>.</p>
-          <div class="hist-entry-foot">
-            <span class="t-label-mono hist-entry-source">Source: Gmail</span>
-            <span class="t-label-mono hist-entry-meta">4 nodes added</span>
-          </div>
-        </div>
-      </article>
-      <article class="hist-entry hist-entry-notice">
-        <div class="hist-entry-time">
-          <span class="t-label-mono">Yesterday · 11:30 AM</span>
-        </div>
-        <div class="hist-entry-mode">
-          <span class="hist-dot hist-dot-notice"></span>
-          <span class="t-label-mono">NOTICE</span>
-        </div>
-        <div class="hist-entry-card hist-entry-card-insight">
-          <div class="hist-entry-head">
-            <h3 class="hist-entry-title">Cadence shift with Kane</h3>
-            <span class="hist-entry-kind">insight</span>
-          </div>
-          <p class="hist-entry-body">Your pinned conversations with Kane have moved from <em>strategic</em> to <em>operational</em>. Worth a check-in?</p>
-          <div class="hist-entry-foot">
-            <span class="t-label-mono hist-entry-source">Watched Slack + Gmail</span>
-            <span class="t-label-mono hist-entry-meta">Layer 02 · Beliefs</span>
-          </div>
-        </div>
-      </article>
-        </div>
-      </div>
-      <div class="hist-day-group">
-        <div class="hist-day-marker">
-          <span class="hist-day-label">Earlier this week</span>
-          <span class="t-label-mono hist-day-date">May 1–5</span>
-          <span class="hist-day-dot"></span>
-        </div>
-        <div class="hist-day-entries">
-      <article class="hist-entry hist-entry-do">
-        <div class="hist-entry-time">
-          <span class="t-label-mono">2d ago</span>
-        </div>
-        <div class="hist-entry-mode">
-          <span class="hist-dot hist-dot-do"></span>
-          <span class="t-label-mono">DO</span>
-        </div>
-        <div class="hist-entry-card hist-entry-card-action">
-          <div class="hist-entry-head">
-            <h3 class="hist-entry-title">Track day prep checklist built</h3>
-            <span class="hist-entry-kind">action</span>
-          </div>
-          <p class="hist-entry-body">Built your Chuckwalla prep list, drew from <em>Work Life routines</em> and your past two track sessions.</p>
-          <div class="hist-entry-foot">
-            <span class="t-label-mono hist-entry-source">Drew from Atlas · 12 captures</span>
-            <span class="t-label-mono hist-entry-meta">Synced to Reminders</span>
-          </div>
-        </div>
-      </article>
-      <article class="hist-entry hist-entry-ask">
-        <div class="hist-entry-time">
-          <span class="t-label-mono">3d ago</span>
-        </div>
-        <div class="hist-entry-mode">
-          <span class="hist-dot hist-dot-ask"></span>
-          <span class="t-label-mono">ASK</span>
-        </div>
-        <div class="hist-entry-card hist-entry-card-thread">
-          <div class="hist-entry-head">
-            <h3 class="hist-entry-title">Travel patterns</h3>
-            <span class="hist-entry-kind">thread</span>
-          </div>
-          <p class="hist-entry-body">Sage mapped your travel rhythm, <em>3-4 trips/year, 80% domestic, prefers warm weather</em>.</p>
-          <div class="hist-entry-foot">
-            <span class="t-label-mono hist-entry-source">Sage thread · 6 turns</span>
-            <span class="t-label-mono hist-entry-meta">Layer 01 · Facts</span>
-          </div>
-        </div>
-      </article>
-      <article class="hist-entry hist-entry-notice">
-        <div class="hist-entry-time">
-          <span class="t-label-mono">4d ago</span>
-        </div>
-        <div class="hist-entry-mode">
-          <span class="hist-dot hist-dot-notice"></span>
-          <span class="t-label-mono">NOTICE</span>
-        </div>
-        <div class="hist-entry-card hist-entry-card-insight">
-          <div class="hist-entry-head">
-            <h3 class="hist-entry-title">Sleep cadence shift</h3>
-            <span class="hist-entry-kind">insight</span>
-          </div>
-          <p class="hist-entry-body">Your usual 11pm bedtime has slipped 90 min later five nights running. Aligned with the <em>pitch deck push</em>.</p>
-          <div class="hist-entry-foot">
-            <span class="t-label-mono hist-entry-source">Watched Health Connect</span>
-            <span class="t-label-mono hist-entry-meta">Surfaced for your attention</span>
-          </div>
-        </div>
-      </article>
-      <article class="hist-entry hist-entry-do">
-        <div class="hist-entry-time">
-          <span class="t-label-mono">5d ago</span>
-        </div>
-        <div class="hist-entry-mode">
-          <span class="hist-dot hist-dot-do"></span>
-          <span class="t-label-mono">DO</span>
-        </div>
-        <div class="hist-entry-card hist-entry-card-action">
-          <div class="hist-entry-head">
-            <h3 class="hist-entry-title">Drafted Series A teaser</h3>
-            <span class="hist-entry-kind">action</span>
-          </div>
-          <p class="hist-entry-body">One-pager teaser drafted for cold outreach. <em>Tighter, less rocket-ship</em>.</p>
-          <div class="hist-entry-foot">
-            <span class="t-label-mono hist-entry-source">Drew from Founder OS Library</span>
-            <span class="t-label-mono hist-entry-meta">Pending your review</span>
-          </div>
-        </div>
-      </article>
-      <article class="hist-entry hist-entry-ask">
-        <div class="hist-entry-time">
-          <span class="t-label-mono">6d ago</span>
-        </div>
-        <div class="hist-entry-mode">
-          <span class="hist-dot hist-dot-ask"></span>
-          <span class="t-label-mono">ASK</span>
-        </div>
-        <div class="hist-entry-card hist-entry-card-capture">
-          <div class="hist-entry-head">
-            <h3 class="hist-entry-title">LinkedIn import</h3>
-            <span class="hist-entry-kind">capture</span>
-          </div>
-          <p class="hist-entry-body">Pulled employment timeline, education, and 18 endorsements.</p>
-          <div class="hist-entry-foot">
-            <span class="t-label-mono hist-entry-source">Source: LinkedIn</span>
-            <span class="t-label-mono hist-entry-meta">42 nodes added</span>
-          </div>
-        </div>
-      </article>
-        </div>
-      </div>
-    </section>
-    <section class="hist-foot">
-      <button class="btn btn-secondary btn-lg">Load older history <i class="ph ph-arrow-down"></i></button>
-      <div class="hist-foot-meta">
-        <span class="t-label-mono">Showing 11 of 487 events</span>
-        <span class="t-label-mono">·</span>
-        <a href="export.html" class="hist-foot-link">Export full history <i class="ph ph-arrow-right"></i></a>
+      <div class="history-foot-actions">
+        <a href="export.html" class="btn btn-primary terra btn-lg"><i class="ph ph-download-simple"></i> Export everything</a>
+        <a href="atlas.html" class="btn btn-secondary btn-lg"><i class="ph ph-graph"></i> Open in Atlas</a>
       </div>
     </section>
   </div>
