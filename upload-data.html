@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Upload Data · MyGentic</title>
+<link rel="stylesheet" href="app.css" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+
+<style>
+
+  .app-content { padding: 0; }
+  .upload-page {
+    max-width: var(--w-bleed);
+    margin: 0 auto;
+    padding: var(--s-5) var(--s-6) var(--s-9);
+  }
+  @media (max-width: 900px) {
+    .upload-page { padding: var(--s-4) var(--s-4) var(--s-7); }
+  }
+
+  .atlas-breadcrumb {
+    display: flex; align-items: center; gap: var(--s-2);
+    font-family: var(--f-mono); font-size: 11px;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--ink-mute);
+    padding: var(--s-2) 0 var(--s-4);
+  }
+  .atlas-breadcrumb a { color: var(--ink-mute); }
+  .atlas-breadcrumb a:hover { color: var(--terra); }
+  .atlas-breadcrumb i { font-size: 14px; opacity: 0.6; }
+
+  /* HERO */
+  .upload-hero {
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: var(--s-6);
+    margin-bottom: var(--s-7);
+    max-width: 1000px;
+  }
+  .upload-eyebrow { color: var(--terra); margin-bottom: var(--s-3); }
+  .upload-hero-title {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: clamp(40px, 5vw, 60px);
+    line-height: 1.05; letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: var(--s-4);
+  }
+  .upload-hero-title em { font-style: italic; }
+  .upload-hero-deck {
+    font-size: 17px; line-height: 1.55;
+    color: var(--ink-soft);
+    max-width: 780px;
+  }
+  .upload-hero-deck strong { color: var(--ink); font-weight: 600; }
+  .upload-hero-deck em { font-style: italic; color: var(--terra); }
+
+  /* DROP ZONE */
+  .upload-dropzone-wrap {
+    margin-bottom: var(--s-8);
+  }
+  .upload-dropzone {
+    background:
+      radial-gradient(ellipse at 50% 0%, var(--terra-tint), transparent 70%),
+      var(--paper);
+    border: 2px dashed var(--rule-strong);
+    border-radius: var(--r-lg);
+    padding: var(--s-8) var(--s-6);
+    text-align: center;
+    transition: border-color var(--t-fast), background var(--t-fast);
+    cursor: pointer;
+  }
+  .upload-dropzone:hover, .upload-dropzone:focus {
+    border-color: var(--terra);
+    outline: none;
+  }
+  .upload-dropzone-stack {
+    display: flex; flex-direction: column; align-items: center;
+    gap: var(--s-3);
+    max-width: 640px;
+    margin: 0 auto;
+  }
+  .upload-dropzone-icon {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: var(--terra-tint);
+    color: var(--terra);
+    display: grid; place-items: center;
+    font-size: 32px;
+    margin-bottom: var(--s-2);
+  }
+  .upload-dropzone-icon i { font-size: 32px; }
+  .upload-dropzone-title {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: clamp(26px, 3vw, 34px);
+    line-height: 1.15;
+    color: var(--ink);
+  }
+  .upload-dropzone-title em { font-style: italic; color: var(--terra); }
+  .upload-dropzone-deck {
+    font-size: 15px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+  .upload-dropzone-types {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    gap: 6px;
+    margin: var(--s-2) 0;
+  }
+  .upload-type-chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px 10px;
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    font-family: var(--f-mono);
+    font-size: 11px; letter-spacing: 0.04em;
+    color: var(--ink-soft);
+  }
+  .upload-type-chip i { font-size: 12px; color: var(--ink-mute); }
+
+  .upload-dropzone-actions {
+    display: flex; gap: var(--s-2); flex-wrap: wrap; justify-content: center;
+    margin-top: var(--s-3);
+  }
+  .upload-dropzone-hint {
+    font-size: 12px; color: var(--ink-mute);
+    margin-top: var(--s-2);
+  }
+  .upload-dropzone-hint a { color: var(--terra); }
+  .upload-dropzone-hint a:hover { color: var(--terra-deep); }
+
+  /* MODES */
+  .upload-modes {
+    margin-bottom: var(--s-8);
+  }
+  .upload-modes-head { margin-bottom: var(--s-5); }
+  .upload-modes-title {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: clamp(28px, 3vw, 36px);
+    line-height: 1.1; letter-spacing: -0.01em;
+    color: var(--ink);
+    margin-bottom: var(--s-2);
+  }
+  .upload-modes-title em { font-style: italic; }
+  .upload-modes-deck {
+    font-size: 15px; color: var(--ink-soft);
+  }
+  .upload-modes-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--s-3);
+  }
+  @media (max-width: 1100px) { .upload-modes-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px)  { .upload-modes-grid { grid-template-columns: 1fr; } }
+
+  .upload-mode-card {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-top: 4px solid var(--terra);
+    border-radius: var(--r-lg);
+    padding: var(--s-4);
+    display: flex; flex-direction: column; gap: var(--s-2);
+  }
+  .upload-mode-card-skip {
+    border-top-color: var(--ink-mute);
+    background: var(--paper-2);
+  }
+  .upload-mode-num { color: var(--terra); }
+  .upload-mode-card-skip .upload-mode-num { color: var(--ink-mute); }
+  .upload-mode-name {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: 22px; line-height: 1.15;
+    color: var(--ink);
+  }
+  .upload-mode-card p {
+    font-size: 13px; line-height: 1.5;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+  .upload-mode-foot {
+    margin-top: auto !important;
+    padding-top: var(--s-2);
+    color: var(--ink-mute) !important;
+    font-size: 11px !important;
+  }
+  .upload-mode-foot span {
+    color: var(--terra);
+    font-weight: 500;
+  }
+  .upload-mode-card-skip .upload-mode-foot span { color: var(--ink-soft); }
+
+  /* RECENT UPLOADS */
+  .upload-recent { margin-bottom: var(--s-7); }
+  .upload-recent-head {
+    display: flex; justify-content: space-between; align-items: end;
+    flex-wrap: wrap; gap: var(--s-4);
+    padding-bottom: var(--s-4);
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: var(--s-4);
+  }
+  .upload-recent-title {
+    font-family: var(--f-display); font-weight: 400;
+    font-size: clamp(28px, 3vw, 36px);
+    line-height: 1.1; letter-spacing: -0.01em;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .upload-recent-title em { font-style: italic; }
+  .upload-recent-deck {
+    font-size: 14px; color: var(--ink-mute);
+  }
+  .upload-recent-actions {
+    display: flex; gap: var(--s-2); align-items: center;
+  }
+  .upload-search {
+    position: relative;
+    display: flex; align-items: center;
+  }
+  .upload-search i {
+    position: absolute; left: 10px;
+    color: var(--ink-mute);
+    font-size: 14px;
+  }
+  .upload-search input {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    padding: 8px 14px 8px 32px;
+    font-family: var(--f-body); font-size: 13px;
+    color: var(--ink);
+    width: 220px;
+  }
+  .upload-search input:focus {
+    outline: none;
+    border-color: var(--terra);
+  }
+
+  .upload-rows {
+    display: flex; flex-direction: column; gap: var(--s-2);
+  }
+  .upload-row {
+    display: grid;
+    grid-template-columns: 48px 1fr 130px 200px;
+    gap: var(--s-4);
+    align-items: center;
+    padding: var(--s-3) var(--s-4);
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-md);
+    transition: border-color var(--t-fast);
+  }
+  .upload-row:hover { border-color: var(--rule-strong); }
+  .upload-row-failed { background: var(--paper-2); opacity: 0.85; }
+  .upload-row-extracting { background: linear-gradient(90deg, var(--terra-tint) 0%, var(--paper) 30%); }
+  @media (max-width: 900px) {
+    .upload-row { grid-template-columns: 48px 1fr; }
+    .upload-row-nodes, .upload-row-actions { grid-column: 2; }
+  }
+
+  .upload-row-icon {
+    width: 40px; height: 40px;
+    background: var(--paper-2);
+    border-radius: var(--r-sm);
+    display: grid; place-items: center;
+    color: var(--ink-soft);
+  }
+  .upload-row-icon i { font-size: 20px; }
+  .upload-row-failed .upload-row-icon { color: var(--ink-mute); }
+
+  .upload-row-main { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .upload-row-head { display: flex; align-items: center; gap: 8px; }
+  .upload-row-name {
+    font-family: var(--f-body); font-weight: 600;
+    font-size: 14px; color: var(--ink);
+  }
+  .upload-row-status {
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+  }
+  .upload-row-extracted .upload-row-status  { color: #2D7A47; background: rgba(79, 175, 111, 0.12); }
+  .upload-row-extracting .upload-row-status { color: #B07020; background: rgba(216, 149, 52, 0.12); }
+  .upload-row-failed .upload-row-status     { color: #B85040; background: rgba(184, 80, 64, 0.12); }
+  .upload-row-meta { color: var(--ink-mute); }
+  .upload-row-summary {
+    font-size: 13px; color: var(--ink-soft);
+    line-height: 1.45;
+  }
+
+  .upload-row-dims {
+    display: flex; flex-wrap: wrap; gap: 4px;
+    margin-top: 2px;
+  }
+  .upload-dim-pill {
+    font-family: var(--f-display); font-style: italic;
+    font-size: 11px; color: var(--terra);
+    background: var(--terra-tint);
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+
+  .upload-row-nodes {
+    display: flex; flex-direction: column;
+    align-items: flex-end;
+  }
+  .upload-row-nodes-val {
+    font-family: var(--f-display);
+    font-size: 22px;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .upload-row-nodes-label {
+    color: var(--ink-mute);
+    margin-top: 4px;
+  }
+
+  .upload-row-actions {
+    display: flex; gap: 4px; align-items: center;
+    justify-content: flex-end;
+  }
+  .upload-row-action-link {
+    display: inline-flex; align-items: center; gap: 4px;
+    color: var(--terra);
+    font-size: 13px; font-weight: 500;
+    padding: 6px 10px;
+    border-radius: var(--r-sm);
+  }
+  .upload-row-action-link:hover {
+    background: var(--terra-tint);
+    color: var(--terra-deep);
+  }
+  .upload-row-action-link i { font-size: 13px; }
+  .upload-row-action-menu {
+    width: 32px; height: 32px;
+    background: transparent;
+    color: var(--ink-mute);
+    border-radius: var(--r-sm);
+    display: grid; place-items: center;
+    cursor: pointer;
+  }
+  .upload-row-action-menu:hover {
+    background: var(--paper-2);
+    color: var(--ink);
+  }
+
+  /* TRUST STRIP — match Connections */
+  .upload-trust {
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    padding: var(--s-5) var(--s-6);
+  }
+  .upload-trust-eyebrow {
+    color: var(--terra);
+    margin-bottom: var(--s-3);
+  }
+  .upload-trust-list {
+    list-style: none; padding: 0; margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--s-4) var(--s-6);
+  }
+  @media (max-width: 700px) {
+    .upload-trust-list { grid-template-columns: 1fr; }
+  }
+  .upload-trust-list li {
+    display: flex; align-items: flex-start; gap: var(--s-2);
+    font-size: 14px; line-height: 1.5;
+    color: var(--ink-soft);
+  }
+  .upload-trust-list li i {
+    color: var(--terra);
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .upload-trust-list strong {
+    color: var(--ink); font-weight: 600;
+  }
+
+</style>
+</head>
+<body class="app-shell upload-body">
+<header class="app-topbar">
+  <div class="app-topbar-inner">
+    <label for="navToggle" class="app-burger" aria-label="Open navigation"><i class="ph ph-list"></i></label>
+    <a class="app-brand" href="dashboard.html">My<span class="accent">Gen</span>tic</a>
+    <h1 class="app-page-title">Upload Data</h1>
+    <div class="app-topbar-actions">
+      <div class="app-topbar-search">
+        <i class="ph ph-magnifying-glass"></i>
+        <input type="text" placeholder="Search your context, agents, libraries…" />
+        <kbd>⌘K</kbd>
+      </div>
+      <button class="app-icon-btn" aria-label="Notifications"><i class="ph ph-bell"></i><span class="dot"></span></button>
+      <button class="app-avatar" aria-label="User menu">NA</button>
+    </div>
+  </div>
+</header>
+<div class="app-layout">
+  <input type="checkbox" id="navToggle" class="app-nav-toggle sr-only" />
+<label for="navToggle" class="app-leftnav-backdrop"></label>
+<nav class="app-leftnav" aria-label="Primary">
+  <div class="app-nav-section-label">Workspace</div>
+      <a href="dashboard.html" class="app-nav-item" data-page="dashboard"><i class="ph ph-gauge"></i><span>Dashboard</span></a>
+      <a href="atlas.html" class="app-nav-item" data-page="atlas"><i class="ph ph-graph"></i><span>Atlas</span></a>
+      <a href="sage.html" class="app-nav-item" data-page="sage"><i class="ph ph-chats-circle"></i><span>Sage</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Context</div>
+      <a href="context.html" class="app-nav-item" data-page="context"><i class="ph ph-stack"></i><span>Context Layers</span></a>
+      <a href="token-compaction.html" class="app-nav-item" data-page="token-compaction"><i class="ph ph-funnel"></i><span>Token Compaction</span></a>
+      <a href="history.html" class="app-nav-item" data-page="history"><i class="ph ph-clock-counter-clockwise"></i><span>History</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Connect</div>
+      <a href="connections.html" class="app-nav-item" data-page="connections"><i class="ph ph-plugs-connected"></i><span>Connections</span></a>
+      <a href="upload-data.html" class="app-nav-item active" data-page="upload-data"><i class="ph ph-upload-simple"></i><span>Upload Data</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Build</div>
+      <a href="agents.html" class="app-nav-item" data-page="agents"><i class="ph ph-sparkle"></i><span>Agents</span></a>
+      <a href="marketplace.html" class="app-nav-item" data-page="marketplace"><i class="ph ph-books"></i><span>Expert Libraries</span><span class="nav-badge">New</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Account</div>
+      <a href="export.html" class="app-nav-item" data-page="export"><i class="ph ph-download-simple"></i><span>Export &amp; Data</span></a>
+      <a href="settings.html" class="app-nav-item" data-page="settings"><i class="ph ph-gear-six"></i><span>Settings</span></a>
+</nav>
+  <main class="app-content">
+  <div class="upload-page">
+    <div class="atlas-breadcrumb">
+      <a href="dashboard.html">Dashboard</a>
+      <i class="ph ph-caret-right"></i>
+      <a href="connections.html">Connect</a>
+      <i class="ph ph-caret-right"></i>
+      <span>Upload Data</span>
+    </div>
+    <header class="upload-hero">
+      <div class="t-label-mono upload-eyebrow">Upload-and-forget · Structured extraction</div>
+      <h1 class="upload-hero-title">Drop a document. <em>We extract the rest.</em></h1>
+      <p class="upload-hero-deck">
+        Transcripts, PDFs, exports, voice memos, code, anything. <em>Same model behind the scenes</em> as live connectors. We parse, identify dimensions, capture beliefs and preferences, and merge into your graph. <strong>Read-only. Encrypted at rest. Deleted on request.</strong>
+      </p>
+    </header>
+    <section class="upload-dropzone-wrap">
+      <div class="upload-dropzone" tabindex="0">
+        <div class="upload-dropzone-stack">
+          <div class="upload-dropzone-icon">
+            <i class="ph ph-upload-simple"></i>
+          </div>
+          <h2 class="upload-dropzone-title">Drop files here, or <em>click to browse.</em></h2>
+          <p class="upload-dropzone-deck">
+            Support for PDFs, Word docs, Markdown, plain text, JSON exports, audio transcripts, and image archives.
+          </p>
+          <div class="upload-dropzone-types">
+            <span class="upload-type-chip"><i class="ph ph-file-pdf"></i> PDF</span>
+            <span class="upload-type-chip"><i class="ph ph-file-doc"></i> DOCX</span>
+            <span class="upload-type-chip"><i class="ph ph-file-text"></i> MD · TXT</span>
+            <span class="upload-type-chip"><i class="ph ph-brackets-curly"></i> JSON</span>
+            <span class="upload-type-chip"><i class="ph ph-file-zip"></i> ZIP</span>
+            <span class="upload-type-chip"><i class="ph ph-microphone"></i> M4A · MP3</span>
+          </div>
+          <div class="upload-dropzone-actions">
+            <button class="btn btn-primary terra btn-lg"><i class="ph ph-folder-open"></i> Choose files</button>
+            <button class="btn btn-secondary btn-lg"><i class="ph ph-link"></i> Paste a link</button>
+          </div>
+          <p class="upload-dropzone-hint">
+            Up to 50 MB per file · Up to 20 files at once · Larger uploads via <a href="connections.html">Drive integration</a>
+          </p>
+        </div>
+      </div>
+    </section>
+    <section class="upload-modes">
+      <div class="upload-modes-head">
+        <h2 class="upload-modes-title">What we extract. <em>And what we don't.</em></h2>
+        <p class="upload-modes-deck">Four extraction passes. Each with a clear scope and a clean stop point.</p>
+      </div>
+      <div class="upload-modes-grid">
+        <article class="upload-mode-card">
+          <div class="t-label-mono upload-mode-num">01 · Facts</div>
+          <h3 class="upload-mode-name">Concrete claims.</h3>
+          <p>Roles, dates, places, organizations. The verifiable surface a résumé would show.</p>
+          <p class="upload-mode-foot t-label-mono">Lands in <span>Layer 01</span></p>
+        </article>
+        <article class="upload-mode-card">
+          <div class="t-label-mono upload-mode-num">02 · Beliefs</div>
+          <h3 class="upload-mode-name">How you frame it.</h3>
+          <p>Decision rationales, values, frameworks you reach for. The lens, not just the lens cap.</p>
+          <p class="upload-mode-foot t-label-mono">Lands in <span>Layer 02</span></p>
+        </article>
+        <article class="upload-mode-card">
+          <div class="t-label-mono upload-mode-num">03 · Preferences</div>
+          <h3 class="upload-mode-name">How you live it.</h3>
+          <p>Tone of voice, brand affinities, daily blocks, dietary choices. Texture, not signal.</p>
+          <p class="upload-mode-foot t-label-mono">Lands in <span>Layer 03</span></p>
+        </article>
+        <article class="upload-mode-card upload-mode-card-skip">
+          <div class="t-label-mono upload-mode-num">⌀ · Never</div>
+          <h3 class="upload-mode-name">What we skip.</h3>
+          <p>Other people's PII, transient sensor data, signed NDAs, anything you flag private.</p>
+          <p class="upload-mode-foot t-label-mono">Stays out of the graph</p>
+        </article>
+      </div>
+    </section>
+    <section class="upload-recent">
+      <header class="upload-recent-head">
+        <div>
+          <h2 class="upload-recent-title">Recent <em>uploads.</em></h2>
+          <p class="upload-recent-deck">Last 30 days. Click any row to inspect what was captured.</p>
+        </div>
+        <div class="upload-recent-actions">
+          <div class="upload-search">
+            <i class="ph ph-magnifying-glass"></i>
+            <input type="search" placeholder="Search uploads…" />
+          </div>
+          <button class="btn btn-secondary"><i class="ph ph-export"></i> Export log</button>
+        </div>
+      </header>
+      <div class="upload-rows">
+      <article class="upload-row upload-row-extracted">
+        <div class="upload-row-icon"><i class="ph ph-file-pdf"></i></div>
+        <div class="upload-row-main">
+          <div class="upload-row-head">
+            <span class="upload-row-name">Q1-2026-board-deck.pdf</span>
+            <span class="upload-row-status t-label-mono">EXTRACTED</span>
+          </div>
+          <div class="upload-row-meta t-label-mono">4.2 MB · 12 min ago</div>
+          <div class="upload-row-summary">Strategic priorities, hiring plan, runway scenarios.</div>
+          <div class="upload-row-dims"><span class="upload-dim-pill">Professional</span> <span class="upload-dim-pill">Work Life</span></div>
+        </div>
+        <div class="upload-row-nodes">
+          <span class="upload-row-nodes-val">24 nodes</span>
+          <span class="t-label-mono upload-row-nodes-label">Captured</span>
+        </div>
+        <div class="upload-row-actions">
+          <a class="upload-row-action-link" href="atlas.html">View in Atlas <i class="ph ph-arrow-up-right"></i></a>
+          <button class="upload-row-action-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+        </div>
+      </article>
+      <article class="upload-row upload-row-extracted">
+        <div class="upload-row-icon"><i class="ph ph-file-text"></i></div>
+        <div class="upload-row-main">
+          <div class="upload-row-head">
+            <span class="upload-row-name">investor-call-transcript.txt</span>
+            <span class="upload-row-status t-label-mono">EXTRACTED</span>
+          </div>
+          <div class="upload-row-meta t-label-mono">38 KB · 1h ago</div>
+          <div class="upload-row-summary">Aurora Capital follow-up, revenue projections, team scaling.</div>
+          <div class="upload-row-dims"><span class="upload-dim-pill">Professional</span> <span class="upload-dim-pill">Relationships</span></div>
+        </div>
+        <div class="upload-row-nodes">
+          <span class="upload-row-nodes-val">17 nodes</span>
+          <span class="t-label-mono upload-row-nodes-label">Captured</span>
+        </div>
+        <div class="upload-row-actions">
+          <a class="upload-row-action-link" href="atlas.html">View in Atlas <i class="ph ph-arrow-up-right"></i></a>
+          <button class="upload-row-action-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+        </div>
+      </article>
+      <article class="upload-row upload-row-extracted">
+        <div class="upload-row-icon"><i class="ph ph-file-text"></i></div>
+        <div class="upload-row-main">
+          <div class="upload-row-head">
+            <span class="upload-row-name">M2-track-day-notes.md</span>
+            <span class="upload-row-status t-label-mono">EXTRACTED</span>
+          </div>
+          <div class="upload-row-meta t-label-mono">12 KB · 3h ago</div>
+          <div class="upload-row-summary">Chuckwalla session notes, tire setup, sector times.</div>
+          <div class="upload-row-dims"><span class="upload-dim-pill">Interests</span></div>
+        </div>
+        <div class="upload-row-nodes">
+          <span class="upload-row-nodes-val">9 nodes</span>
+          <span class="t-label-mono upload-row-nodes-label">Captured</span>
+        </div>
+        <div class="upload-row-actions">
+          <a class="upload-row-action-link" href="atlas.html">View in Atlas <i class="ph ph-arrow-up-right"></i></a>
+          <button class="upload-row-action-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+        </div>
+      </article>
+      <article class="upload-row upload-row-extracted">
+        <div class="upload-row-icon"><i class="ph ph-brackets-curly"></i></div>
+        <div class="upload-row-main">
+          <div class="upload-row-head">
+            <span class="upload-row-name">founder-os-export.json</span>
+            <span class="upload-row-status t-label-mono">EXTRACTED</span>
+          </div>
+          <div class="upload-row-meta t-label-mono">892 KB · Yesterday</div>
+          <div class="upload-row-summary">Operating frameworks, decision logs, team rituals.</div>
+          <div class="upload-row-dims"><span class="upload-dim-pill">Professional</span> <span class="upload-dim-pill">Work Life</span></div>
+        </div>
+        <div class="upload-row-nodes">
+          <span class="upload-row-nodes-val">47 nodes</span>
+          <span class="t-label-mono upload-row-nodes-label">Captured</span>
+        </div>
+        <div class="upload-row-actions">
+          <a class="upload-row-action-link" href="atlas.html">View in Atlas <i class="ph ph-arrow-up-right"></i></a>
+          <button class="upload-row-action-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+        </div>
+      </article>
+      <article class="upload-row upload-row-extracting">
+        <div class="upload-row-icon"><i class="ph ph-file-zip"></i></div>
+        <div class="upload-row-main">
+          <div class="upload-row-head">
+            <span class="upload-row-name">aesthetic-moodboard.zip</span>
+            <span class="upload-row-status t-label-mono">EXTRACTING</span>
+          </div>
+          <div class="upload-row-meta t-label-mono">14 MB · 4 min ago</div>
+          <div class="upload-row-summary">Image archive, processing visual references…</div>
+          <div class="upload-row-dims"><span class="upload-dim-pill">Aesthetic</span></div>
+        </div>
+        <div class="upload-row-nodes">
+          <span class="upload-row-nodes-val">~22 nodes</span>
+          <span class="t-label-mono upload-row-nodes-label">Captured</span>
+        </div>
+        <div class="upload-row-actions">
+          <a class="upload-row-action-link" href="atlas.html">View in Atlas <i class="ph ph-arrow-up-right"></i></a>
+          <button class="upload-row-action-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+        </div>
+      </article>
+      <article class="upload-row upload-row-failed">
+        <div class="upload-row-icon"><i class="ph ph-file-doc"></i></div>
+        <div class="upload-row-main">
+          <div class="upload-row-head">
+            <span class="upload-row-name">berkely-music-archive.docx</span>
+            <span class="upload-row-status t-label-mono">FAILED</span>
+          </div>
+          <div class="upload-row-meta t-label-mono">156 KB · 2d ago</div>
+          <div class="upload-row-summary">Could not parse — file may be corrupted.</div>
+          
+        </div>
+        <div class="upload-row-nodes">
+          <span class="upload-row-nodes-val">—</span>
+          <span class="t-label-mono upload-row-nodes-label">Captured</span>
+        </div>
+        <div class="upload-row-actions">
+          <a class="upload-row-action-link" href="atlas.html">View in Atlas <i class="ph ph-arrow-up-right"></i></a>
+          <button class="upload-row-action-menu" aria-label="More"><i class="ph ph-dots-three-vertical"></i></button>
+        </div>
+      </article>
+      </div>
+    </section>
+    <section class="upload-trust">
+      <div class="t-label-mono upload-trust-eyebrow">How we treat your uploads</div>
+      <ul class="upload-trust-list">
+        <li><i class="ph ph-shield-check"></i> <span><strong>Encrypted at rest</strong> — files and extractions, both.</span></li>
+        <li><i class="ph ph-clock-counter-clockwise"></i> <span><strong>Source kept 30 days</strong> — extraction kept until you delete it.</span></li>
+        <li><i class="ph ph-flag"></i> <span><strong>Flag any node private</strong> — kept in your graph, hidden from agents.</span></li>
+        <li><i class="ph ph-export"></i> <span><strong>Export anytime</strong> — original file plus structured nodes.</span></li>
+      </ul>
+    </section>
+  </div>
+</main>
+</div>
+</body>
+</html>
