@@ -140,6 +140,8 @@
   .event-dot-agent   { background: #7C9C5E; }
   .event-dot-library { background: #C97956; }
   .event-dot-merge   { background: #B59FF0; }
+  /* v2.1: prompts surfaced from AI Marketplace library */
+  .event-dot-prompt  { background: #7B68EE; }
 
   /* Timeline */
   .history-timeline {
@@ -339,11 +341,12 @@
       <hr class="app-nav-divider" />
       <div class="app-nav-section-label">Connect</div>
       <a href="connections.html" class="app-nav-item" data-page="connections"><i class="ph ph-plugs-connected"></i><span>Connections</span></a>
+      <a href="ai-marketplace.html" class="app-nav-item" data-page="ai-marketplace"><i class="ph ph-storefront"></i><span>AI Marketplace</span><span class="nav-badge">New</span></a>
       <a href="upload-data.html" class="app-nav-item" data-page="upload-data"><i class="ph ph-upload-simple"></i><span>Upload Data</span></a>
       <hr class="app-nav-divider" />
       <div class="app-nav-section-label">Build</div>
       <a href="agents.html" class="app-nav-item" data-page="agents"><i class="ph ph-sparkle"></i><span>Agents</span></a>
-      <a href="marketplace.html" class="app-nav-item" data-page="marketplace"><i class="ph ph-books"></i><span>Expert Libraries</span><span class="nav-badge">New</span></a>
+      <a href="expert-libraries.html" class="app-nav-item" data-page="expert-libraries"><i class="ph ph-books"></i><span>Expert Libraries</span><span class="nav-badge">New</span></a>
       <hr class="app-nav-divider" />
       <div class="app-nav-section-label">Account</div>
       <a href="export.html" class="app-nav-item" data-page="export"><i class="ph ph-download-simple"></i><span>Export &amp; Data</span></a>
@@ -366,29 +369,32 @@
     </header>
     <div class="history-controls">
       <div class="history-filters">
-        <button class="history-filter history-filter-active">
-          <i class="ph ph-list"></i> All <span class="filter-count">142</span>
+        <button class="history-filter history-filter-active" data-filter="all">
+          <i class="ph ph-list"></i> All <span class="filter-count" data-count="all">142</span>
         </button>
-        <button class="history-filter">
-          <span class="event-dot event-dot-sage"></span> Sage <span class="filter-count">38</span>
+        <button class="history-filter" data-filter="sage">
+          <span class="event-dot event-dot-sage"></span> Sage <span class="filter-count" data-count="sage">38</span>
         </button>
-        <button class="history-filter">
-          <span class="event-dot event-dot-capture"></span> Captures <span class="filter-count">47</span>
+        <button class="history-filter" data-filter="capture">
+          <span class="event-dot event-dot-capture"></span> Captures <span class="filter-count" data-count="capture">47</span>
         </button>
-        <button class="history-filter">
-          <span class="event-dot event-dot-ingest"></span> Ingestions <span class="filter-count">29</span>
+        <button class="history-filter" data-filter="ingest">
+          <span class="event-dot event-dot-ingest"></span> Ingestions <span class="filter-count" data-count="ingest">29</span>
         </button>
-        <button class="history-filter">
-          <span class="event-dot event-dot-deepen"></span> Deepenings <span class="filter-count">14</span>
+        <button class="history-filter" data-filter="deepen">
+          <span class="event-dot event-dot-deepen"></span> Deepenings <span class="filter-count" data-count="deepen">14</span>
         </button>
-        <button class="history-filter">
-          <span class="event-dot event-dot-agent"></span> Agent runs <span class="filter-count">9</span>
+        <button class="history-filter" data-filter="agent">
+          <span class="event-dot event-dot-agent"></span> Agent runs <span class="filter-count" data-count="agent">9</span>
         </button>
-        <button class="history-filter">
-          <span class="event-dot event-dot-library"></span> Libraries <span class="filter-count">3</span>
+        <button class="history-filter" data-filter="library">
+          <span class="event-dot event-dot-library"></span> Libraries <span class="filter-count" data-count="library">3</span>
         </button>
-        <button class="history-filter">
-          <span class="event-dot event-dot-merge"></span> Merges <span class="filter-count">2</span>
+        <button class="history-filter" data-filter="prompt">
+          <span class="event-dot event-dot-prompt"></span> Prompts <span class="filter-count" data-count="prompt">0</span>
+        </button>
+        <button class="history-filter" data-filter="merge">
+          <span class="event-dot event-dot-merge"></span> Merges <span class="filter-count" data-count="merge">2</span>
         </button>
       </div>
       <div class="history-actions">
@@ -586,7 +592,7 @@
               <p class="event-card-body">Layered Founder OS expert library on top of Professional dimension. Operating frameworks now available to agents.</p>
               <div class="event-card-foot">
                 <span class="t-label-mono event-card-meta">Industry Rockstar · 187 frameworks</span>
-                <a class="event-card-link" href="marketplace.html">Open <i class="ph ph-arrow-up-right"></i></a>
+                <a class="event-card-link" href="expert-libraries.html">Open <i class="ph ph-arrow-up-right"></i></a>
               </div>
             </div>
           </article>
@@ -783,7 +789,7 @@
               <p class="event-card-body">Added Industry Rockstar library. Now informs all agent runs that touch design, branding, and content.</p>
               <div class="event-card-foot">
                 <span class="t-label-mono event-card-meta">94 frameworks · Active</span>
-                <a class="event-card-link" href="marketplace.html">Open <i class="ph ph-arrow-up-right"></i></a>
+                <a class="event-card-link" href="expert-libraries.html">Open <i class="ph ph-arrow-up-right"></i></a>
               </div>
             </div>
           </article>
@@ -829,5 +835,164 @@
   </div>
 </main>
 </div>
+
+<script>
+/* =====================================================================
+   History v2.1 — chip filter wiring + saved-prompt rendering.
+   Reads localStorage `mg.savedPrompts` (written by ai-marketplace.html).
+   Renders prompt cards into the timeline and wires every filter chip
+   so they actually narrow the view (previously the chips were inert).
+   ?filter=prompts auto-applies the prompts filter on load.
+   ===================================================================== */
+(function () {
+  'use strict';
+
+  const STORAGE_KEY = 'mg.savedPrompts';
+
+  const CAT_LABEL = {
+    image: 'Image', video: 'Video', audio: 'Audio',
+    agents: 'Agents', code: 'Code', slides: 'Slides'
+  };
+
+  function loadSaved() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+    catch (e) { return []; }
+  }
+
+  function fmtTime(d) {
+    return d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  }
+  function titleFromBrief(brief) {
+    const words = (brief || '').trim().split(/\s+/).slice(0, 6).join(' ');
+    return words || 'Compacted prompt';
+  }
+
+  function buildPromptArticle(p) {
+    const when = new Date(p.savedAt);
+    const briefTitle = titleFromBrief(p.brief);
+    const dimsLine = (p.dimensions || []).join(' · ');
+    const tool = p.tool || '—';
+    const tokens = p.tokens != null ? p.tokens : 0;
+    const saved  = p.savedTokens != null ? p.savedTokens : 0;
+    const catLabel = CAT_LABEL[p.service] || (p.service || '').toUpperCase();
+    const href = 'ai-marketplace.html?prompt=' + encodeURIComponent(p.id);
+
+    const art = document.createElement('article');
+    art.className = 'history-event event-prompt';
+    art.dataset.filter = 'prompt';
+    art.dataset.timestamp = when.toISOString();
+    art.innerHTML = ''
+      + '<div class="history-event-rail">'
+      +   '<span class="event-dot event-dot-prompt"></span>'
+      +   '<span class="event-rail-line"></span>'
+      + '</div>'
+      + '<div class="history-event-time">'
+      +   '<span class="t-label-mono">' + fmtTime(when) + '</span>'
+      + '</div>'
+      + '<div class="history-event-card">'
+      +   '<div class="event-card-head">'
+      +     '<div class="event-card-eyebrow">'
+      +       '<i class="ph ph-pen-nib"></i>'
+      +       '<span class="t-label-mono">Prompt</span>'
+      +       '<span class="event-card-divider">·</span>'
+      +       '<span class="event-card-dim">' + catLabel + '</span>'
+      +     '</div>'
+      +     '<button class="event-card-menu" aria-label="Event menu"><i class="ph ph-dots-three"></i></button>'
+      +   '</div>'
+      +   '<h3 class="event-card-title">' + briefTitle + '</h3>'
+      +   '<p class="event-card-body">Compacted prompt for ' + tool + '. ' + tokens + ' tokens, ' + saved + '% saved vs full context.</p>'
+      +   '<div class="event-card-foot">'
+      +     '<span class="t-label-mono event-card-meta">' + tool + (dimsLine ? ' · ' + dimsLine : '') + '</span>'
+      +     '<a class="event-card-link" href="' + href + '">Open <i class="ph ph-arrow-up-right"></i></a>'
+      +   '</div>'
+      + '</div>';
+    return art;
+  }
+
+  function tagExistingEvents() {
+    // The static event articles already carry classes like `event-sage`,
+    // `event-capture`, etc. Mirror that to a data-filter for clean filtering.
+    const TYPES = ['sage', 'capture', 'ingest', 'deepen', 'agent', 'library', 'merge'];
+    document.querySelectorAll('.history-event').forEach(art => {
+      if (art.dataset.filter) return;
+      for (const t of TYPES) {
+        if (art.classList.contains('event-' + t)) {
+          art.dataset.filter = t;
+          return;
+        }
+      }
+    });
+  }
+
+  function insertSavedPrompts() {
+    const list = loadSaved();
+    if (!list.length) return;
+    // Find the first day-group's event container. We sort prompts into
+    // the top of the timeline rather than computing actual date math —
+    // good enough for prototype demos.
+    const firstGroup = document.querySelector('.history-day .history-day-events');
+    if (!firstGroup) return;
+    // newest-first; reverse-iterate so unshift preserves order
+    list.slice().reverse().forEach(p => {
+      firstGroup.insertBefore(buildPromptArticle(p), firstGroup.firstChild);
+    });
+  }
+
+  function updateChipCounts() {
+    const chips = document.querySelectorAll('.history-filter[data-filter]');
+    let total = 0;
+    chips.forEach(chip => {
+      const f = chip.dataset.filter;
+      if (f === 'all') return;
+      const n = document.querySelectorAll('.history-event[data-filter="' + f + '"]').length;
+      const span = chip.querySelector('.filter-count');
+      if (span) span.textContent = String(n);
+      total += n;
+    });
+    const allChip = document.querySelector('.history-filter[data-filter="all"] .filter-count');
+    if (allChip) allChip.textContent = String(total);
+  }
+
+  function applyFilter(filter) {
+    document.querySelectorAll('.history-filter').forEach(c => {
+      c.classList.toggle('history-filter-active', c.dataset.filter === filter);
+    });
+    document.querySelectorAll('.history-event').forEach(art => {
+      const show = (filter === 'all') || (art.dataset.filter === filter);
+      art.style.display = show ? '' : 'none';
+    });
+    // Hide day groups that have no visible events
+    document.querySelectorAll('.history-day').forEach(day => {
+      const anyVisible = Array.from(day.querySelectorAll('.history-event'))
+        .some(art => art.style.display !== 'none');
+      day.style.display = anyVisible ? '' : 'none';
+    });
+  }
+
+  function wireChips() {
+    document.querySelectorAll('.history-filter[data-filter]').forEach(chip => {
+      chip.addEventListener('click', () => applyFilter(chip.dataset.filter));
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    tagExistingEvents();
+    insertSavedPrompts();
+    updateChipCounts();
+    wireChips();
+
+    // Deep-link: ?filter=prompts | sage | capture | …
+    const params = new URLSearchParams(window.location.search);
+    const requested = params.get('filter');
+    if (requested) {
+      // accept either "prompt" or "prompts" — singular matches our chip
+      const f = requested.replace(/s$/, '');
+      const chip = document.querySelector('.history-filter[data-filter="' + f + '"]');
+      if (chip) applyFilter(f);
+    }
+  });
+})();
+</script>
+
 </body>
 </html>

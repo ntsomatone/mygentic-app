@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI Marketplace · MyGentic</title>
+<link rel="stylesheet" href="app.css" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+
+<style>
+  /* ==================================================================
+     AI Marketplace — Discovery + Prompt Builder + Saved Library
+     Follows the same layout shell as connections.html / history.html.
+     Three sub-tabs anchor-scroll between Discover, Build, Saved.
+     Saved prompts persist to localStorage key `mg.savedPrompts`.
+     ================================================================== */
+
+  .app-content { padding: 0; }
+  .aim-page {
+    max-width: var(--w-bleed);
+    margin: 0 auto;
+    padding: var(--s-5) var(--s-6) var(--s-9);
+  }
+  @media (max-width: 900px) {
+    .aim-page { padding: var(--s-4) var(--s-4) var(--s-7); }
+  }
+
+  /* ── Breadcrumb (shared pattern) ── */
+  .atlas-breadcrumb {
+    display: flex; align-items: center; gap: var(--s-2);
+    font-family: var(--f-mono); font-size: 11px;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--ink-mute);
+    padding: var(--s-2) 0 var(--s-4);
+  }
+  .atlas-breadcrumb a { color: var(--ink-mute); }
+  .atlas-breadcrumb a:hover { color: var(--terra); }
+
+  /* ── Hero ── */
+  .aim-hero { margin-bottom: var(--s-6); }
+  .aim-eyebrow { color: var(--terra); margin-bottom: var(--s-3); }
+  .aim-hero-title {
+    font: 400 56px/1.05 var(--f-display);
+    color: var(--ink);
+    margin: 0 0 var(--s-3);
+    letter-spacing: -0.02em;
+  }
+  .aim-hero-title em {
+    font-style: italic;
+    color: var(--terra);
+  }
+  .aim-hero-deck {
+    font: 400 17px/1.55 var(--f-body);
+    color: var(--ink-soft);
+    max-width: 720px;
+  }
+  .aim-hero-deck em { font-style: italic; color: var(--ink); }
+
+  /* ── Sticky sub-tabs ── */
+  .aim-subtabs {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    gap: var(--s-1);
+    padding: var(--s-3) 0;
+    margin-bottom: var(--s-5);
+    background: var(--paper);
+    border-bottom: 1px solid var(--rule);
+  }
+  .aim-subtab {
+    display: inline-flex; align-items: center; gap: var(--s-2);
+    padding: 8px 14px;
+    border-radius: var(--r-md);
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--ink-mute);
+    font: 500 13px/1 var(--f-body);
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 150ms;
+  }
+  .aim-subtab:hover {
+    color: var(--terra);
+    background: var(--terra-tint);
+  }
+  .aim-subtab.is-active {
+    color: var(--terra-deep);
+    background: var(--terra-tint);
+    border-color: var(--terra-soft);
+  }
+
+  /* ── Section dividers ── */
+  .aim-section { padding: var(--s-6) 0; }
+  .aim-section + .aim-section { border-top: 1px solid var(--rule); }
+  .aim-section-alt {
+    background: var(--paper-3);
+    border-radius: var(--r-lg);
+    padding: var(--s-7) var(--s-6);
+    margin: var(--s-6) 0;
+    border: 1px solid var(--rule);
+  }
+  .aim-section-head { margin-bottom: var(--s-5); }
+  .aim-section-eyebrow { color: var(--terra); margin-bottom: var(--s-2); }
+  .aim-section-title {
+    font: 400 36px/1.1 var(--f-display);
+    color: var(--ink);
+    margin: 0 0 var(--s-2);
+    letter-spacing: -0.01em;
+  }
+  .aim-section-title em { font-style: italic; color: var(--terra); }
+  .aim-section-deck {
+    font: 400 15px/1.55 var(--f-body);
+    color: var(--ink-soft);
+    max-width: 680px;
+  }
+
+  /* ── Filter chip row (Discover) ── */
+  .aim-filters {
+    display: flex; flex-wrap: wrap; gap: var(--s-2);
+    margin-bottom: var(--s-5);
+  }
+  .aim-filter {
+    display: inline-flex; align-items: center; gap: var(--s-2);
+    padding: 7px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--rule-strong);
+    background: var(--card);
+    color: var(--ink-soft);
+    font: 500 12px/1 var(--f-body);
+    cursor: pointer;
+    transition: all 150ms;
+  }
+  .aim-filter:hover { color: var(--ink); border-color: var(--ink-faint); }
+  .aim-filter.is-active {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+  .aim-filter-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    display: inline-block;
+  }
+  .aim-filter[data-cat="image"]    .aim-filter-dot { background: #A78BFA; }
+  .aim-filter[data-cat="video"]    .aim-filter-dot { background: #49CCF9; }
+  .aim-filter[data-cat="audio"]    .aim-filter-dot { background: #FF8C7A; }
+  .aim-filter[data-cat="agents"]   .aim-filter-dot { background: #10B981; }
+  .aim-filter[data-cat="code"]     .aim-filter-dot { background: #7B68EE; }
+  .aim-filter[data-cat="slides"]   .aim-filter-dot { background: #FFC800; }
+
+  /* ── Tool card grid ── */
+  .aim-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s-4);
+  }
+  @media (max-width: 1100px) {
+    .aim-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 700px) {
+    .aim-grid { grid-template-columns: 1fr; }
+  }
+
+  .aim-card {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    padding: var(--s-4);
+    display: flex; flex-direction: column;
+    gap: var(--s-3);
+    transition: all 200ms;
+    position: relative;
+  }
+  .aim-card:hover {
+    border-color: var(--ink-faint);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-pop, 0 6px 24px rgba(20,17,15,0.08));
+  }
+  .aim-card[hidden] { display: none; }
+
+  .aim-card-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: var(--s-2);
+  }
+  .aim-card-pills {
+    display: flex; gap: var(--s-2); align-items: center; flex-wrap: wrap;
+  }
+  .aim-cat-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font: 500 10px/1 var(--f-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .aim-cat-pill .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+  }
+  .aim-cat-pill[data-cat="image"]    { background: #EFE9FE; color: #5B3AD1; }
+  .aim-cat-pill[data-cat="image"]    .dot { background: #A78BFA; }
+  .aim-cat-pill[data-cat="video"]    { background: #DAF1FB; color: #1B6B96; }
+  .aim-cat-pill[data-cat="video"]    .dot { background: #49CCF9; }
+  .aim-cat-pill[data-cat="audio"]    { background: #FCE0DA; color: #B33D26; }
+  .aim-cat-pill[data-cat="audio"]    .dot { background: #FF8C7A; }
+  .aim-cat-pill[data-cat="agents"]   { background: #D6F5E5; color: #0A6E45; }
+  .aim-cat-pill[data-cat="agents"]   .dot { background: #10B981; }
+  .aim-cat-pill[data-cat="code"]     { background: #E4DFFE; color: #3A2D9F; }
+  .aim-cat-pill[data-cat="code"]     .dot { background: #7B68EE; }
+  .aim-cat-pill[data-cat="slides"]   { background: #FFF1CC; color: #8C6800; }
+  .aim-cat-pill[data-cat="slides"]   .dot { background: #FFC800; }
+
+  .aim-partner-pill {
+    font: italic 500 10px/1 var(--f-display);
+    letter-spacing: 0.04em;
+    color: var(--terra);
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: var(--terra-tint);
+    border: 1px solid var(--terra-soft);
+  }
+
+  .aim-card-launch {
+    width: 24px; height: 24px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 6px;
+    color: var(--ink-mute);
+    border: 1px solid var(--rule);
+    background: var(--paper-2);
+    transition: all 150ms;
+    font-size: 12px;
+  }
+  .aim-card:hover .aim-card-launch {
+    color: var(--terra);
+    border-color: var(--terra-soft);
+    background: var(--terra-tint);
+  }
+
+  .aim-card-name {
+    font: 500 18px/1.2 var(--f-body);
+    color: var(--ink);
+    margin: 0;
+  }
+  .aim-card-tagline {
+    font: 400 13px/1.45 var(--f-body);
+    color: var(--ink-soft);
+    margin: 0;
+    flex: 1;
+  }
+  .aim-card-foot {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-top: var(--s-2);
+    border-top: 1px dashed var(--rule);
+    margin-top: var(--s-1);
+  }
+  .aim-card-meta {
+    font-family: var(--f-mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .aim-card-cta {
+    font: 500 12px/1 var(--f-body);
+    color: var(--terra);
+    text-decoration: none;
+  }
+  .aim-card-cta:hover { color: var(--terra-deep); }
+
+  /* ── Build a prompt: two-column form + output ── */
+  .aim-builder {
+    display: grid;
+    grid-template-columns: 5fr 7fr;
+    gap: var(--s-5);
+    margin-top: var(--s-5);
+  }
+  @media (max-width: 900px) {
+    .aim-builder { grid-template-columns: 1fr; }
+  }
+
+  .aim-form {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    padding: var(--s-5);
+    display: flex; flex-direction: column; gap: var(--s-4);
+  }
+  .aim-form-field { display: flex; flex-direction: column; gap: 6px; }
+  .aim-form-label {
+    font-family: var(--f-mono); font-size: 11px;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+  .aim-form-input,
+  .aim-form-select,
+  .aim-form-textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--rule-strong);
+    border-radius: var(--r-md);
+    background: var(--paper);
+    color: var(--ink);
+    font: 400 14px/1.5 var(--f-body);
+    font-family: var(--f-body);
+    transition: border-color 150ms, box-shadow 150ms;
+  }
+  .aim-form-input:focus,
+  .aim-form-select:focus,
+  .aim-form-textarea:focus {
+    outline: none;
+    border-color: var(--terra);
+    box-shadow: 0 0 0 3px var(--terra-soft);
+  }
+  .aim-form-textarea { resize: vertical; min-height: 96px; }
+  .aim-form-help {
+    font: italic 400 12px/1.4 var(--f-body);
+    color: var(--ink-mute);
+  }
+
+  .aim-chip-group {
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .aim-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--rule-strong);
+    background: var(--paper);
+    color: var(--ink-soft);
+    font: 500 12px/1 var(--f-body);
+    cursor: pointer;
+    transition: all 150ms;
+  }
+  .aim-chip:hover { border-color: var(--ink-faint); color: var(--ink); }
+  .aim-chip.is-on {
+    background: var(--terra);
+    color: var(--paper);
+    border-color: var(--terra);
+  }
+
+  /* Output panel — charcoal */
+  .aim-output {
+    background: #1A1F2A;
+    border-radius: var(--r-lg);
+    padding: var(--s-5);
+    display: flex; flex-direction: column; gap: var(--s-4);
+    color: #E2E4E8;
+    position: relative;
+  }
+  .aim-output-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: var(--s-3);
+    flex-wrap: wrap;
+  }
+  .aim-output-eyebrow {
+    font-family: var(--f-mono); font-size: 11px;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--marigold);
+  }
+  .aim-output-state {
+    font-family: var(--f-mono); font-size: 10px;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: rgba(216, 149, 52, 0.18);
+    color: var(--marigold);
+  }
+  .aim-output-state.is-locked {
+    background: rgba(80, 230, 130, 0.18);
+    color: var(--neon-bright);
+  }
+
+  .aim-pulled-row {
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .aim-pulled-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: rgba(216, 149, 52, 0.14);
+    color: var(--marigold);
+    font: 500 11px/1 var(--f-mono);
+    letter-spacing: 0.05em;
+  }
+
+  .aim-output-body {
+    background: #0E1119;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: var(--r-md);
+    padding: var(--s-4);
+    font: 400 13px/1.65 var(--f-mono);
+    color: #C9CCD2;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    min-height: 240px;
+    max-height: 480px;
+    overflow-y: auto;
+  }
+  .aim-output-body em { color: var(--marigold); font-style: normal; }
+
+  .aim-output-stats {
+    display: flex; flex-wrap: wrap; gap: var(--s-4);
+    font: 500 11px/1 var(--f-mono);
+    letter-spacing: 0.08em;
+    color: #909AAB;
+    padding-top: var(--s-2);
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .aim-output-stat strong { color: var(--marigold); font-weight: 600; }
+  .aim-output-stat.is-savings strong { color: var(--neon-bright); }
+
+  .aim-output-actions {
+    display: flex; flex-wrap: wrap; gap: var(--s-2);
+  }
+  .aim-output-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px;
+    border-radius: var(--r-md);
+    border: 1px solid rgba(255,255,255,0.14);
+    background: rgba(255,255,255,0.04);
+    color: var(--paper);
+    font: 500 12px/1 var(--f-body);
+    cursor: pointer;
+    transition: all 150ms;
+  }
+  .aim-output-btn:hover {
+    background: rgba(255,255,255,0.10);
+    border-color: rgba(255,255,255,0.24);
+  }
+  .aim-output-btn-primary {
+    background: var(--terra);
+    border-color: var(--terra);
+  }
+  .aim-output-btn-primary:hover {
+    background: var(--terra-deep);
+    border-color: var(--terra-deep);
+  }
+
+  /* ── Saved prompts list ── */
+  .aim-saved {
+    display: flex; flex-direction: column; gap: var(--s-3);
+  }
+  .aim-saved-empty {
+    background: var(--paper-2);
+    border: 1px dashed var(--rule-strong);
+    border-radius: var(--r-lg);
+    padding: var(--s-7) var(--s-5);
+    text-align: center;
+    color: var(--ink-mute);
+    font: italic 400 14px/1.5 var(--f-body);
+  }
+  .aim-saved-row {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-md);
+    padding: var(--s-3) var(--s-4);
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: var(--s-4);
+    align-items: center;
+  }
+  @media (max-width: 700px) {
+    .aim-saved-row { grid-template-columns: 1fr; }
+  }
+  .aim-saved-meta {
+    display: flex; flex-direction: column; gap: 4px;
+    min-width: 130px;
+  }
+  .aim-saved-time {
+    font: 500 11px/1 var(--f-mono);
+    letter-spacing: 0.08em;
+    color: var(--ink-mute);
+  }
+  .aim-saved-tool {
+    font: 500 13px/1.2 var(--f-body);
+    color: var(--ink);
+  }
+  .aim-saved-body { min-width: 0; }
+  .aim-saved-brief {
+    font: 400 14px/1.45 var(--f-body);
+    color: var(--ink-soft);
+    margin: 0 0 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  .aim-saved-stats {
+    font: 500 10px/1 var(--f-mono);
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+  }
+  .aim-saved-actions { display: flex; gap: 6px; }
+  .aim-saved-act {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px;
+    border-radius: 6px;
+    border: 1px solid var(--rule);
+    background: var(--paper);
+    color: var(--ink-mute);
+    cursor: pointer;
+    transition: all 150ms;
+    font-size: 14px;
+  }
+  .aim-saved-act:hover { color: var(--terra); border-color: var(--terra-soft); }
+  .aim-saved-act-danger:hover { color: var(--danger); border-color: var(--danger); }
+
+  .aim-saved-foot {
+    margin-top: var(--s-4);
+    text-align: center;
+  }
+  .aim-saved-foot a {
+    color: var(--terra);
+    font: 500 13px/1 var(--f-body);
+    text-decoration: none;
+  }
+  .aim-saved-foot a:hover { color: var(--terra-deep); }
+  .aim-saved-foot i { margin-left: 4px; }
+
+  /* ── Outro band ── */
+  .aim-outro {
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    padding: var(--s-5) var(--s-6);
+    margin-top: var(--s-7);
+    display: flex; align-items: center; justify-content: space-between;
+    gap: var(--s-4);
+    flex-wrap: wrap;
+  }
+  .aim-outro-text {
+    font: 400 15px/1.5 var(--f-body);
+    color: var(--ink-soft);
+    max-width: 540px;
+  }
+  .aim-outro-text strong { color: var(--ink); }
+  .aim-outro-actions { display: flex; gap: var(--s-2); }
+
+  /* ── Toast ── */
+  .aim-toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 10px 16px;
+    border-radius: var(--r-md);
+    font: 500 13px/1 var(--f-body);
+    z-index: 100;
+    opacity: 0;
+    transform: translateY(8px);
+    pointer-events: none;
+    transition: opacity 200ms, transform 200ms;
+  }
+  .aim-toast.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+</head>
+<body class="app-shell aim-body">
+<header class="app-topbar">
+  <div class="app-topbar-inner">
+    <label for="navToggle" class="app-burger" aria-label="Open navigation"><i class="ph ph-list"></i></label>
+    <a class="app-brand" href="dashboard.html">My<span class="accent">Gen</span>tic</a>
+    <h1 class="app-page-title">AI Marketplace</h1>
+    <div class="app-topbar-actions">
+      <div class="app-topbar-search">
+        <i class="ph ph-magnifying-glass"></i>
+        <input type="text" placeholder="Search your context, agents, libraries…" />
+        <kbd>⌘K</kbd>
+      </div>
+      <button class="app-icon-btn" aria-label="Notifications"><i class="ph ph-bell"></i><span class="dot"></span></button>
+      <button class="app-avatar" aria-label="User menu">NA</button>
+    </div>
+  </div>
+</header>
+<div class="app-layout">
+  <input type="checkbox" id="navToggle" class="app-nav-toggle sr-only" />
+<label for="navToggle" class="app-leftnav-backdrop"></label>
+<nav class="app-leftnav" aria-label="Primary">
+  <div class="app-nav-section-label">Workspace</div>
+      <a href="dashboard.html" class="app-nav-item" data-page="dashboard"><i class="ph ph-gauge"></i><span>Dashboard</span></a>
+      <a href="atlas.html" class="app-nav-item" data-page="atlas"><i class="ph ph-graph"></i><span>Atlas</span></a>
+      <a href="sage.html" class="app-nav-item" data-page="sage"><i class="ph ph-chats-circle"></i><span>Sage</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Context</div>
+      <a href="context.html" class="app-nav-item" data-page="context"><i class="ph ph-stack"></i><span>Context Layers</span></a>
+      <a href="token-compaction.html" class="app-nav-item" data-page="token-compaction"><i class="ph ph-funnel"></i><span>Token Compaction</span></a>
+      <a href="history.html" class="app-nav-item" data-page="history"><i class="ph ph-clock-counter-clockwise"></i><span>History</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Connect</div>
+      <a href="connections.html" class="app-nav-item" data-page="connections"><i class="ph ph-plugs-connected"></i><span>Connections</span></a>
+      <a href="ai-marketplace.html" class="app-nav-item active" data-page="ai-marketplace"><i class="ph ph-storefront"></i><span>AI Marketplace</span><span class="nav-badge">New</span></a>
+      <a href="upload-data.html" class="app-nav-item" data-page="upload-data"><i class="ph ph-upload-simple"></i><span>Upload Data</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Build</div>
+      <a href="agents.html" class="app-nav-item" data-page="agents"><i class="ph ph-sparkle"></i><span>Agents</span></a>
+      <a href="expert-libraries.html" class="app-nav-item" data-page="expert-libraries"><i class="ph ph-books"></i><span>Expert Libraries</span><span class="nav-badge">New</span></a>
+      <hr class="app-nav-divider" />
+      <div class="app-nav-section-label">Account</div>
+      <a href="export.html" class="app-nav-item" data-page="export"><i class="ph ph-download-simple"></i><span>Export &amp; Data</span></a>
+      <a href="settings.html" class="app-nav-item" data-page="settings"><i class="ph ph-gear-six"></i><span>Settings</span></a>
+</nav>
+  <main class="app-content">
+  <div class="aim-page">
+    <div class="atlas-breadcrumb">
+      <a href="dashboard.html">Dashboard</a>
+      <i class="ph ph-caret-right"></i>
+      <span>AI Marketplace</span>
+    </div>
+
+    <header class="aim-hero">
+      <div class="t-label-mono aim-eyebrow">Connect · AI Marketplace</div>
+      <h1 class="aim-hero-title">Every AI tool, <em>briefed on you.</em></h1>
+      <p class="aim-hero-deck">
+        Launch curated third-party AI products with your context already in hand. Or
+        <em>build a prompt here, copy it,</em> paste it anywhere.
+      </p>
+    </header>
+
+    <nav class="aim-subtabs" aria-label="Marketplace sections">
+      <a href="#discover" class="aim-subtab is-active" data-tab="discover"><i class="ph ph-grid-four"></i> Discover tools</a>
+      <a href="#build" class="aim-subtab" data-tab="build"><i class="ph ph-pen-nib"></i> Build a prompt</a>
+      <a href="#saved" class="aim-subtab" data-tab="saved"><i class="ph ph-bookmark-simple"></i> Saved prompts</a>
+    </nav>
+
+    <!-- ═══════════════════ DISCOVER ═══════════════════ -->
+    <section class="aim-section" id="discover">
+      <div class="aim-section-head">
+        <div class="t-label-mono aim-section-eyebrow">Curated catalog · 30 tools</div>
+        <h2 class="aim-section-title">Discover what <em>fits your context.</em></h2>
+        <p class="aim-section-deck">
+          Partner tools first within each category. Click any card to launch with your
+          MyGentic context attached. (Free standalone use always works too — your call.)
+        </p>
+      </div>
+
+      <div class="aim-filters" id="aimFilters">
+        <button class="aim-filter is-active" data-cat="all"><i class="ph ph-list"></i> All <span class="filter-count" data-count="all">30</span></button>
+        <button class="aim-filter" data-cat="image"><span class="aim-filter-dot"></span> Image <span class="filter-count" data-count="image">5</span></button>
+        <button class="aim-filter" data-cat="video"><span class="aim-filter-dot"></span> Video <span class="filter-count" data-count="video">5</span></button>
+        <button class="aim-filter" data-cat="audio"><span class="aim-filter-dot"></span> Audio <span class="filter-count" data-count="audio">5</span></button>
+        <button class="aim-filter" data-cat="agents"><span class="aim-filter-dot"></span> Agents <span class="filter-count" data-count="agents">5</span></button>
+        <button class="aim-filter" data-cat="code"><span class="aim-filter-dot"></span> Code <span class="filter-count" data-count="code">5</span></button>
+        <button class="aim-filter" data-cat="slides"><span class="aim-filter-dot"></span> Slides <span class="filter-count" data-count="slides">5</span></button>
+      </div>
+
+      <div class="aim-grid" id="aimGrid">
+        <!-- cards rendered by JS from CATALOG -->
+      </div>
+    </section>
+
+    <!-- ═══════════════════ BUILD ═══════════════════ -->
+    <section class="aim-section-alt" id="build">
+      <div class="aim-section-head">
+        <div class="t-label-mono aim-section-eyebrow">Build · Compact context · Ready to paste</div>
+        <h2 class="aim-section-title">Build a prompt, <em>ready to paste.</em></h2>
+        <p class="aim-section-deck">
+          Pick a service, a use case, a target tool. Drop in a brief. MyGentic pulls the
+          right slice of your context and assembles a compact prompt that costs a fraction of
+          the full payload.
+        </p>
+      </div>
+
+      <div class="aim-builder">
+        <!-- FORM -->
+        <div class="aim-form">
+          <div class="aim-form-field">
+            <label class="aim-form-label" for="bService">Service</label>
+            <select class="aim-form-select" id="bService">
+              <option value="image">Image generation</option>
+              <option value="video">Video generation</option>
+              <option value="audio">Voice &amp; audio</option>
+              <option value="agents">Agent orchestration</option>
+              <option value="code">Code &amp; build</option>
+              <option value="slides">Slides &amp; docs</option>
+            </select>
+          </div>
+          <div class="aim-form-field">
+            <label class="aim-form-label" for="bUseCase">Use case</label>
+            <select class="aim-form-select" id="bUseCase"><!-- cascades --></select>
+          </div>
+          <div class="aim-form-field">
+            <label class="aim-form-label" for="bTool">Target tool</label>
+            <select class="aim-form-select" id="bTool"><!-- cascades --></select>
+          </div>
+          <div class="aim-form-field">
+            <label class="aim-form-label" for="bBrief">Brief</label>
+            <textarea class="aim-form-textarea" id="bBrief" placeholder="One or two sentences. What are you making, for whom, and what's the vibe?"></textarea>
+            <span class="aim-form-help">Sage will use this verbatim and wrap it with your context.</span>
+          </div>
+          <div class="aim-form-field">
+            <label class="aim-form-label">Context dimensions to pull</label>
+            <div class="aim-chip-group" id="bChips">
+              <!-- chips rendered by JS, smart-default toggled on per service -->
+            </div>
+            <span class="aim-form-help">Toggle which slices of your identity to include.</span>
+          </div>
+          <div class="aim-form-field">
+            <button class="btn btn-primary terra" id="bGenerate"><i class="ph ph-sparkle"></i> Finalize prompt</button>
+          </div>
+        </div>
+
+        <!-- OUTPUT -->
+        <div class="aim-output" id="bOutput">
+          <div class="aim-output-head">
+            <div>
+              <div class="aim-output-eyebrow">Compacted prompt · Ready</div>
+            </div>
+            <span class="aim-output-state" id="bState">Draft · live</span>
+          </div>
+          <div class="aim-pulled-row" id="bPulled"><!-- rendered --></div>
+          <pre class="aim-output-body" id="bBody"></pre>
+          <div class="aim-output-stats">
+            <span class="aim-output-stat">Tokens · <strong id="bTokens">0</strong></span>
+            <span class="aim-output-stat is-savings">Saved vs full context · <strong id="bSaved">0%</strong></span>
+            <span class="aim-output-stat">Target · <strong id="bToolDisplay">—</strong></span>
+          </div>
+          <div class="aim-output-actions">
+            <button class="aim-output-btn" id="bCopy"><i class="ph ph-copy"></i> Copy</button>
+            <button class="aim-output-btn" id="bDownload"><i class="ph ph-download-simple"></i> Download JSON</button>
+            <button class="aim-output-btn aim-output-btn-primary" id="bSave"><i class="ph ph-bookmark-simple"></i> Save to library</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ SAVED ═══════════════════ -->
+    <section class="aim-section" id="saved">
+      <div class="aim-section-head">
+        <div class="t-label-mono aim-section-eyebrow">Your library · localStorage</div>
+        <h2 class="aim-section-title">Your <em>saved prompts.</em></h2>
+        <p class="aim-section-deck">
+          Re-load any prompt into the builder, copy it again, or surface it in History.
+        </p>
+      </div>
+      <div class="aim-saved" id="aimSaved">
+        <!-- rendered by JS -->
+      </div>
+      <div class="aim-saved-foot">
+        <a href="history.html?filter=prompts">View in History <i class="ph ph-arrow-right"></i></a>
+      </div>
+    </section>
+
+    <!-- Outro band -->
+    <div class="aim-outro">
+      <div class="aim-outro-text">
+        <strong>Want all of it?</strong> Every prompt you generate is yours — export your
+        whole library to JSON anytime, or send it to History to live alongside the rest of
+        your activity.
+      </div>
+      <div class="aim-outro-actions">
+        <a class="btn btn-secondary" href="export.html"><i class="ph ph-download-simple"></i> Export library</a>
+        <a class="btn btn-primary terra" href="history.html?filter=prompts">Open History</a>
+      </div>
+    </div>
+
+  </div>
+  </main>
+</div>
+
+<div class="aim-toast" id="aimToast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ────────────────────────────────────────────────
+  // Catalog (30 tools, 5 per category)
+  // Affiliate flag (partner: true) → sorts first within category.
+  // ────────────────────────────────────────────────
+  const CATALOG = [
+    // Image
+    { cat: 'image',  name: 'Midjourney',         tagline: 'High-art image generation with house style baked in.',  partner: true,  url: '#' },
+    { cat: 'image',  name: 'Ideogram',           tagline: 'Type-aware image generation. Posters, packaging, labels.', partner: true, url: '#' },
+    { cat: 'image',  name: 'Recraft',            tagline: 'Brand-consistent vector + raster output with style locks.', partner: true, url: '#' },
+    { cat: 'image',  name: 'Leonardo.AI',        tagline: 'Game-ready assets, characters, environments.',           partner: false, url: '#' },
+    { cat: 'image',  name: 'Adobe Firefly',      tagline: 'Commercial-safe imagery, native in Creative Cloud.',     partner: false, url: '#' },
+
+    // Video
+    { cat: 'video',  name: 'Runway',             tagline: 'Cinematic Gen-3 video, image-to-video, editing.',        partner: true,  url: '#' },
+    { cat: 'video',  name: 'Luma Dream Machine', tagline: 'Smooth realistic motion, great for product reels.',      partner: true,  url: '#' },
+    { cat: 'video',  name: 'HeyGen',             tagline: 'Talking-head avatars in 40+ languages.',                  partner: true,  url: '#' },
+    { cat: 'video',  name: 'Pika',               tagline: 'Quick stylized video clips and effects.',                partner: false, url: '#' },
+    { cat: 'video',  name: 'Kling',              tagline: 'High-fidelity action sequences and motion design.',       partner: false, url: '#' },
+
+    // Audio
+    { cat: 'audio',  name: 'ElevenLabs',         tagline: 'Voice cloning + TTS that sounds like a human.',           partner: true,  url: '#' },
+    { cat: 'audio',  name: 'Udio',               tagline: 'Music generation with structure controls.',              partner: true,  url: '#' },
+    { cat: 'audio',  name: 'Descript',           tagline: 'Audio editing by editing the transcript. Studio-grade.', partner: true,  url: '#' },
+    { cat: 'audio',  name: 'Suno',               tagline: 'Fast lyric-to-song generation.',                          partner: false, url: '#' },
+    { cat: 'audio',  name: 'PlayHT',             tagline: 'Realtime voice cloning for production workflows.',        partner: false, url: '#' },
+
+    // Agent orchestration
+    { cat: 'agents', name: 'n8n',                tagline: 'Self-hostable workflow automation with AI nodes.',         partner: true,  url: '#' },
+    { cat: 'agents', name: 'Relevance AI',       tagline: 'No-code multi-agent teams with memory.',                  partner: true,  url: '#' },
+    { cat: 'agents', name: 'Lindy',              tagline: 'Personal AI agents for calendars, inbox, research.',     partner: true,  url: '#' },
+    { cat: 'agents', name: 'Make',               tagline: 'Visual scenario builder. 1,500+ integrations.',           partner: false, url: '#' },
+    { cat: 'agents', name: 'Crew AI',            tagline: 'Open-source multi-agent role coordination.',              partner: false, url: '#' },
+
+    // Code & build
+    { cat: 'code',   name: 'Lovable',            tagline: 'Full-stack app generator from natural language.',          partner: true,  url: '#' },
+    { cat: 'code',   name: 'v0',                 tagline: 'UI generation from prompts. Ships to Vercel.',             partner: true,  url: '#' },
+    { cat: 'code',   name: 'Replit Agent',       tagline: 'End-to-end app build inside a sandbox.',                   partner: true,  url: '#' },
+    { cat: 'code',   name: 'Cursor',             tagline: 'AI-native code editor with agent mode.',                   partner: false, url: '#' },
+    { cat: 'code',   name: 'Bolt.new',           tagline: 'Browser-based stack scaffold with live preview.',          partner: false, url: '#' },
+
+    // Slides & docs
+    { cat: 'slides', name: 'Gamma',              tagline: 'AI presentation builder. Slides, docs, sites.',           partner: true,  url: '#' },
+    { cat: 'slides', name: 'Beautiful.AI',       tagline: 'Smart slide templates for execs and operators.',          partner: true,  url: '#' },
+    { cat: 'slides', name: 'Canva AI',           tagline: 'Brand-aware decks, docs, and social posts.',              partner: true,  url: '#' },
+    { cat: 'slides', name: 'Tome',               tagline: 'Narrative-first AI decks.',                                partner: false, url: '#' },
+    { cat: 'slides', name: 'Decktopus',          tagline: 'Pitch decks from a single sentence brief.',                partner: false, url: '#' }
+  ];
+
+  const CAT_LABEL = {
+    image: 'Image', video: 'Video', audio: 'Audio',
+    agents: 'Agents', code: 'Code', slides: 'Slides'
+  };
+
+  // Service → use case list
+  const USE_CASES = {
+    image:  ['Social media campaign', 'Hero image for landing page', 'Product mockup', 'Editorial illustration', 'Brand asset variations'],
+    video:  ['Launch teaser', 'Tutorial walkthrough', 'Talking-head explainer', 'Animated explainer', 'Short social reel'],
+    audio:  ['Podcast voiceover', 'Product demo narration', 'Music for video', 'Voice clone for outreach', 'Audio summary of a doc'],
+    agents: ['Lead enrichment flow', 'Daily digest', 'Multi-step research', 'CRM sync pipeline', 'Notion → email workflow'],
+    code:   ['New app scaffold', 'Component generation', 'Refactor pass', 'Test suite scaffolding', 'Quick prototype'],
+    slides: ['Investor pitch', 'Quarterly review', 'Workshop deck', 'One-pager handout', 'Conference talk']
+  };
+
+  // Service → tool short-list (used by builder dropdown)
+  const SERVICE_TOOLS = {
+    image:  ['Midjourney', 'Ideogram', 'Recraft', 'Leonardo.AI', 'Adobe Firefly'],
+    video:  ['Runway', 'Luma Dream Machine', 'HeyGen', 'Pika', 'Kling'],
+    audio:  ['ElevenLabs', 'Udio', 'Descript', 'Suno', 'PlayHT'],
+    agents: ['n8n', 'Relevance AI', 'Lindy', 'Make', 'Crew AI'],
+    code:   ['Lovable', 'v0', 'Replit Agent', 'Cursor', 'Bolt.new'],
+    slides: ['Gamma', 'Beautiful.AI', 'Canva AI', 'Tome', 'Decktopus']
+  };
+
+  // Service label
+  const SERVICE_LABEL = {
+    image: 'Image generation',
+    video: 'Video generation',
+    audio: 'Voice & audio',
+    agents: 'Agent orchestration',
+    code: 'Code & build',
+    slides: 'Slides & docs'
+  };
+
+  // Context dimensions and their default-on per service
+  const ALL_DIMS = ['Aesthetic', 'Consumer', 'Interests', 'Communication', 'Professional', 'Work Life'];
+  const DEFAULT_DIMS = {
+    image:  ['Aesthetic', 'Consumer', 'Interests'],
+    video:  ['Aesthetic', 'Consumer', 'Professional'],
+    audio:  ['Communication', 'Professional'],
+    agents: ['Professional', 'Work Life'],
+    code:   ['Professional', 'Work Life'],
+    slides: ['Professional', 'Aesthetic']
+  };
+
+  // Sample MyGentic context fragments to drop into the compacted prompt
+  // (these read as if pulled from the user's identity)
+  const SAMPLE_CONTEXT = {
+    'Aesthetic':      'Editorial > decorative. Warm > neutral. Wide kerning, generous whitespace, terra cotta + cream palette.',
+    'Consumer':       'Premium-when-it-matters; values craft and longevity over novelty. Subscribes to Stratechery, Lenny\'s Newsletter, NYT.',
+    'Interests':      'Personal AI infrastructure, motorcycles (BMW R nineT), trail running, design criticism, jazz piano.',
+    'Communication':  'Direct, brief, no flattery. Sentence-first thinking. Comfortable saying "I don\'t know yet."',
+    'Professional':   'Founder, MyGentic. Prior: Director of Product at a fintech. Bias toward shipping over polish, but not at the cost of trust.',
+    'Work Life':      'Async-default, two no-meeting blocks per week. Calendar density ~5 hrs/day in meetings on heavy weeks.'
+  };
+
+  const STORAGE_KEY = 'mg.savedPrompts';
+
+  // ────────────────────────────────────────────────
+  // Bootstrap: seed two example prompts on first visit
+  // ────────────────────────────────────────────────
+  function ensureSeeded() {
+    if (localStorage.getItem(STORAGE_KEY) != null) return;
+    const seeded = [
+      {
+        id: 'prm_seed_runway',
+        savedAt: new Date(Date.now() - 1000 * 60 * 60 * 18).toISOString(),
+        service: 'video',
+        useCase: 'Launch teaser',
+        tool: 'Runway',
+        brief: 'A 6-second product launch teaser for MyGentic — abstract context flowing into a single warm orb. Editorial, cinematic, never trendy.',
+        dimensions: ['Aesthetic', 'Consumer', 'Professional'],
+        prompt: '',
+        tokens: 642,
+        savedTokens: 81
+      },
+      {
+        id: 'prm_seed_gamma',
+        savedAt: new Date(Date.now() - 1000 * 60 * 60 * 50).toISOString(),
+        service: 'slides',
+        useCase: 'Investor pitch',
+        tool: 'Gamma',
+        brief: 'Series A pitch deck — 12 slides. Lead with the moat (Sage + Context Layer). Close with the V1 → V1.5 plan and 12-month milestones.',
+        dimensions: ['Professional', 'Aesthetic'],
+        prompt: '',
+        tokens: 738,
+        savedTokens: 76
+      }
+    ];
+    // Backfill the generated prompt body for each seed
+    seeded.forEach(s => { s.prompt = renderPromptText(s); });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));
+  }
+
+  function loadSaved() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+    catch (e) { return []; }
+  }
+  function writeSaved(list) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+  }
+
+  // ────────────────────────────────────────────────
+  // DISCOVER grid render + filter
+  // ────────────────────────────────────────────────
+  function sortedCatalog() {
+    // Partner cards sort first within each category. Stable order otherwise.
+    return CATALOG.slice().sort((a, b) => {
+      if (a.cat !== b.cat) return 0;
+      return (b.partner ? 1 : 0) - (a.partner ? 1 : 0);
+    });
+  }
+
+  function renderGrid() {
+    const grid = document.getElementById('aimGrid');
+    if (!grid) return;
+    const cards = sortedCatalog().map(t => {
+      const partnerPill = t.partner
+        ? '<span class="aim-partner-pill">Partner</span>' : '';
+      return ''
+        + '<article class="aim-card" data-cat="' + t.cat + '">'
+        +   '<div class="aim-card-head">'
+        +     '<div class="aim-card-pills">'
+        +       '<span class="aim-cat-pill" data-cat="' + t.cat + '"><span class="dot"></span>' + CAT_LABEL[t.cat] + '</span>'
+        +       partnerPill
+        +     '</div>'
+        +     '<a href="' + t.url + '" class="aim-card-launch" aria-label="Launch ' + t.name + '" title="Launch with context"><i class="ph ph-arrow-up-right"></i></a>'
+        +   '</div>'
+        +   '<h3 class="aim-card-name">' + t.name + '</h3>'
+        +   '<p class="aim-card-tagline">' + t.tagline + '</p>'
+        +   '<div class="aim-card-foot">'
+        +     '<span class="aim-card-meta">Launch ready</span>'
+        +     '<a href="#build" class="aim-card-cta" data-tool="' + t.name + '" data-cat="' + t.cat + '">Build a prompt →</a>'
+        +   '</div>'
+        + '</article>';
+    }).join('');
+    grid.innerHTML = cards;
+
+    // Wire "Build a prompt →" to pre-populate the builder
+    grid.querySelectorAll('[data-tool]').forEach(a => {
+      a.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        const cat = a.dataset.cat;
+        const tool = a.dataset.tool;
+        const svcSel = document.getElementById('bService');
+        svcSel.value = cat;
+        applyServiceCascade(cat);
+        const toolSel = document.getElementById('bTool');
+        if (Array.from(toolSel.options).some(o => o.value === tool)) {
+          toolSel.value = tool;
+        }
+        renderPrompt();
+        document.getElementById('build').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+  }
+
+  function applyFilter(cat) {
+    const cards = document.querySelectorAll('.aim-card');
+    cards.forEach(c => {
+      c.hidden = (cat !== 'all' && c.dataset.cat !== cat);
+    });
+    document.querySelectorAll('.aim-filter').forEach(b => {
+      b.classList.toggle('is-active', b.dataset.cat === cat);
+    });
+  }
+
+  // ────────────────────────────────────────────────
+  // BUILDER — cascading dropdowns, live prompt
+  // ────────────────────────────────────────────────
+  function fillSelect(sel, items, selected) {
+    sel.innerHTML = items.map(i => '<option value="' + i + '"' + (i === selected ? ' selected' : '') + '>' + i + '</option>').join('');
+  }
+
+  function applyServiceCascade(service) {
+    fillSelect(document.getElementById('bUseCase'), USE_CASES[service], USE_CASES[service][0]);
+    fillSelect(document.getElementById('bTool'),    SERVICE_TOOLS[service], SERVICE_TOOLS[service][0]);
+    renderChips(DEFAULT_DIMS[service]);
+  }
+
+  function renderChips(onDims) {
+    const host = document.getElementById('bChips');
+    if (!host) return;
+    const onSet = new Set(onDims || []);
+    host.innerHTML = ALL_DIMS.map(d =>
+      '<button type="button" class="aim-chip' + (onSet.has(d) ? ' is-on' : '') + '" data-dim="' + d + '">' + d + '</button>'
+    ).join('');
+    host.querySelectorAll('.aim-chip').forEach(b => {
+      b.addEventListener('click', () => {
+        b.classList.toggle('is-on');
+        renderPrompt();
+      });
+    });
+  }
+
+  function activeDims() {
+    return Array.from(document.querySelectorAll('#bChips .aim-chip.is-on')).map(b => b.dataset.dim);
+  }
+
+  function readForm() {
+    return {
+      service: document.getElementById('bService').value,
+      useCase: document.getElementById('bUseCase').value,
+      tool:    document.getElementById('bTool').value,
+      brief:   document.getElementById('bBrief').value.trim(),
+      dimensions: activeDims()
+    };
+  }
+
+  // Token / savings heuristics (per spec)
+  function calcTokens(brief, dims) {
+    return Math.round(280 + (brief || '').length * 0.6 + (dims || []).length * 40);
+  }
+  function calcSavings(dims) {
+    return Math.min(94, 60 + (dims || []).length * 5);
+  }
+
+  function renderPromptText(state) {
+    const briefLine = state.brief && state.brief.length
+      ? state.brief
+      : '(your brief here — the more specific the better)';
+    const dimsBlock = (state.dimensions || []).map(d =>
+      '• ' + d + ' — ' + (SAMPLE_CONTEXT[d] || 'pulled from your MyGentic profile.')
+    ).join('\n');
+    const tool = state.tool || '—';
+    const svc  = SERVICE_LABEL[state.service] || state.service;
+    const uc   = state.useCase || '—';
+    return [
+      '# Prompt for ' + tool + ' · ' + svc,
+      '# Generated by MyGentic — compacted to the slice ' + tool + ' actually needs',
+      '',
+      '## Brief',
+      briefLine,
+      '',
+      '## Use case',
+      uc,
+      '',
+      '## Context pulled from your MyGentic identity',
+      dimsBlock || '(no dimensions selected — toggle a few above)',
+      '',
+      '## Instructions to ' + tool,
+      'Produce a response that honors the brief above while reading as authentically aligned to the context block.',
+      'Match tone, taste, and constraints implied by that context. If you must trade one off against another, ',
+      'prioritize the brief; treat context as the voice, not the spec.',
+      '',
+      '— end of compacted prompt —'
+    ].join('\n');
+  }
+
+  function renderPulledRow(dims) {
+    return dims.map(d => '<span class="aim-pulled-chip"><i class="ph ph-link"></i> ' + d + '</span>').join('');
+  }
+
+  let lockState = false;
+  function setLockState(locked) {
+    lockState = !!locked;
+    const el = document.getElementById('bState');
+    if (!el) return;
+    el.textContent = lockState ? 'Finalized · ready to paste' : 'Draft · live';
+    el.classList.toggle('is-locked', lockState);
+  }
+
+  let renderTimer = null;
+  function renderPrompt() {
+    if (renderTimer) clearTimeout(renderTimer);
+    renderTimer = setTimeout(() => {
+      const s = readForm();
+      const tokens = calcTokens(s.brief, s.dimensions);
+      const savings = calcSavings(s.dimensions);
+      document.getElementById('bBody').textContent = renderPromptText(s);
+      document.getElementById('bPulled').innerHTML = renderPulledRow(s.dimensions);
+      document.getElementById('bTokens').textContent = String(tokens);
+      document.getElementById('bSaved').textContent  = savings + '%';
+      document.getElementById('bToolDisplay').textContent = s.tool;
+      // Editing any field reverts to live-draft state
+      setLockState(false);
+    }, 150);
+  }
+
+  // ────────────────────────────────────────────────
+  // ACTIONS — Copy, Download JSON, Save, Reload, Delete
+  // ────────────────────────────────────────────────
+  function showToast(msg) {
+    const t = document.getElementById('aimToast');
+    if (!t) return;
+    t.textContent = msg;
+    t.classList.add('is-visible');
+    setTimeout(() => t.classList.remove('is-visible'), 1800);
+  }
+
+  function copyPrompt() {
+    const text = document.getElementById('bBody').textContent;
+    if (!text) return;
+    // Some browsers gate clipboard on user gesture even with permission — fall
+    // back to a hidden textarea + execCommand for max portability.
+    navigator.clipboard.writeText(text).then(
+      () => showToast('Prompt copied'),
+      () => {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); showToast('Prompt copied'); }
+        catch (e) { showToast('Could not copy — select manually'); }
+        document.body.removeChild(ta);
+      }
+    );
+  }
+
+  function downloadJson() {
+    const s = readForm();
+    const payload = {
+      service: SERVICE_LABEL[s.service],
+      useCase: s.useCase,
+      tool: s.tool,
+      brief: s.brief,
+      dimensions: s.dimensions,
+      tokens: calcTokens(s.brief, s.dimensions),
+      savedTokens: calcSavings(s.dimensions),
+      prompt: renderPromptText(s),
+      generatedAt: new Date().toISOString(),
+      generator: 'MyGentic AI Marketplace v1.0'
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'mygentic-prompt-' + s.tool.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Date.now() + '.json';
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 0);
+    showToast('Prompt downloaded as JSON');
+  }
+
+  function saveToLibrary() {
+    const s = readForm();
+    if (!s.brief) { showToast('Add a brief first'); return; }
+    const id = 'prm_' + Date.now();
+    const entry = {
+      id: id,
+      savedAt: new Date().toISOString(),
+      service: s.service,
+      useCase: s.useCase,
+      tool: s.tool,
+      brief: s.brief,
+      dimensions: s.dimensions,
+      prompt: renderPromptText(s),
+      tokens: calcTokens(s.brief, s.dimensions),
+      savedTokens: calcSavings(s.dimensions)
+    };
+    const list = loadSaved();
+    list.unshift(entry);
+    writeSaved(list);
+    renderSavedList();
+    setLockState(true);
+    showToast('Saved to your library');
+  }
+
+  function loadIntoBuilder(id) {
+    const item = loadSaved().find(p => p.id === id);
+    if (!item) return;
+    document.getElementById('bService').value = item.service;
+    applyServiceCascade(item.service);
+    document.getElementById('bUseCase').value = item.useCase;
+    document.getElementById('bTool').value = item.tool;
+    document.getElementById('bBrief').value = item.brief;
+    renderChips(item.dimensions);
+    renderPrompt();
+    document.getElementById('build').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    showToast('Loaded into builder');
+  }
+
+  function deleteSaved(id) {
+    if (!confirm('Delete this saved prompt? This cannot be undone.')) return;
+    const list = loadSaved().filter(p => p.id !== id);
+    writeSaved(list);
+    renderSavedList();
+    showToast('Prompt deleted');
+  }
+
+  function renderSavedList() {
+    const host = document.getElementById('aimSaved');
+    if (!host) return;
+    const list = loadSaved();
+    if (!list.length) {
+      host.innerHTML = '<div class="aim-saved-empty">Save a prompt above to start your library.</div>';
+      return;
+    }
+    host.innerHTML = list.map(item => {
+      const when = new Date(item.savedAt);
+      const stamp = when.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' · ' +
+                    when.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+      const briefPreview = (item.brief || '').replace(/</g, '&lt;');
+      return ''
+        + '<div class="aim-saved-row" data-id="' + item.id + '">'
+        +   '<div class="aim-saved-meta">'
+        +     '<span class="aim-saved-time">' + stamp + '</span>'
+        +     '<span class="aim-saved-tool">' + item.tool + ' · ' + CAT_LABEL[item.service] + '</span>'
+        +   '</div>'
+        +   '<div class="aim-saved-body">'
+        +     '<p class="aim-saved-brief">' + briefPreview + '</p>'
+        +     '<span class="aim-saved-stats">' + item.tokens + ' tokens · ' + item.savedTokens + '% saved · ' + (item.dimensions || []).join(' · ') + '</span>'
+        +   '</div>'
+        +   '<div class="aim-saved-actions">'
+        +     '<button class="aim-saved-act" data-act="reload" title="Reload into builder"><i class="ph ph-arrow-counter-clockwise"></i></button>'
+        +     '<button class="aim-saved-act" data-act="copy"   title="Copy prompt"><i class="ph ph-copy"></i></button>'
+        +     '<button class="aim-saved-act aim-saved-act-danger" data-act="delete" title="Delete"><i class="ph ph-trash"></i></button>'
+        +   '</div>'
+        + '</div>';
+    }).join('');
+    host.querySelectorAll('.aim-saved-row').forEach(row => {
+      const id = row.dataset.id;
+      row.querySelector('[data-act="reload"]').addEventListener('click', () => loadIntoBuilder(id));
+      row.querySelector('[data-act="copy"]').addEventListener('click', () => {
+        const item = loadSaved().find(p => p.id === id);
+        if (!item) return;
+        navigator.clipboard.writeText(item.prompt).then(
+          () => showToast('Prompt copied'),
+          () => showToast('Could not copy')
+        );
+      });
+      row.querySelector('[data-act="delete"]').addEventListener('click', () => deleteSaved(id));
+    });
+  }
+
+  // ────────────────────────────────────────────────
+  // Sub-tab state
+  // ────────────────────────────────────────────────
+  function syncSubtabs() {
+    const sections = ['discover', 'build', 'saved'];
+    const tabs = document.querySelectorAll('.aim-subtab');
+    // Use viewport position to decide active tab — simpler than IO + handles
+    // jump-link clicks cleanly.
+    function check() {
+      const fold = 220; // px below top counts as "current"
+      let active = sections[0];
+      for (const id of sections) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        const rect = el.getBoundingClientRect();
+        if (rect.top - fold <= 0) active = id;
+      }
+      tabs.forEach(t => t.classList.toggle('is-active', t.dataset.tab === active));
+    }
+    window.addEventListener('scroll', check, { passive: true });
+    check();
+  }
+
+  // ────────────────────────────────────────────────
+  // Init
+  // ────────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', function () {
+    ensureSeeded();
+    renderGrid();
+    document.getElementById('aimFilters').addEventListener('click', (ev) => {
+      const btn = ev.target.closest('.aim-filter');
+      if (!btn) return;
+      applyFilter(btn.dataset.cat);
+    });
+    // Builder init
+    const svc = document.getElementById('bService');
+    applyServiceCascade(svc.value);
+    svc.addEventListener('change', () => { applyServiceCascade(svc.value); renderPrompt(); });
+    ['bUseCase', 'bTool', 'bBrief'].forEach(id => {
+      document.getElementById(id).addEventListener('input', renderPrompt);
+      document.getElementById(id).addEventListener('change', renderPrompt);
+    });
+    document.getElementById('bGenerate').addEventListener('click', (ev) => {
+      ev.preventDefault();
+      // Re-render and mark locked
+      renderPrompt();
+      setTimeout(() => setLockState(true), 160);
+      showToast('Prompt finalized');
+    });
+    document.getElementById('bCopy').addEventListener('click', copyPrompt);
+    document.getElementById('bDownload').addEventListener('click', downloadJson);
+    document.getElementById('bSave').addEventListener('click', saveToLibrary);
+
+    renderSavedList();
+    renderPrompt();
+    syncSubtabs();
+
+    // Deep-link: ai-marketplace.html?prompt=<id> loads that prompt into builder
+    const params = new URLSearchParams(window.location.search);
+    const pid = params.get('prompt');
+    if (pid) loadIntoBuilder(pid);
+  });
+})();
+</script>
+</body>
+</html>
