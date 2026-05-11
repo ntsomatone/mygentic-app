@@ -144,14 +144,18 @@
     align-items: center;
     margin-bottom: 16px;
   }
-  .atlas-room .toggle {
+  .atlas-room .view-toggle {
     display: inline-flex;
-    background: var(--panel-soft);
-    border: 1px solid var(--hair);
-    border-radius: 8px;
+    background: var(--panel-tint);
+    border: 1px solid var(--hair-strong);
+    border-radius: 9px;
     padding: 3px;
+    position: static;
+    width: auto;
+    height: auto;
   }
-  .atlas-room .toggle button {
+  .atlas-room .view-toggle::after { content: none; }
+  .atlas-room .view-toggle button {
     height: 32px;
     padding: 0 16px;
     background: transparent;
@@ -159,12 +163,16 @@
     font-weight: 500;
     color: var(--ink-mute);
     border-radius: 6px;
-    transition: all 200ms var(--ease);
+    outline: 0;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: background 200ms var(--ease), color 200ms var(--ease), box-shadow 200ms var(--ease);
   }
-  .atlas-room .toggle button.active {
+  .atlas-room .view-toggle button:hover:not(.active) { color: var(--ink); }
+  .atlas-room .view-toggle button.active {
     background: var(--panel);
     color: var(--ink);
-    box-shadow: 0 1px 2px rgba(10, 14, 26, 0.06), 0 0 0 1px var(--hair-strong);
+    box-shadow: 0 1px 2px rgba(10, 14, 26, 0.08), 0 0 0 1px var(--hair-strong);
   }
   .atlas-room .legend {
     display: flex;
@@ -558,6 +566,87 @@
   .atlas-room .cta-btn:hover { background: var(--panel-soft); }
   .atlas-room .cta-btn.primary:hover { background: #1A1F2E; }
 
+  /* RECENT CAPTURES (timeline below the stage) */
+  .atlas-room .recent-captures { margin-top: 48px; }
+  .atlas-room .recent-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 18px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .atlas-room .recent-title {
+    font-weight: 500;
+    font-size: 32px;
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .atlas-room .recent-title em {
+    font-family: var(--f-serif);
+    font-weight: 400;
+    font-size: 38px;
+    color: var(--ink);
+    font-style: italic;
+    letter-spacing: -0.015em;
+  }
+  .atlas-room .recent-meta {
+    font-family: var(--f-mono);
+    font-size: 11px;
+    color: var(--ink-mute);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .atlas-room .recent-box {
+    background: var(--panel);
+    border: 1px solid var(--hair);
+    border-radius: 14px;
+    padding: 14px 28px;
+    box-shadow:
+      0 1px 2px rgba(10, 14, 26, 0.04),
+      0 8px 24px rgba(10, 14, 26, 0.04);
+  }
+  .atlas-room .recent-row {
+    display: grid;
+    grid-template-columns: 110px 1fr 56px;
+    align-items: center;
+    gap: 24px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--hair-soft);
+  }
+  .atlas-room .recent-row:last-child { border-bottom: 0; }
+  .atlas-room .recent-day {
+    font-family: var(--f-mono);
+    font-size: 11px;
+    color: var(--ink-mute);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .atlas-room .recent-bar {
+    display: flex;
+    height: 14px;
+    border-radius: 7px;
+    overflow: hidden;
+  }
+  .atlas-room .recent-seg {
+    background: var(--c, var(--ink-mute));
+    height: 100%;
+  }
+  .atlas-room .recent-count {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 26px;
+    color: var(--ink);
+    text-align: right;
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+  }
+  @media (max-width: 900px) {
+    .atlas-room .recent-row { grid-template-columns: 80px 1fr 44px; gap: 14px; }
+  }
+
   /* Reduced motion */
   @media (prefers-reduced-motion: reduce) {
     .atlas-room .conn-shimmer,
@@ -644,9 +733,9 @@
 
       <!-- CONTROLS -->
       <div class="controls">
-        <div class="toggle">
-          <button class="active" data-view="ecosystem">Ecosystem</button>
-          <button data-view="structure">Structure</button>
+        <div class="view-toggle" role="tablist" aria-label="Atlas view">
+          <button class="active" data-view="ecosystem" role="tab" aria-selected="true">Ecosystem</button>
+          <button data-view="structure" role="tab" aria-selected="false">Structure</button>
         </div>
         <div class="legend">
           <span class="legend-item"><span class="legend-swatch facts"></span>Facts</span>
@@ -1193,6 +1282,75 @@
         </svg>
       </div>
 
+      <!-- RECENT CAPTURES -->
+      <section class="recent-captures" aria-label="Recent captures">
+        <div class="recent-head">
+          <h2 class="recent-title">Recent <em>captures.</em></h2>
+          <div class="recent-meta">Last 7 days · 132 captures</div>
+        </div>
+        <div class="recent-box">
+          <div class="recent-row">
+            <div class="recent-day">Today</div>
+            <div class="recent-bar">
+              <span class="recent-seg" style="--c: var(--cat-sage-cat-deep); width: 25%;"></span>
+              <span class="recent-seg" style="--c: var(--cat-pulled-deep); width: 35%;"></span>
+              <span class="recent-seg" style="--c: var(--cat-mcp-deep); width: 22%;"></span>
+              <span class="recent-seg" style="--c: var(--cat-library-deep); width: 18%;"></span>
+            </div>
+            <div class="recent-count">47</div>
+          </div>
+          <div class="recent-row">
+            <div class="recent-day">Yesterday</div>
+            <div class="recent-bar">
+              <span class="recent-seg" style="--c: var(--cat-sage-cat-deep); width: 22%;"></span>
+              <span class="recent-seg" style="--c: var(--cat-pulled-deep); width: 45%;"></span>
+              <span class="recent-seg" style="--c: var(--cat-mcp-deep); width: 33%;"></span>
+            </div>
+            <div class="recent-count">31</div>
+          </div>
+          <div class="recent-row">
+            <div class="recent-day">Mon</div>
+            <div class="recent-bar">
+              <span class="recent-seg" style="--c: var(--cat-pulled-deep); width: 50%;"></span>
+              <span class="recent-seg" style="--c: var(--cat-mcp-deep); width: 50%;"></span>
+            </div>
+            <div class="recent-count">19</div>
+          </div>
+          <div class="recent-row">
+            <div class="recent-day">Sun</div>
+            <div class="recent-bar">
+              <span class="recent-seg" style="--c: var(--cat-sage-cat-deep); width: 100%;"></span>
+            </div>
+            <div class="recent-count">12</div>
+          </div>
+          <div class="recent-row">
+            <div class="recent-day">Sat</div>
+            <div class="recent-bar">
+              <span class="recent-seg" style="--c: var(--cat-pulled-deep); width: 45%;"></span>
+              <span class="recent-seg" style="--c: var(--cat-library-deep); width: 55%;"></span>
+            </div>
+            <div class="recent-count">8</div>
+          </div>
+          <div class="recent-row">
+            <div class="recent-day">Fri</div>
+            <div class="recent-bar">
+              <span class="recent-seg" style="--c: var(--cat-sage-cat-deep); width: 22%;"></span>
+              <span class="recent-seg" style="--c: var(--cat-pulled-deep); width: 50%;"></span>
+              <span class="recent-seg" style="--c: var(--cat-mcp-deep); width: 28%;"></span>
+            </div>
+            <div class="recent-count">9</div>
+          </div>
+          <div class="recent-row">
+            <div class="recent-day">Thu</div>
+            <div class="recent-bar">
+              <span class="recent-seg" style="--c: var(--cat-pulled-deep); width: 65%;"></span>
+              <span class="recent-seg" style="--c: var(--cat-mcp-deep); width: 35%;"></span>
+            </div>
+            <div class="recent-count">6</div>
+          </div>
+        </div>
+      </section>
+
     </div>
 
     <!-- INSPECTOR (fixed-position; lives inside .atlas-room for scoped styles) -->
@@ -1247,11 +1405,15 @@
 
     // STAGE TOGGLE
     const stage = root.querySelector('#stage');
-    const toggleBtns = root.querySelectorAll('.toggle button');
+    const toggleBtns = root.querySelectorAll('.view-toggle button');
     toggleBtns.forEach(btn => {
       btn.addEventListener('click', () => {
-        toggleBtns.forEach(b => b.classList.remove('active'));
+        toggleBtns.forEach(b => {
+          b.classList.remove('active');
+          b.setAttribute('aria-selected', 'false');
+        });
         btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
         stage.classList.remove('ecosystem', 'structure');
         stage.classList.add(btn.dataset.view);
       });
