@@ -115,156 +115,182 @@
     max-width: 680px;
   }
 
-  /* ── Filter chip row (Discover) ── */
-  .aim-filters {
-    display: flex; flex-wrap: wrap; gap: var(--s-2);
-    margin-bottom: var(--s-5);
+  /* ── v2: Horizontal scrollable category rows ── */
+  .aim-discover-rows { display: flex; flex-direction: column; gap: 6px; }
+  .aim-row { margin-bottom: 18px; }
+  .aim-row-hd {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 8px;
   }
-  .aim-filter {
-    display: inline-flex; align-items: center; gap: var(--s-2);
-    padding: 7px 14px;
+  .aim-row-hd-l { display: flex; align-items: center; gap: 8px; }
+  .aim-row-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .aim-row-name {
+    font: 600 13px/1.2 var(--f-body);
+    color: var(--ink);
+  }
+  .aim-row-count {
+    font-family: var(--f-mono); font-size: 10px;
+    color: var(--ink-mute); letter-spacing: 0.06em;
+    padding: 2px 6px;
+    background: #F4F1EB;
     border-radius: 999px;
-    border: 1px solid var(--rule-strong);
-    background: var(--card);
-    color: var(--ink-soft);
-    font: 500 12px/1 var(--f-body);
+  }
+  .aim-row-nav { display: flex; gap: 4px; }
+  .aim-row-btn {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    border: 1px solid rgba(41, 45, 52, 0.18);
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 13px;
     cursor: pointer;
+    display: grid; place-items: center;
+    line-height: 1;
     transition: all 150ms;
   }
-  .aim-filter:hover { color: var(--ink); border-color: var(--ink-faint); }
-  .aim-filter.is-active {
+  .aim-row-btn:hover { border-color: var(--terra); color: var(--terra); }
+  .aim-row-btn.is-disabled { opacity: 0.3; pointer-events: none; }
+
+  .aim-row-track {
+    display: flex; gap: 10px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    padding: 2px 2px 8px;
+    scrollbar-width: none;
+  }
+  .aim-row-track::-webkit-scrollbar { height: 0; display: none; }
+
+  /* v2.2: Wider + shorter card — 360px so exactly 3 fit per row on a
+     1440px viewport with the sidebar. Description trimmed to a single
+     line with ellipsis so card height drops ~40px. */
+  .aim-card {
+    flex: 0 0 360px;
+    background: var(--card);
+    border: 1px solid rgba(41, 45, 52, 0.10);
+    border-radius: 10px;
+    padding: 10px 14px 10px;
+    scroll-snap-align: start;
+    position: relative;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    transition: border-color 150ms, transform 150ms, box-shadow 150ms;
+  }
+  .aim-card:hover {
+    border-color: rgba(41, 45, 52, 0.22);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(20, 17, 15, 0.06);
+  }
+  .aim-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--ac, var(--ink));
+  }
+
+  .aim-card-top {
+    display: flex; align-items: center;
+    gap: 11px;
+    margin-top: 4px;
+  }
+  .aim-card-logo {
+    width: 40px; height: 40px;
+    border-radius: 6px;
+    background: #F4F1EB;
+    flex: 0 0 40px;
+    display: grid; place-items: center;
+    overflow: hidden;
+    position: relative;
+  }
+  .aim-card-logo img {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    padding: 4px;
+  }
+  .aim-card-logo .aim-card-fb {
+    position: absolute; inset: 0;
+    display: none; place-items: center;
+    font-family: var(--f-display);
+    font-size: 20px;
+    color: var(--ac, var(--ink));
+    background: color-mix(in srgb, var(--ac, #292D34) 14%, white);
+  }
+  .aim-card-id { flex: 1; min-width: 0; }
+  .aim-card-name-row {
+    display: flex; align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .aim-card-name {
+    font: 600 14px/1.2 var(--f-body);
+    color: var(--ink);
+  }
+  .aim-card-partner {
+    font-family: var(--f-label);
+    font: italic 700 8px/1 var(--f-label);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 999px;
+    color: var(--terra-deep);
+    background: var(--terra-soft);
+    border: 1px solid var(--terra);
+  }
+  .aim-card-desc {
+    font: 400 11.5px/1.4 var(--f-body);
+    color: var(--ink-mute);
+    margin: 4px 0 0;
+    /* Single-line truncate — wider card means the description still reads cleanly */
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .aim-card-foot {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 6px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(41, 45, 52, 0.06);
+    margin-top: 8px;
+  }
+  .aim-card-goto {
+    display: inline-flex; align-items: center;
+    gap: 4px;
+    font: 600 11px/1 var(--f-body);
+    color: var(--ink);
+    padding: 5px 10px;
+    border: 1px solid rgba(41, 45, 52, 0.18);
+    border-radius: 5px;
+    text-decoration: none;
+    line-height: 1;
+    transition: all 150ms;
+  }
+  .aim-card-goto:hover {
     background: var(--ink);
     color: var(--paper);
     border-color: var(--ink);
   }
-  .aim-filter-dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    display: inline-block;
+  .aim-card-build {
+    font: 600 11px/1 var(--f-body);
+    color: var(--terra);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    line-height: 1;
+    padding: 5px 0;
   }
-  .aim-filter[data-cat="image"]    .aim-filter-dot { background: #A78BFA; }
-  .aim-filter[data-cat="video"]    .aim-filter-dot { background: #49CCF9; }
-  .aim-filter[data-cat="audio"]    .aim-filter-dot { background: #FF8C7A; }
-  .aim-filter[data-cat="agents"]   .aim-filter-dot { background: #10B981; }
-  .aim-filter[data-cat="code"]     .aim-filter-dot { background: #7B68EE; }
-  .aim-filter[data-cat="slides"]   .aim-filter-dot { background: #FFC800; }
+  .aim-card-build:hover { text-decoration: underline; color: var(--terra-deep); }
 
-  /* ── Tool card grid ── */
-  .aim-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--s-4);
-  }
+  /* Below 1100px the row content can't fit 3 wide cards; shrink so 2 fit
+     and the carousel handles the rest. */
   @media (max-width: 1100px) {
-    .aim-grid { grid-template-columns: repeat(2, 1fr); }
+    .aim-card { flex: 0 0 320px; }
   }
-  @media (max-width: 700px) {
-    .aim-grid { grid-template-columns: 1fr; }
+  @media (max-width: 640px) {
+    .aim-row-nav { display: none; }
+    .aim-card { flex: 0 0 280px; }
   }
-
-  .aim-card {
-    background: var(--card);
-    border: 1px solid var(--rule);
-    border-radius: var(--r-lg);
-    padding: var(--s-4);
-    display: flex; flex-direction: column;
-    gap: var(--s-3);
-    transition: all 200ms;
-    position: relative;
-  }
-  .aim-card:hover {
-    border-color: var(--ink-faint);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-pop, 0 6px 24px rgba(20,17,15,0.08));
-  }
-  .aim-card[hidden] { display: none; }
-
-  .aim-card-head {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: var(--s-2);
-  }
-  .aim-card-pills {
-    display: flex; gap: var(--s-2); align-items: center; flex-wrap: wrap;
-  }
-  .aim-cat-pill {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 3px 9px;
-    border-radius: 999px;
-    font: 500 10px/1 var(--f-mono);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-  .aim-cat-pill .dot {
-    width: 6px; height: 6px; border-radius: 50%;
-  }
-  .aim-cat-pill[data-cat="image"]    { background: #EFE9FE; color: #5B3AD1; }
-  .aim-cat-pill[data-cat="image"]    .dot { background: #A78BFA; }
-  .aim-cat-pill[data-cat="video"]    { background: #DAF1FB; color: #1B6B96; }
-  .aim-cat-pill[data-cat="video"]    .dot { background: #49CCF9; }
-  .aim-cat-pill[data-cat="audio"]    { background: #FCE0DA; color: #B33D26; }
-  .aim-cat-pill[data-cat="audio"]    .dot { background: #FF8C7A; }
-  .aim-cat-pill[data-cat="agents"]   { background: #D6F5E5; color: #0A6E45; }
-  .aim-cat-pill[data-cat="agents"]   .dot { background: #10B981; }
-  .aim-cat-pill[data-cat="code"]     { background: #E4DFFE; color: #3A2D9F; }
-  .aim-cat-pill[data-cat="code"]     .dot { background: #7B68EE; }
-  .aim-cat-pill[data-cat="slides"]   { background: #FFF1CC; color: #8C6800; }
-  .aim-cat-pill[data-cat="slides"]   .dot { background: #FFC800; }
-
-  .aim-partner-pill {
-    font: italic 500 10px/1 var(--f-display);
-    letter-spacing: 0.04em;
-    color: var(--terra);
-    padding: 3px 8px;
-    border-radius: 999px;
-    background: var(--terra-tint);
-    border: 1px solid var(--terra-soft);
-  }
-
-  .aim-card-launch {
-    width: 24px; height: 24px;
-    display: inline-flex; align-items: center; justify-content: center;
-    border-radius: 6px;
-    color: var(--ink-mute);
-    border: 1px solid var(--rule);
-    background: var(--paper-2);
-    transition: all 150ms;
-    font-size: 12px;
-  }
-  .aim-card:hover .aim-card-launch {
-    color: var(--terra);
-    border-color: var(--terra-soft);
-    background: var(--terra-tint);
-  }
-
-  .aim-card-name {
-    font: 500 18px/1.2 var(--f-body);
-    color: var(--ink);
-    margin: 0;
-  }
-  .aim-card-tagline {
-    font: 400 13px/1.45 var(--f-body);
-    color: var(--ink-soft);
-    margin: 0;
-    flex: 1;
-  }
-  .aim-card-foot {
-    display: flex; justify-content: space-between; align-items: center;
-    padding-top: var(--s-2);
-    border-top: 1px dashed var(--rule);
-    margin-top: var(--s-1);
-  }
-  .aim-card-meta {
-    font-family: var(--f-mono);
-    font-size: 10px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--ink-faint);
-  }
-  .aim-card-cta {
-    font: 500 12px/1 var(--f-body);
-    color: var(--terra);
-    text-decoration: none;
-  }
-  .aim-card-cta:hover { color: var(--terra-deep); }
 
   /* ── Build a prompt: two-column form + output ── */
   .aim-builder {
@@ -336,6 +362,35 @@
     color: var(--paper);
     border-color: var(--terra);
   }
+
+  /* v2: "Other..." freeform fallback for dropdowns */
+  .bb-other { margin-top: 6px; display: none; }
+  .bb-other.is-on { display: block; }
+  .bb-other input {
+    width: 100%;
+    padding: 7px 10px;
+    font: 400 12px/1.4 var(--f-body);
+    font-family: var(--f-body);
+    border: 1px dashed var(--terra);
+    border-radius: 5px;
+    background: #FFF4EF;
+    color: var(--ink);
+    outline: none;
+    box-sizing: border-box;
+    transition: border-style 150ms;
+  }
+  .bb-other input:focus { border-style: solid; }
+  .bb-hint {
+    font: 500 11px/1.4 var(--f-body);
+    color: var(--terra-deep);
+    background: #FFF4EF;
+    padding: 6px 9px;
+    border-left: 2px solid var(--terra);
+    border-radius: 0 4px 4px 0;
+    margin: -4px 0 6px;
+    display: none;
+  }
+  .bb-hint.is-on { display: block; }
 
   /* Output panel — charcoal */
   .aim-output {
@@ -628,7 +683,7 @@
     <!-- ═══════════════════ DISCOVER ═══════════════════ -->
     <section class="aim-section" id="discover">
       <div class="aim-section-head">
-        <div class="t-label-mono aim-section-eyebrow">Curated catalog · 30 tools</div>
+        <div class="t-label-mono aim-section-eyebrow">Curated catalog · 28 tools</div>
         <h2 class="aim-section-title">Discover what <em>fits your context.</em></h2>
         <p class="aim-section-deck">
           Partner tools first within each category. Click any card to launch with your
@@ -636,18 +691,8 @@
         </p>
       </div>
 
-      <div class="aim-filters" id="aimFilters">
-        <button class="aim-filter is-active" data-cat="all"><i class="ph ph-list"></i> All <span class="filter-count" data-count="all">30</span></button>
-        <button class="aim-filter" data-cat="image"><span class="aim-filter-dot"></span> Image <span class="filter-count" data-count="image">5</span></button>
-        <button class="aim-filter" data-cat="video"><span class="aim-filter-dot"></span> Video <span class="filter-count" data-count="video">5</span></button>
-        <button class="aim-filter" data-cat="audio"><span class="aim-filter-dot"></span> Audio <span class="filter-count" data-count="audio">5</span></button>
-        <button class="aim-filter" data-cat="agents"><span class="aim-filter-dot"></span> Agents <span class="filter-count" data-count="agents">5</span></button>
-        <button class="aim-filter" data-cat="code"><span class="aim-filter-dot"></span> Code <span class="filter-count" data-count="code">5</span></button>
-        <button class="aim-filter" data-cat="slides"><span class="aim-filter-dot"></span> Slides <span class="filter-count" data-count="slides">5</span></button>
-      </div>
-
-      <div class="aim-grid" id="aimGrid">
-        <!-- cards rendered by JS from CATALOG -->
+      <div class="aim-discover-rows" id="aimDiscoverRows">
+        <!-- v2: six horizontal scrollable category rows rendered from CATALOG -->
       </div>
     </section>
 
@@ -670,20 +715,29 @@
             <label class="aim-form-label" for="bService">Service</label>
             <select class="aim-form-select" id="bService">
               <option value="image">Image generation</option>
-              <option value="video">Video generation</option>
-              <option value="audio">Voice &amp; audio</option>
+              <option value="video">Audio/Video</option>
               <option value="agents">Agent orchestration</option>
               <option value="code">Code &amp; build</option>
               <option value="slides">Slides &amp; docs</option>
+              <option value="Other">Other…</option>
             </select>
+            <div class="bb-other" id="bServiceOther">
+              <input type="text" id="bServiceOtherInput" placeholder="Describe the service you need">
+            </div>
           </div>
           <div class="aim-form-field">
             <label class="aim-form-label" for="bUseCase">Use case</label>
             <select class="aim-form-select" id="bUseCase"><!-- cascades --></select>
+            <div class="bb-other" id="bUseCaseOther">
+              <input type="text" id="bUseCaseOtherInput" placeholder="Describe your use case">
+            </div>
           </div>
           <div class="aim-form-field">
             <label class="aim-form-label" for="bTool">Target tool</label>
             <select class="aim-form-select" id="bTool"><!-- cascades --></select>
+            <div class="bb-other" id="bToolOther">
+              <input type="text" id="bToolOtherInput" placeholder="Name the tool you'll use (URL optional)">
+            </div>
           </div>
           <div class="aim-form-field">
             <label class="aim-form-label" for="bBrief">Brief</label>
@@ -692,6 +746,7 @@
           </div>
           <div class="aim-form-field">
             <label class="aim-form-label">Context dimensions to pull</label>
+            <div class="bb-hint" id="bServiceHint">No category match — defaulting to Professional + Aesthetic. Adjust below if needed.</div>
             <div class="aim-chip-group" id="bChips">
               <!-- chips rendered by JS, smart-default toggled on per service -->
             </div>
@@ -767,94 +822,105 @@
   'use strict';
 
   // ────────────────────────────────────────────────
-  // Catalog (30 tools, 5 per category)
-  // Affiliate flag (partner: true) → sorts first within category.
+  // v2 Catalog — 6 categories, 5 tools each, with real domain
+  // for Clearbit logo fetch and url for the "Go to" link.
   // ────────────────────────────────────────────────
-  const CATALOG = [
-    // Image
-    { cat: 'image',  name: 'Midjourney',         tagline: 'High-art image generation with house style baked in.',  partner: true,  url: '#' },
-    { cat: 'image',  name: 'Ideogram',           tagline: 'Type-aware image generation. Posters, packaging, labels.', partner: true, url: '#' },
-    { cat: 'image',  name: 'Recraft',            tagline: 'Brand-consistent vector + raster output with style locks.', partner: true, url: '#' },
-    { cat: 'image',  name: 'Leonardo.AI',        tagline: 'Game-ready assets, characters, environments.',           partner: false, url: '#' },
-    { cat: 'image',  name: 'Adobe Firefly',      tagline: 'Commercial-safe imagery, native in Creative Cloud.',     partner: false, url: '#' },
-
-    // Video
-    { cat: 'video',  name: 'Runway',             tagline: 'Cinematic Gen-3 video, image-to-video, editing.',        partner: true,  url: '#' },
-    { cat: 'video',  name: 'Luma Dream Machine', tagline: 'Smooth realistic motion, great for product reels.',      partner: true,  url: '#' },
-    { cat: 'video',  name: 'HeyGen',             tagline: 'Talking-head avatars in 40+ languages.',                  partner: true,  url: '#' },
-    { cat: 'video',  name: 'Pika',               tagline: 'Quick stylized video clips and effects.',                partner: false, url: '#' },
-    { cat: 'video',  name: 'Kling',              tagline: 'High-fidelity action sequences and motion design.',       partner: false, url: '#' },
-
-    // Audio
-    { cat: 'audio',  name: 'ElevenLabs',         tagline: 'Voice cloning + TTS that sounds like a human.',           partner: true,  url: '#' },
-    { cat: 'audio',  name: 'Udio',               tagline: 'Music generation with structure controls.',              partner: true,  url: '#' },
-    { cat: 'audio',  name: 'Descript',           tagline: 'Audio editing by editing the transcript. Studio-grade.', partner: true,  url: '#' },
-    { cat: 'audio',  name: 'Suno',               tagline: 'Fast lyric-to-song generation.',                          partner: false, url: '#' },
-    { cat: 'audio',  name: 'PlayHT',             tagline: 'Realtime voice cloning for production workflows.',        partner: false, url: '#' },
-
-    // Agent orchestration
-    { cat: 'agents', name: 'n8n',                tagline: 'Self-hostable workflow automation with AI nodes.',         partner: true,  url: '#' },
-    { cat: 'agents', name: 'Relevance AI',       tagline: 'No-code multi-agent teams with memory.',                  partner: true,  url: '#' },
-    { cat: 'agents', name: 'Lindy',              tagline: 'Personal AI agents for calendars, inbox, research.',     partner: true,  url: '#' },
-    { cat: 'agents', name: 'Make',               tagline: 'Visual scenario builder. 1,500+ integrations.',           partner: false, url: '#' },
-    { cat: 'agents', name: 'Crew AI',            tagline: 'Open-source multi-agent role coordination.',              partner: false, url: '#' },
-
-    // Code & build
-    { cat: 'code',   name: 'Lovable',            tagline: 'Full-stack app generator from natural language.',          partner: true,  url: '#' },
-    { cat: 'code',   name: 'v0',                 tagline: 'UI generation from prompts. Ships to Vercel.',             partner: true,  url: '#' },
-    { cat: 'code',   name: 'Replit Agent',       tagline: 'End-to-end app build inside a sandbox.',                   partner: true,  url: '#' },
-    { cat: 'code',   name: 'Cursor',             tagline: 'AI-native code editor with agent mode.',                   partner: false, url: '#' },
-    { cat: 'code',   name: 'Bolt.new',           tagline: 'Browser-based stack scaffold with live preview.',          partner: false, url: '#' },
-
-    // Slides & docs
-    { cat: 'slides', name: 'Gamma',              tagline: 'AI presentation builder. Slides, docs, sites.',           partner: true,  url: '#' },
-    { cat: 'slides', name: 'Beautiful.AI',       tagline: 'Smart slide templates for execs and operators.',          partner: true,  url: '#' },
-    { cat: 'slides', name: 'Canva AI',           tagline: 'Brand-aware decks, docs, and social posts.',              partner: true,  url: '#' },
-    { cat: 'slides', name: 'Tome',               tagline: 'Narrative-first AI decks.',                                partner: false, url: '#' },
-    { cat: 'slides', name: 'Decktopus',          tagline: 'Pitch decks from a single sentence brief.',                partner: false, url: '#' }
-  ];
+  const CATALOG = {
+    image: {
+      name: 'Image generation', accent: '#A78BFA',
+      tools: [
+        { name: 'Midjourney',     domain: 'midjourney.com',     url: 'https://www.midjourney.com',           desc: 'High-art diffusion with house style baked in.',     partner: true  },
+        { name: 'Ideogram',       domain: 'ideogram.ai',        url: 'https://ideogram.ai',                  desc: 'Type-aware images. Posters, labels, signage.',       partner: true  },
+        { name: 'Recraft',        domain: 'recraft.ai',         url: 'https://www.recraft.ai',               desc: 'Brand-locked vector + raster output.',               partner: true  },
+        { name: 'Leonardo.AI',    domain: 'leonardo.ai',        url: 'https://leonardo.ai',                  desc: 'Game-ready assets, characters, environments.',       partner: false },
+        { name: 'Adobe Firefly',  domain: 'adobe.com',          url: 'https://firefly.adobe.com',            desc: 'Commercial-safe imagery in Creative Cloud.',         partner: false }
+      ]
+    },
+    // v2.1: Audio + Video merged into one Audio/Video row. Kept video's
+    // cyan accent since video now dominates the count (5 of 8). Dropped
+    // the bottom two audio tools (Suno, PlayHT) per user direction.
+    video: {
+      name: 'Audio/Video', accent: '#49CCF9',
+      tools: [
+        { name: 'Runway',         domain: 'runwayml.com',       url: 'https://runwayml.com',                 desc: 'Gen-3 video, image-to-video, editing.',              partner: true  },
+        { name: 'Luma Dream',     domain: 'lumalabs.ai',        url: 'https://lumalabs.ai/dream-machine',    desc: 'High-fidelity motion from a single still.',          partner: true  },
+        { name: 'HeyGen',         domain: 'heygen.com',         url: 'https://www.heygen.com',               desc: 'Avatar video, multi-language voiceover.',            partner: true  },
+        { name: 'ElevenLabs',     domain: 'elevenlabs.io',      url: 'https://elevenlabs.io',                desc: 'Studio-grade voice synth and cloning.',              partner: true  },
+        { name: 'Udio',           domain: 'udio.com',           url: 'https://www.udio.com',                 desc: 'Music generation, vocals and stems.',                partner: true  },
+        { name: 'Descript',       domain: 'descript.com',       url: 'https://www.descript.com',             desc: 'Edit audio by editing the transcript.',              partner: true  },
+        { name: 'Pika',           domain: 'pika.art',           url: 'https://pika.art',                     desc: 'Fast, playful short-form video gen.',                partner: false },
+        { name: 'Kling',          domain: 'klingai.com',        url: 'https://klingai.com',                  desc: 'Cinematic long-form video synthesis.',               partner: false }
+      ]
+    },
+    agents: {
+      name: 'Agent orchestration', accent: '#10B981',
+      tools: [
+        { name: 'n8n',            domain: 'n8n.io',             url: 'https://n8n.io',                       desc: 'Visual orchestration for agent workflows.',          partner: true  },
+        { name: 'Relevance AI',   domain: 'relevance.ai',       url: 'https://relevance.ai',                 desc: 'No-code AI agents and team automations.',            partner: true  },
+        { name: 'Lindy',          domain: 'lindy.ai',           url: 'https://www.lindy.ai',                 desc: 'Personal AI assistants for ops and inbox.',          partner: true  },
+        { name: 'Make',           domain: 'make.com',           url: 'https://www.make.com',                 desc: 'Drag-and-drop scenario automation.',                 partner: false },
+        { name: 'Crew AI',        domain: 'crewai.com',         url: 'https://www.crewai.com',               desc: 'Role-based multi-agent crews.',                      partner: false }
+      ]
+    },
+    code: {
+      name: 'Code & build', accent: '#7B68EE',
+      tools: [
+        { name: 'Lovable',        domain: 'lovable.dev',        url: 'https://lovable.dev',                  desc: 'Full-stack apps from a prompt.',                     partner: true  },
+        { name: 'v0 by Vercel',   domain: 'v0.dev',             url: 'https://v0.dev',                       desc: 'UI components, generated and refined.',              partner: true  },
+        { name: 'Replit Agent',   domain: 'replit.com',         url: 'https://replit.com',                   desc: 'Agentic IDE that ships full projects.',              partner: true  },
+        { name: 'Cursor',         domain: 'cursor.com',         url: 'https://www.cursor.com',               desc: 'AI-native IDE with code-aware agents.',              partner: false },
+        { name: 'Bolt.new',       domain: 'bolt.new',           url: 'https://bolt.new',                     desc: 'Browser-native dev environment.',                    partner: false }
+      ]
+    },
+    slides: {
+      name: 'Slides & docs', accent: '#FFC800',
+      tools: [
+        { name: 'Gamma',          domain: 'gamma.app',          url: 'https://gamma.app',                    desc: 'AI-generated decks, docs, webpages.',                partner: true  },
+        { name: 'Beautiful.AI',   domain: 'beautiful.ai',       url: 'https://www.beautiful.ai',             desc: 'Smart slide templates that adapt.',                  partner: true  },
+        { name: 'Canva AI',       domain: 'canva.com',          url: 'https://www.canva.com',                desc: 'AI inside the design tool you know.',                partner: true  },
+        { name: 'Tome',           domain: 'tome.app',           url: 'https://tome.app',                     desc: 'Sales narratives and pitch decks.',                  partner: false },
+        { name: 'Decktopus',      domain: 'decktopus.com',      url: 'https://www.decktopus.com',            desc: 'AI presentations with one prompt.',                  partner: false }
+      ]
+    }
+  };
 
   const CAT_LABEL = {
-    image: 'Image', video: 'Video', audio: 'Audio',
+    image: 'Image', video: 'Audio/Video',
     agents: 'Agents', code: 'Code', slides: 'Slides'
   };
 
-  // Service → use case list
+  // Service → use case list (audio merged into video)
   const USE_CASES = {
     image:  ['Social media campaign', 'Hero image for landing page', 'Product mockup', 'Editorial illustration', 'Brand asset variations'],
-    video:  ['Launch teaser', 'Tutorial walkthrough', 'Talking-head explainer', 'Animated explainer', 'Short social reel'],
-    audio:  ['Podcast voiceover', 'Product demo narration', 'Music for video', 'Voice clone for outreach', 'Audio summary of a doc'],
+    video:  ['Launch teaser', 'Tutorial walkthrough', 'Talking-head explainer', 'Short social reel', 'Podcast voiceover', 'Music for video', 'Voice clone for outreach', 'Audio summary of a doc'],
     agents: ['Lead enrichment flow', 'Daily digest', 'Multi-step research', 'CRM sync pipeline', 'Notion → email workflow'],
     code:   ['New app scaffold', 'Component generation', 'Refactor pass', 'Test suite scaffolding', 'Quick prototype'],
     slides: ['Investor pitch', 'Quarterly review', 'Workshop deck', 'One-pager handout', 'Conference talk']
   };
 
-  // Service → tool short-list (used by builder dropdown)
-  const SERVICE_TOOLS = {
-    image:  ['Midjourney', 'Ideogram', 'Recraft', 'Leonardo.AI', 'Adobe Firefly'],
-    video:  ['Runway', 'Luma Dream Machine', 'HeyGen', 'Pika', 'Kling'],
-    audio:  ['ElevenLabs', 'Udio', 'Descript', 'Suno', 'PlayHT'],
-    agents: ['n8n', 'Relevance AI', 'Lindy', 'Make', 'Crew AI'],
-    code:   ['Lovable', 'v0', 'Replit Agent', 'Cursor', 'Bolt.new'],
-    slides: ['Gamma', 'Beautiful.AI', 'Canva AI', 'Tome', 'Decktopus']
-  };
+  // Service → tool short-list (used by builder dropdown — derived from CATALOG.tools[].name)
+  const SERVICE_TOOLS = Object.keys(CATALOG).reduce((acc, k) => {
+    acc[k] = CATALOG[k].tools.map(t => t.name);
+    return acc;
+  }, {});
 
-  // Service label
+  // Service label (audio merged into video display label)
   const SERVICE_LABEL = {
     image: 'Image generation',
-    video: 'Video generation',
-    audio: 'Voice & audio',
+    video: 'Audio/Video',
     agents: 'Agent orchestration',
     code: 'Code & build',
-    slides: 'Slides & docs'
+    slides: 'Slides & docs',
+    Other: 'Other (custom)'
   };
 
   // Context dimensions and their default-on per service
   const ALL_DIMS = ['Aesthetic', 'Consumer', 'Interests', 'Communication', 'Professional', 'Work Life'];
   const DEFAULT_DIMS = {
     image:  ['Aesthetic', 'Consumer', 'Interests'],
-    video:  ['Aesthetic', 'Consumer', 'Professional'],
-    audio:  ['Communication', 'Professional'],
+    // v2.1: Audio/Video gets a slightly broader default — Aesthetic for the
+    // visual side, Communication for voice/dialogue, Professional for context.
+    video:  ['Aesthetic', 'Communication', 'Professional'],
     agents: ['Professional', 'Work Life'],
     code:   ['Professional', 'Work Life'],
     slides: ['Professional', 'Aesthetic']
@@ -918,47 +984,107 @@
   }
 
   // ────────────────────────────────────────────────
-  // DISCOVER grid render + filter
+  // v2: Render 6 horizontal category rows. Partner tools sort first
+  // within each row. Each card carries an --ac CSS variable for the
+  // top accent stripe.
   // ────────────────────────────────────────────────
-  function sortedCatalog() {
-    // Partner cards sort first within each category. Stable order otherwise.
-    return CATALOG.slice().sort((a, b) => {
-      if (a.cat !== b.cat) return 0;
-      return (b.partner ? 1 : 0) - (a.partner ? 1 : 0);
+  function escapeAttr(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function renderCatalog() {
+    const container = document.getElementById('aimDiscoverRows');
+    if (!container) return;
+    container.innerHTML = '';
+    Object.keys(CATALOG).forEach(catKey => {
+      const cat = CATALOG[catKey];
+      const sortedTools = cat.tools.slice().sort((a, b) => (b.partner ? 1 : 0) - (a.partner ? 1 : 0));
+      const row = document.createElement('div');
+      row.className = 'aim-row';
+      row.dataset.cat = catKey;
+      row.innerHTML = ''
+        + '<div class="aim-row-hd">'
+        +   '<div class="aim-row-hd-l">'
+        +     '<span class="aim-row-dot" style="background:' + cat.accent + '"></span>'
+        +     '<span class="aim-row-name">' + cat.name + '</span>'
+        +     '<span class="aim-row-count">' + sortedTools.length + '</span>'
+        +   '</div>'
+        +   '<div class="aim-row-nav">'
+        +     '<button class="aim-row-btn" data-dir="-1" aria-label="Scroll left">‹</button>'
+        +     '<button class="aim-row-btn" data-dir="1" aria-label="Scroll right">›</button>'
+        +   '</div>'
+        + '</div>'
+        + '<div class="aim-row-track">'
+        +   sortedTools.map(t => {
+              const initial = escapeAttr(t.name.charAt(0));
+              const partner = t.partner ? '<span class="aim-card-partner">Partner</span>' : '';
+              return ''
+                + '<div class="aim-card" style="--ac:' + cat.accent + '">'
+                +   '<div class="aim-card-top">'
+                +     '<div class="aim-card-logo">'
+                // Clearbit's free logo API was retired in 2025. icon.horse is a
+                // drop-in replacement with broader coverage; the inline onerror
+                // falls back to the initial-letter tile for any 404/504.
+                +       '<img src="https://icon.horse/icon/' + escapeAttr(t.domain) + '" '
+                +            'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'" '
+                +            'alt="' + escapeAttr(t.name) + ' logo">'
+                +       '<div class="aim-card-fb">' + initial + '</div>'
+                +     '</div>'
+                +     '<div class="aim-card-id">'
+                +       '<div class="aim-card-name-row">'
+                +         '<span class="aim-card-name">' + escapeAttr(t.name) + '</span>'
+                +         partner
+                +       '</div>'
+                +       '<div class="aim-card-desc">' + escapeAttr(t.desc) + '</div>'
+                +     '</div>'
+                +   '</div>'
+                +   '<div class="aim-card-foot">'
+                +     '<a href="' + escapeAttr(t.url) + '" target="_blank" rel="noopener" class="aim-card-goto">Go to <i class="ph ph-arrow-up-right"></i></a>'
+                +     '<button class="aim-card-build" data-tool="' + escapeAttr(t.name) + '" data-cat="' + catKey + '">Build prompt →</button>'
+                +   '</div>'
+                + '</div>';
+            }).join('')
+        + '</div>';
+      container.appendChild(row);
+    });
+    wireCarousels();
+    wireCardBuildButtons();
+  }
+
+  function wireCarousels() {
+    document.querySelectorAll('#aimDiscoverRows .aim-row').forEach(row => {
+      const track = row.querySelector('.aim-row-track');
+      const btns  = row.querySelectorAll('.aim-row-btn');
+      const left  = btns[0];
+      const right = btns[1];
+      if (!track || !left || !right) return;
+      function updateArrows() {
+        const atStart = track.scrollLeft <= 2;
+        const atEnd   = track.scrollLeft + track.clientWidth >= track.scrollWidth - 2;
+        left.classList.toggle('is-disabled', atStart);
+        right.classList.toggle('is-disabled', atEnd);
+      }
+      // v2.2: Advance by one card width per click. Measures the first card's
+      // outerWidth + gap so this stays correct across the responsive widths
+      // (360 desktop / 320 tablet / 280 mobile).
+      function step() {
+        const c = track.querySelector('.aim-card');
+        return c ? (c.getBoundingClientRect().width + 10) : 370;
+      }
+      left .addEventListener('click', () => track.scrollBy({ left: -step(), behavior: 'smooth' }));
+      right.addEventListener('click', () => track.scrollBy({ left:  step(), behavior: 'smooth' }));
+      track.addEventListener('scroll', updateArrows, { passive: true });
+      // updateArrows on next frame so layout is settled
+      requestAnimationFrame(updateArrows);
     });
   }
 
-  function renderGrid() {
-    const grid = document.getElementById('aimGrid');
-    if (!grid) return;
-    const cards = sortedCatalog().map(t => {
-      const partnerPill = t.partner
-        ? '<span class="aim-partner-pill">Partner</span>' : '';
-      return ''
-        + '<article class="aim-card" data-cat="' + t.cat + '">'
-        +   '<div class="aim-card-head">'
-        +     '<div class="aim-card-pills">'
-        +       '<span class="aim-cat-pill" data-cat="' + t.cat + '"><span class="dot"></span>' + CAT_LABEL[t.cat] + '</span>'
-        +       partnerPill
-        +     '</div>'
-        +     '<a href="' + t.url + '" class="aim-card-launch" aria-label="Launch ' + t.name + '" title="Launch with context"><i class="ph ph-arrow-up-right"></i></a>'
-        +   '</div>'
-        +   '<h3 class="aim-card-name">' + t.name + '</h3>'
-        +   '<p class="aim-card-tagline">' + t.tagline + '</p>'
-        +   '<div class="aim-card-foot">'
-        +     '<span class="aim-card-meta">Launch ready</span>'
-        +     '<a href="#build" class="aim-card-cta" data-tool="' + t.name + '" data-cat="' + t.cat + '">Build a prompt →</a>'
-        +   '</div>'
-        + '</article>';
-    }).join('');
-    grid.innerHTML = cards;
-
-    // Wire "Build a prompt →" to pre-populate the builder
-    grid.querySelectorAll('[data-tool]').forEach(a => {
-      a.addEventListener('click', (ev) => {
+  function wireCardBuildButtons() {
+    document.querySelectorAll('#aimDiscoverRows .aim-card-build').forEach(btn => {
+      btn.addEventListener('click', (ev) => {
         ev.preventDefault();
-        const cat = a.dataset.cat;
-        const tool = a.dataset.tool;
+        const cat = btn.dataset.cat;
+        const tool = btn.dataset.tool;
         const svcSel = document.getElementById('bService');
         svcSel.value = cat;
         applyServiceCascade(cat);
@@ -972,16 +1098,6 @@
     });
   }
 
-  function applyFilter(cat) {
-    const cards = document.querySelectorAll('.aim-card');
-    cards.forEach(c => {
-      c.hidden = (cat !== 'all' && c.dataset.cat !== cat);
-    });
-    document.querySelectorAll('.aim-filter').forEach(b => {
-      b.classList.toggle('is-active', b.dataset.cat === cat);
-    });
-  }
-
   // ────────────────────────────────────────────────
   // BUILDER — cascading dropdowns, live prompt
   // ────────────────────────────────────────────────
@@ -990,9 +1106,36 @@
   }
 
   function applyServiceCascade(service) {
-    fillSelect(document.getElementById('bUseCase'), USE_CASES[service], USE_CASES[service][0]);
-    fillSelect(document.getElementById('bTool'),    SERVICE_TOOLS[service], SERVICE_TOOLS[service][0]);
-    renderChips(DEFAULT_DIMS[service]);
+    const isOther = (service === 'Other');
+    // Service's own freeform wrapper toggles regardless of branch.
+    setOtherVisible('bServiceOther', isOther);
+    if (isOther) {
+      // Service is custom — repopulate Use Case and Tool with just "Other…" and
+      // surface their freeform inputs. Smart defaults can't map so we drop to
+      // Professional + Aesthetic and show a hint.
+      fillSelect(document.getElementById('bUseCase'), ['Other'], 'Other');
+      fillSelect(document.getElementById('bTool'),    ['Other'], 'Other');
+      setOtherVisible('bUseCaseOther', true);
+      setOtherVisible('bToolOther', true);
+      setHintVisible('bServiceHint', true);
+      renderChips(['Professional', 'Aesthetic']);
+    } else {
+      fillSelect(document.getElementById('bUseCase'), USE_CASES[service], USE_CASES[service][0]);
+      fillSelect(document.getElementById('bTool'),    SERVICE_TOOLS[service], SERVICE_TOOLS[service][0]);
+      setOtherVisible('bUseCaseOther', false);
+      setOtherVisible('bToolOther',    false);
+      setHintVisible('bServiceHint', false);
+      renderChips(DEFAULT_DIMS[service]);
+    }
+  }
+
+  function setOtherVisible(id, on) {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('is-on', !!on);
+  }
+  function setHintVisible(id, on) {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('is-on', !!on);
   }
 
   function renderChips(onDims) {
@@ -1014,13 +1157,29 @@
     return Array.from(document.querySelectorAll('#bChips .aim-chip.is-on')).map(b => b.dataset.dim);
   }
 
+  // v2: Resolve "Other" selection by reading the adjacent freeform input.
+  // Returns the input's value if non-empty, else a polite "unspecified" stub.
+  function getFieldValue(selectId, otherWrapId) {
+    const sel = document.getElementById(selectId);
+    if (!sel) return '';
+    if (sel.value === 'Other') {
+      const inp = document.querySelector('#' + otherWrapId + ' input');
+      const v = (inp && inp.value || '').trim();
+      return v || 'unspecified';
+    }
+    return sel.value;
+  }
+
   function readForm() {
     return {
-      service: document.getElementById('bService').value,
-      useCase: document.getElementById('bUseCase').value,
-      tool:    document.getElementById('bTool').value,
+      service: getFieldValue('bService',  'bServiceOther'),
+      useCase: getFieldValue('bUseCase',  'bUseCaseOther'),
+      tool:    getFieldValue('bTool',     'bToolOther'),
       brief:   document.getElementById('bBrief').value.trim(),
-      dimensions: activeDims()
+      dimensions: activeDims(),
+      // Surface the raw service-select value so renderPromptText can decide
+      // whether to use SERVICE_LABEL or the user's freeform service name.
+      _serviceSelectValue: document.getElementById('bService').value
     };
   }
 
@@ -1154,12 +1313,21 @@
     const s = readForm();
     if (!s.brief) { showToast('Add a brief first'); return; }
     const id = 'prm_' + Date.now();
+    const isOtherService = s._serviceSelectValue === 'Other';
+    const useCaseSelVal  = document.getElementById('bUseCase').value;
+    const toolSelVal     = document.getElementById('bTool').value;
     const entry = {
       id: id,
       savedAt: new Date().toISOString(),
-      service: s.service,
-      useCase: s.useCase,
-      tool: s.tool,
+      // Keep `service` as a category-key string for CAT_LABEL lookups.
+      // When Other, surface the freeform name on `customService` so any
+      // downstream renderer (saved list, History) can decide what to show.
+      service: s._serviceSelectValue,
+      customService: isOtherService ? s.service : null,
+      useCase: useCaseSelVal === 'Other' ? s.useCase : s.useCase,
+      customUseCase: useCaseSelVal === 'Other' ? s.useCase : null,
+      tool: toolSelVal === 'Other' ? s.tool : s.tool,
+      customTool: toolSelVal === 'Other' ? s.tool : null,
       brief: s.brief,
       dimensions: s.dimensions,
       prompt: renderPromptText(s),
@@ -1177,10 +1345,31 @@
   function loadIntoBuilder(id) {
     const item = loadSaved().find(p => p.id === id);
     if (!item) return;
-    document.getElementById('bService').value = item.service;
+    const svcEl = document.getElementById('bService');
+    svcEl.value = item.service;
     applyServiceCascade(item.service);
-    document.getElementById('bUseCase').value = item.useCase;
-    document.getElementById('bTool').value = item.tool;
+
+    // If this saved prompt used "Other", repopulate the freeform inputs.
+    if (item.service === 'Other') {
+      const inp = document.getElementById('bServiceOtherInput');
+      if (inp) inp.value = item.customService || '';
+    }
+    if (item.customUseCase) {
+      const u = document.getElementById('bUseCaseOtherInput');
+      if (u) u.value = item.customUseCase;
+    }
+    if (item.customTool) {
+      const t = document.getElementById('bToolOtherInput');
+      if (t) t.value = item.customTool;
+    }
+
+    // Set the cascaded dropdowns only if the saved values match an option;
+    // otherwise leave them at the default "Other…" and rely on freeform.
+    const uSel = document.getElementById('bUseCase');
+    if (uSel && Array.from(uSel.options).some(o => o.value === item.useCase)) uSel.value = item.useCase;
+    const tSel = document.getElementById('bTool');
+    if (tSel && Array.from(tSel.options).some(o => o.value === item.tool))    tSel.value = item.tool;
+
     document.getElementById('bBrief').value = item.brief;
     renderChips(item.dimensions);
     renderPrompt();
@@ -1209,11 +1398,15 @@
       const stamp = when.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' · ' +
                     when.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
       const briefPreview = (item.brief || '').replace(/</g, '&lt;');
+      const toolLabel = item.customTool || item.tool;
+      const catLabel  = item.service === 'Other'
+        ? (item.customService || 'Custom')
+        : (CAT_LABEL[item.service] || item.service);
       return ''
         + '<div class="aim-saved-row" data-id="' + item.id + '">'
         +   '<div class="aim-saved-meta">'
         +     '<span class="aim-saved-time">' + stamp + '</span>'
-        +     '<span class="aim-saved-tool">' + item.tool + ' · ' + CAT_LABEL[item.service] + '</span>'
+        +     '<span class="aim-saved-tool">' + toolLabel + ' · ' + catLabel + '</span>'
         +   '</div>'
         +   '<div class="aim-saved-body">'
         +     '<p class="aim-saved-brief">' + briefPreview + '</p>'
@@ -1269,23 +1462,35 @@
   // ────────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', function () {
     ensureSeeded();
-    renderGrid();
-    document.getElementById('aimFilters').addEventListener('click', (ev) => {
-      const btn = ev.target.closest('.aim-filter');
-      if (!btn) return;
-      applyFilter(btn.dataset.cat);
-    });
+    renderCatalog();
+
     // Builder init
     const svc = document.getElementById('bService');
     applyServiceCascade(svc.value);
     svc.addEventListener('change', () => { applyServiceCascade(svc.value); renderPrompt(); });
-    ['bUseCase', 'bTool', 'bBrief'].forEach(id => {
-      document.getElementById(id).addEventListener('input', renderPrompt);
-      document.getElementById(id).addEventListener('change', renderPrompt);
+
+    // Use Case and Tool selects: show/hide their freeform input on Other,
+    // then re-render the prompt so the output panel reflects the change.
+    ['bUseCase', 'bTool'].forEach(selId => {
+      const sel = document.getElementById(selId);
+      sel.addEventListener('change', () => {
+        const otherWrap = selId === 'bUseCase' ? 'bUseCaseOther' : 'bToolOther';
+        setOtherVisible(otherWrap, sel.value === 'Other');
+        renderPrompt();
+      });
     });
+
+    // Brief textarea
+    document.getElementById('bBrief').addEventListener('input', renderPrompt);
+
+    // Freeform "Other..." inputs trigger live prompt updates too
+    ['bServiceOtherInput', 'bUseCaseOtherInput', 'bToolOtherInput'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', renderPrompt);
+    });
+
     document.getElementById('bGenerate').addEventListener('click', (ev) => {
       ev.preventDefault();
-      // Re-render and mark locked
       renderPrompt();
       setTimeout(() => setLockState(true), 160);
       showToast('Prompt finalized');
