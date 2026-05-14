@@ -6,6 +6,10 @@
 <title>Expert Libraries · MyGentic</title>
 <link rel="stylesheet" href="app.css" />
 <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" />
 
 <style>
 
@@ -433,6 +437,581 @@
   }
   .market-publish-link:hover { color: #1F8F3A; }
 
+  /* ============================================================
+     LIBRARY PREVIEW MODAL
+     Provider branded. Theme class on .lib-modal sets CSS vars,
+     structural CSS reads them. AI District will use a sibling
+     theme class with its own palette.
+     Hidden by default. JS-off: never renders.
+     ============================================================ */
+
+  /* Theme: Industry Rockstar */
+  .lib-modal-theme-ir {
+    --m-bg: #0A1129;
+    --m-surface: #141C3D;
+    --m-text: #FFFFFF;
+    --m-text-soft: rgba(255,255,255,0.68);
+    --m-text-faint: rgba(255,255,255,0.42);
+    --m-border: rgba(255,255,255,0.08);
+    --m-accent-1: #3DCDF6;
+    --m-accent-2: #9747FF;
+    --m-accent-3: #E94EBD;
+    --m-grad: linear-gradient(135deg, #3DCDF6 0%, #9747FF 55%, #E94EBD 100%);
+    --m-star: #5BB8E8;
+    --m-font: 'Manrope', system-ui, sans-serif;
+    --m-radius: 18px;
+    --m-shadow:
+      0 24px 80px rgba(0, 0, 0, 0.7),
+      0 0 60px rgba(61, 205, 246, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    --m-border-color: rgba(151, 71, 255, 0.25);
+  }
+
+  /* Overlay */
+  .lib-modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    z-index: 200;
+    background: rgba(4, 7, 20, 0.78);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: var(--s-4);
+    overflow-y: auto;
+  }
+  .lib-modal-overlay.is-open {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    animation: libModalFade var(--t-mid) ease-out;
+  }
+  @keyframes libModalFade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @media (min-width: 900px) {
+    .lib-modal-overlay.is-open { align-items: center; }
+  }
+
+  /* Panel */
+  .lib-modal {
+    position: relative;
+    width: 100%;
+    max-width: 1080px;
+    max-height: calc(100vh - var(--s-7));
+    overflow-y: auto;
+    background: var(--m-bg);
+    border: 1px solid var(--m-border-color);
+    border-radius: var(--m-radius);
+    box-shadow: var(--m-shadow);
+    font-family: var(--m-font);
+    color: var(--m-text);
+    animation: libModalRise var(--t-mid) ease-out;
+  }
+  @keyframes libModalRise {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  /* Top gradient hairline */
+  .lib-modal::before {
+    content: "";
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--m-grad);
+    border-radius: var(--m-radius) var(--m-radius) 0 0;
+    z-index: 1;
+  }
+  .lib-modal::-webkit-scrollbar { width: 8px; }
+  .lib-modal::-webkit-scrollbar-track { background: transparent; }
+  .lib-modal::-webkit-scrollbar-thumb {
+    background: rgba(151, 71, 255, 0.25);
+    border-radius: 8px;
+  }
+  .lib-modal::-webkit-scrollbar-thumb:hover { background: rgba(151, 71, 255, 0.45); }
+
+  /* Close button */
+  .lib-modal-close {
+    position: absolute; top: 16px; right: 16px;
+    width: 36px; height: 36px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+    color: rgba(255, 255, 255, 0.75);
+    cursor: pointer;
+    transition: background var(--t-fast), color var(--t-fast), transform var(--t-fast), border-color var(--t-fast);
+    z-index: 3;
+  }
+  .lib-modal-close i { font-size: 16px; }
+  .lib-modal-close:hover {
+    background: var(--m-grad);
+    color: #FFFFFF;
+    border-color: transparent;
+    transform: rotate(90deg);
+  }
+
+  /* Top bar: brand + category + rating */
+  .lib-modal-bar {
+    display: flex; align-items: center; gap: var(--s-3);
+    padding: var(--s-5) var(--s-6) 0;
+    flex-wrap: wrap;
+  }
+  .lib-modal-brand {
+    display: inline-flex; align-items: center; gap: 10px;
+  }
+  .lib-modal-brand-mark {
+    width: 36px; height: 36px;
+    border-radius: 999px;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .lib-modal-brand-mark svg { display: block; }
+  .lib-modal-brand-text {
+    display: flex; flex-direction: column;
+    line-height: 1.1;
+    gap: 2px;
+  }
+  .lib-modal-brand-name {
+    font-family: var(--m-font);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #FFFFFF;
+  }
+  .lib-modal-brand-sub {
+    font-family: var(--m-font);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--m-text-faint);
+  }
+  .lib-modal-cat {
+    display: inline-flex; align-items: center;
+    padding: 5px 11px;
+    background: rgba(61, 205, 246, 0.1);
+    border: 1px solid rgba(61, 205, 246, 0.3);
+    border-radius: 999px;
+    font-family: var(--m-font);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--m-accent-1);
+  }
+  .lib-modal-rating {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-family: var(--m-font);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--m-text-soft);
+  }
+  .lib-modal-rating i { color: var(--m-star); font-size: 14px; }
+  .lib-modal-eyebrow {
+    margin-left: auto;
+    font-family: var(--m-font);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--m-text-faint);
+  }
+
+  /* Hero */
+  .lib-modal-hero {
+    display: grid;
+    grid-template-columns: 1fr 1.05fr;
+    gap: var(--s-5);
+    padding: var(--s-4) var(--s-6) var(--s-6);
+    align-items: start;
+  }
+  @media (max-width: 880px) {
+    .lib-modal-hero { grid-template-columns: 1fr; gap: var(--s-4); }
+  }
+  .lib-modal-hero-title {
+    font-family: var(--m-font);
+    font-weight: 800;
+    font-size: clamp(32px, 4vw, 48px);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    color: var(--m-text);
+    margin: 0 0 var(--s-2);
+  }
+  .lib-modal-hero-title .grad,
+  .lib-modal-section-title .grad,
+  .lib-modal-price-head .grad {
+    background: var(--m-grad);
+    -webkit-background-clip: text;
+            background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+  .lib-modal-hero-author {
+    font-family: var(--m-font);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--m-text-faint);
+    margin-bottom: var(--s-3);
+  }
+  .lib-modal-hero-author strong {
+    color: var(--m-accent-1);
+    font-weight: 700;
+  }
+  .lib-modal-hero-summary {
+    font-family: var(--m-font);
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.6;
+    color: var(--m-text-soft);
+    margin: 0 0 var(--s-4);
+  }
+  .lib-modal-hero-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--s-3);
+    padding-top: var(--s-3);
+    border-top: 1px solid var(--m-border);
+  }
+  @media (max-width: 560px) {
+    .lib-modal-hero-stats { grid-template-columns: repeat(2, 1fr); gap: var(--s-3); }
+  }
+  .lib-modal-hero-stat { display: flex; flex-direction: column; gap: 4px; }
+  .lib-modal-hero-stat-num {
+    font-family: var(--m-font);
+    font-weight: 800;
+    font-size: 22px;
+    color: var(--m-text);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .lib-modal-hero-stat-label {
+    font-family: var(--m-font);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--m-text-faint);
+  }
+
+  /* Video */
+  .lib-modal-video {
+    display: flex; flex-direction: column; gap: var(--s-2);
+  }
+  .lib-modal-video-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 14px;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse at 22% 28%, rgba(61, 205, 246, 0.28) 0%, transparent 52%),
+      radial-gradient(ellipse at 78% 75%, rgba(151, 71, 255, 0.32) 0%, transparent 55%),
+      radial-gradient(ellipse at 60% 50%, rgba(233, 78, 189, 0.12) 0%, transparent 60%),
+      linear-gradient(135deg, #0E1740 0%, #1A2350 50%, #0E1740 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: border-color var(--t-fast), transform var(--t-fast);
+  }
+  .lib-modal-video-frame:hover { border-color: rgba(61, 205, 246, 0.4); }
+  .lib-modal-video-frame::before {
+    content: "";
+    position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 3px,
+      rgba(255, 255, 255, 0.02) 3px,
+      rgba(255, 255, 255, 0.02) 4px
+    );
+    pointer-events: none;
+  }
+  .lib-modal-video-mono {
+    position: absolute; top: 14px; left: 16px;
+    font-family: var(--m-font);
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.6);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    z-index: 1;
+  }
+  .lib-modal-video-mono .dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: #E94EBD;
+    border-radius: 999px;
+    margin-right: 6px;
+    box-shadow: 0 0 10px #E94EBD;
+    animation: libRecPulse 2s ease-in-out infinite;
+    vertical-align: middle;
+  }
+  @keyframes libRecPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.45; }
+  }
+  .lib-modal-video-duration {
+    position: absolute; bottom: 14px; right: 16px;
+    font-family: var(--m-font);
+    font-size: 11px;
+    font-weight: 700;
+    color: #FFFFFF;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.04em;
+    z-index: 1;
+  }
+  .lib-modal-video-play {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 74px; height: 74px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--m-grad);
+    border: 0;
+    border-radius: 999px;
+    color: #FFFFFF;
+    cursor: pointer;
+    box-shadow:
+      0 0 0 10px rgba(151, 71, 255, 0.14),
+      0 12px 40px rgba(61, 205, 246, 0.4);
+    transition: transform var(--t-fast), box-shadow var(--t-fast);
+    z-index: 2;
+  }
+  .lib-modal-video-play i { font-size: 28px; margin-left: 4px; }
+  .lib-modal-video-frame:hover .lib-modal-video-play {
+    transform: translate(-50%, -50%) scale(1.06);
+    box-shadow:
+      0 0 0 14px rgba(151, 71, 255, 0.2),
+      0 14px 52px rgba(61, 205, 246, 0.55);
+  }
+  .lib-modal-video-caption {
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: var(--m-font);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--m-text-faint);
+  }
+  .lib-modal-video-caption .duration {
+    color: var(--m-text-soft);
+    font-weight: 600;
+  }
+
+  /* Divider */
+  .lib-modal-divider {
+    border: 0;
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      transparent,
+      rgba(151, 71, 255, 0.4) 30%,
+      rgba(61, 205, 246, 0.4) 70%,
+      transparent
+    );
+    margin: 0 var(--s-6);
+  }
+
+  /* Details / What's included */
+  .lib-modal-details {
+    padding: var(--s-6);
+  }
+  .lib-modal-section-head {
+    display: flex; justify-content: space-between; align-items: end;
+    flex-wrap: wrap; gap: var(--s-3);
+    margin-bottom: var(--s-5);
+  }
+  .lib-modal-section-title {
+    font-family: var(--m-font);
+    font-weight: 800;
+    font-size: clamp(24px, 2.6vw, 32px);
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    color: var(--m-text);
+    margin: 0;
+  }
+  .lib-modal-section-count {
+    font-family: var(--m-font);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--m-text-faint);
+  }
+  .lib-modal-bullets {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--s-2);
+  }
+  @media (max-width: 720px) {
+    .lib-modal-bullets { grid-template-columns: 1fr; }
+  }
+  .lib-modal-bullet {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 12px;
+    padding: var(--s-3);
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--m-border);
+    border-radius: 12px;
+    transition: border-color var(--t-fast), background var(--t-fast), transform var(--t-fast);
+  }
+  .lib-modal-bullet:hover {
+    border-color: rgba(61, 205, 246, 0.35);
+    background: rgba(61, 205, 246, 0.04);
+    transform: translateY(-1px);
+  }
+  .lib-modal-bullet-icon {
+    width: 30px; height: 30px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: rgba(61, 205, 246, 0.12);
+    border: 1px solid rgba(61, 205, 246, 0.3);
+    border-radius: 8px;
+    color: var(--m-star);
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .lib-modal-bullet-body {
+    display: flex; flex-direction: column; gap: 4px;
+    min-width: 0;
+  }
+  .lib-modal-bullet-name {
+    font-family: var(--m-font);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--m-text);
+    margin: 0;
+    line-height: 1.3;
+    letter-spacing: -0.005em;
+  }
+  .lib-modal-bullet-desc {
+    font-family: var(--m-font);
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--m-text-soft);
+    margin: 0;
+  }
+
+  /* Pricing card, gradient accented dark panel */
+  .lib-modal-price-card {
+    position: relative;
+    margin: 0 var(--s-6) var(--s-6);
+    background:
+      linear-gradient(180deg, rgba(151, 71, 255, 0.06) 0%, rgba(61, 205, 246, 0.04) 100%),
+      var(--m-surface);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    padding: var(--s-5) var(--s-6);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--s-5);
+    align-items: center;
+    overflow: hidden;
+  }
+  .lib-modal-price-card::before {
+    content: "";
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--m-grad);
+  }
+  @media (max-width: 760px) {
+    .lib-modal-price-card { grid-template-columns: 1fr; padding: var(--s-4); }
+  }
+  .lib-modal-price-eyebrow {
+    font-family: var(--m-font);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--m-accent-1);
+    margin-bottom: 8px;
+  }
+  .lib-modal-price-head {
+    font-family: var(--m-font);
+    font-weight: 800;
+    font-size: clamp(26px, 3vw, 34px);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    color: var(--m-text);
+    margin: 0 0 10px;
+  }
+  .lib-modal-price-sub {
+    font-family: var(--m-font);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.55;
+    color: var(--m-text-soft);
+    margin: 0 0 var(--s-3);
+    max-width: 520px;
+  }
+  .lib-modal-price-sub strong {
+    color: var(--m-text);
+    font-weight: 700;
+  }
+  .lib-modal-price-meta {
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: 6px 10px;
+    font-family: var(--m-font);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--m-text-faint);
+  }
+  .lib-modal-price-meta .sep {
+    width: 3px; height: 3px;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 999px;
+    display: inline-block;
+  }
+  .lib-modal-price-actions {
+    display: flex; flex-direction: column; gap: 10px;
+    align-items: flex-end;
+  }
+  @media (max-width: 760px) {
+    .lib-modal-price-actions { align-items: stretch; }
+  }
+  .lib-modal-price-active {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px;
+    background: rgba(61, 205, 246, 0.1);
+    color: var(--m-accent-1);
+    border: 1px solid rgba(61, 205, 246, 0.3);
+    border-radius: 999px;
+    font-family: var(--m-font);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .lib-modal-price-active i { font-size: 14px; }
+  .lib-modal-price-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 26px;
+    background: var(--m-grad);
+    color: #FFFFFF;
+    border: 0;
+    border-radius: 10px;
+    font-family: var(--m-font);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: -0.005em;
+    transition: transform var(--t-fast), box-shadow var(--t-fast);
+    box-shadow: 0 8px 24px rgba(151, 71, 255, 0.35);
+  }
+  .lib-modal-price-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(151, 71, 255, 0.5);
+  }
+  .lib-modal-price-btn i { font-size: 16px; }
+  .lib-modal-price-link {
+    font-family: var(--m-font);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--m-text-faint);
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .lib-modal-price-link:hover { color: var(--m-accent-1); }
+
 </style>
 </head>
 <body class="app-shell market-body">
@@ -610,8 +1189,8 @@
           <span class="lib-card-price">Free during beta</span>
         </div>
         <div class="lib-card-foot">
-          <a href="library-detail.html?id=industry-rockstar" class="lib-card-link">Preview</a>
-          <button class="btn-matrix-active"><i class="ph ph-check-circle"></i> Active</button>
+          <a href="library-detail.html?id=industry-rockstar" class="lib-card-link" data-lib-trigger="industry-rockstar">Preview</a>
+          <button class="btn-matrix-active" data-lib-trigger="industry-rockstar"><i class="ph ph-check-circle"></i> Active</button>
         </div>
       </article>
       <article class="lib-card lib-card-active">
@@ -752,6 +1331,293 @@
     </section>
   </div>
 </main>
+
+<!-- ============================================================
+     LIBRARY PREVIEW MODAL · INDUSTRY ROCKSTAR
+     Provider-branded modal. Triggered by [data-lib-trigger="industry-rockstar"].
+     Hidden until JS adds .is-open.
+     ============================================================ -->
+<div class="lib-modal-overlay" id="libModal-industry-rockstar" aria-hidden="true">
+  <div class="lib-modal lib-modal-theme-ir" role="dialog" aria-modal="true" aria-labelledby="libModalTitle-ir">
+
+    <button class="lib-modal-close" data-lib-close aria-label="Close preview">
+      <i class="ph ph-x"></i>
+    </button>
+
+    <div class="lib-modal-bar">
+      <div class="lib-modal-brand">
+        <span class="lib-modal-brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 36 36" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="irModalMarkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#3DCDF6"/>
+                <stop offset="55%" stop-color="#9747FF"/>
+                <stop offset="100%" stop-color="#E94EBD"/>
+              </linearGradient>
+            </defs>
+            <circle cx="18" cy="18" r="17" fill="url(#irModalMarkGrad)"/>
+            <text x="18" y="24" text-anchor="middle" font-family="Manrope, sans-serif" font-weight="800" font-size="16" fill="#FFFFFF" letter-spacing="-0.04em">iR</text>
+            <circle cx="26" cy="10" r="1.7" fill="#FFFFFF"/>
+          </svg>
+        </span>
+        <span class="lib-modal-brand-text">
+          <span class="lib-modal-brand-name">Industry Rockstar</span>
+          <span class="lib-modal-brand-sub">Events &amp; Trainings</span>
+        </span>
+      </div>
+      <span class="lib-modal-cat">Founder OS</span>
+      <span class="lib-modal-rating">
+        <i class="ph-fill ph-star"></i>
+        <span>4.9</span>
+        <span style="color: rgba(255,255,255,0.35); margin-left: 2px;">· 2,184 ratings</span>
+      </span>
+      <span class="lib-modal-eyebrow">● Library preview</span>
+    </div>
+
+    <section class="lib-modal-hero">
+      <div class="lib-modal-hero-text">
+        <h2 class="lib-modal-hero-title" id="libModalTitle-ir">
+          Think like a <span class="grad">nine figure operator.</span>
+        </h2>
+        <div class="lib-modal-hero-author">By <strong>Kane &amp; Alessia Minkus</strong>, founders of Industry Rockstar</div>
+        <p class="lib-modal-hero-summary">
+          The flagship operator playbook from the team behind 40+ ventures and 5M+ professionals trained. Twenty years of frameworks, presentations alongside Richard Branson and Kevin Harrington, hundreds of millions in revenue. Encoded so your AI can run them on your behalf.
+        </p>
+        <div class="lib-modal-hero-stats">
+          <div class="lib-modal-hero-stat">
+            <span class="lib-modal-hero-stat-num">5M+</span>
+            <span class="lib-modal-hero-stat-label">Trained</span>
+          </div>
+          <div class="lib-modal-hero-stat">
+            <span class="lib-modal-hero-stat-num">40+</span>
+            <span class="lib-modal-hero-stat-label">Ventures</span>
+          </div>
+          <div class="lib-modal-hero-stat">
+            <span class="lib-modal-hero-stat-num">5,500+</span>
+            <span class="lib-modal-hero-stat-label">Stages</span>
+          </div>
+          <div class="lib-modal-hero-stat">
+            <span class="lib-modal-hero-stat-num">187</span>
+            <span class="lib-modal-hero-stat-label">Frameworks</span>
+          </div>
+        </div>
+      </div>
+      <div class="lib-modal-video">
+        <div class="lib-modal-video-frame" role="button" tabindex="0" aria-label="Play walkthrough">
+          <span class="lib-modal-video-mono"><span class="dot"></span>Walkthrough</span>
+          <button class="lib-modal-video-play" aria-label="Play">
+            <i class="ph-fill ph-play"></i>
+          </button>
+          <span class="lib-modal-video-duration">5:24</span>
+        </div>
+        <div class="lib-modal-video-caption">
+          <span>Walkthrough by Kane Minkus</span>
+          <span class="duration">5 min</span>
+        </div>
+      </div>
+    </section>
+
+    <hr class="lib-modal-divider" />
+
+    <section class="lib-modal-details">
+      <div class="lib-modal-section-head">
+        <h3 class="lib-modal-section-title">What's <span class="grad">included.</span></h3>
+        <span class="lib-modal-section-count">14 framework sets · 187 frameworks total</span>
+      </div>
+      <div class="lib-modal-bullets">
+
+        <article class="lib-modal-bullet">
+          <span class="lib-modal-bullet-icon"><i class="ph-fill ph-star"></i></span>
+          <div class="lib-modal-bullet-body">
+            <h4 class="lib-modal-bullet-name">Business Scaling Systems</h4>
+            <p class="lib-modal-bullet-desc">Playbooks for getting from launch to seven figures, drawn from Kane Minkus's 40+ ventures.</p>
+          </div>
+        </article>
+
+        <article class="lib-modal-bullet">
+          <span class="lib-modal-bullet-icon"><i class="ph-fill ph-star"></i></span>
+          <div class="lib-modal-bullet-body">
+            <h4 class="lib-modal-bullet-name">Nine Figure Operator Techniques</h4>
+            <p class="lib-modal-bullet-desc">Decision frameworks and operating rituals used by founders running businesses at $100M+ scale.</p>
+          </div>
+        </article>
+
+        <article class="lib-modal-bullet">
+          <span class="lib-modal-bullet-icon"><i class="ph-fill ph-star"></i></span>
+          <div class="lib-modal-bullet-body">
+            <h4 class="lib-modal-bullet-name">AI Integration Playbook</h4>
+            <p class="lib-modal-bullet-desc">End to end patterns for layering AI across ops, lead gen, content, and global expansion. No tech background required.</p>
+          </div>
+        </article>
+
+        <article class="lib-modal-bullet">
+          <span class="lib-modal-bullet-icon"><i class="ph-fill ph-star"></i></span>
+          <div class="lib-modal-bullet-body">
+            <h4 class="lib-modal-bullet-name">Brand Building &amp; Monetization</h4>
+            <p class="lib-modal-bullet-desc">Identity, positioning, offer clarification, and monetization tested across 80+ products and 80 countries.</p>
+          </div>
+        </article>
+
+        <article class="lib-modal-bullet">
+          <span class="lib-modal-bullet-icon"><i class="ph-fill ph-star"></i></span>
+          <div class="lib-modal-bullet-body">
+            <h4 class="lib-modal-bullet-name">Sales Systems &amp; Growth Mechanics</h4>
+            <p class="lib-modal-bullet-desc">Sales motions, funnel architectures, and growth patterns behind hundreds of millions in revenue.</p>
+          </div>
+        </article>
+
+        <article class="lib-modal-bullet">
+          <span class="lib-modal-bullet-icon"><i class="ph-fill ph-star"></i></span>
+          <div class="lib-modal-bullet-body">
+            <h4 class="lib-modal-bullet-name">Stage &amp; Presentation Methodology</h4>
+            <p class="lib-modal-bullet-desc">Storytelling and audience engagement refined across 5,500+ live and virtual presentations.</p>
+          </div>
+        </article>
+
+        <article class="lib-modal-bullet">
+          <span class="lib-modal-bullet-icon"><i class="ph-fill ph-star"></i></span>
+          <div class="lib-modal-bullet-body">
+            <h4 class="lib-modal-bullet-name">AI Agency Build Playbook</h4>
+            <p class="lib-modal-bullet-desc">The exact sequence for launching a profitable AI consulting business, from positioning through delivery.</p>
+          </div>
+        </article>
+
+        <article class="lib-modal-bullet">
+          <span class="lib-modal-bullet-icon"><i class="ph-fill ph-star"></i></span>
+          <div class="lib-modal-bullet-body">
+            <h4 class="lib-modal-bullet-name">AI Consultant Curriculum</h4>
+            <p class="lib-modal-bullet-desc">Conversational AI deployment, consulting strategy, and client work patterns.</p>
+          </div>
+        </article>
+
+        <article class="lib-modal-bullet">
+          <span class="lib-modal-bullet-icon"><i class="ph-fill ph-star"></i></span>
+          <div class="lib-modal-bullet-body">
+            <h4 class="lib-modal-bullet-name">Next Gen Coaching Frameworks</h4>
+            <p class="lib-modal-bullet-desc">AI integrated coaching practices, neuroscience based protocols, and human potential systems used by top tier coaches.</p>
+          </div>
+        </article>
+
+        <article class="lib-modal-bullet">
+          <span class="lib-modal-bullet-icon"><i class="ph-fill ph-star"></i></span>
+          <div class="lib-modal-bullet-body">
+            <h4 class="lib-modal-bullet-name">Course Creator Toolkit</h4>
+            <p class="lib-modal-bullet-desc">Templates and rituals for turning expertise into a polished course in hours, not weeks.</p>
+          </div>
+        </article>
+
+        <article class="lib-modal-bullet">
+          <span class="lib-modal-bullet-icon"><i class="ph-fill ph-star"></i></span>
+          <div class="lib-modal-bullet-body">
+            <h4 class="lib-modal-bullet-name">Mindset &amp; Performance Protocols</h4>
+            <p class="lib-modal-bullet-desc">Tech driven mindset training, resilience routines, emotional mastery, and focus practices.</p>
+          </div>
+        </article>
+
+        <article class="lib-modal-bullet">
+          <span class="lib-modal-bullet-icon"><i class="ph-fill ph-star"></i></span>
+          <div class="lib-modal-bullet-body">
+            <h4 class="lib-modal-bullet-name">Personal Development System</h4>
+            <p class="lib-modal-bullet-desc">Frameworks across health, relationships, purpose, and wealth. Built for sustained leadership, not burnout.</p>
+          </div>
+        </article>
+
+        <article class="lib-modal-bullet">
+          <span class="lib-modal-bullet-icon"><i class="ph-fill ph-star"></i></span>
+          <div class="lib-modal-bullet-body">
+            <h4 class="lib-modal-bullet-name">Event Mastery Blueprint</h4>
+            <p class="lib-modal-bullet-desc">Scaling through live and virtual events, drawing on 5,500+ presentations and a global speaking presence.</p>
+          </div>
+        </article>
+
+        <article class="lib-modal-bullet">
+          <span class="lib-modal-bullet-icon"><i class="ph-fill ph-star"></i></span>
+          <div class="lib-modal-bullet-body">
+            <h4 class="lib-modal-bullet-name">Fractional Leadership Patterns</h4>
+            <p class="lib-modal-bullet-desc">Decision rules for fractional CaiO engagements, AI advisory setup, and premium consulting structures.</p>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="lib-modal-price-card">
+      <div class="lib-modal-price-content">
+        <div class="lib-modal-price-eyebrow">Pricing</div>
+        <h3 class="lib-modal-price-head"><span class="grad">Free during beta.</span></h3>
+        <p class="lib-modal-price-sub">Standard price <strong>$99/month</strong> after beta. Lifetime access for early adopters who license now.</p>
+        <div class="lib-modal-price-meta">
+          <span>187 frameworks</span>
+          <span class="sep"></span>
+          <span>Updated weekly</span>
+          <span class="sep"></span>
+          <span>Cancel anytime</span>
+        </div>
+      </div>
+      <div class="lib-modal-price-actions">
+        <div class="lib-modal-price-active"><i class="ph-fill ph-check-circle"></i> Active in your context</div>
+        <button class="lib-modal-price-btn"><i class="ph-fill ph-package"></i> License this Library</button>
+        <a class="lib-modal-price-link" href="context.html">Manage in Context Layers <i class="ph ph-arrow-right"></i></a>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+(function () {
+  const triggers = document.querySelectorAll('[data-lib-trigger]');
+  const closers  = document.querySelectorAll('[data-lib-close]');
+
+  function getModalFor(id) { return document.getElementById('libModal-' + id); }
+
+  function openModal(modal) {
+    if (!modal) return;
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    const closeBtn = modal.querySelector('[data-lib-close]');
+    if (closeBtn) closeBtn.focus();
+  }
+
+  function closeModal(modal) {
+    if (!modal) return;
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  function closeAll() {
+    document.querySelectorAll('.lib-modal-overlay.is-open').forEach(closeModal);
+  }
+
+  triggers.forEach(function (t) {
+    t.addEventListener('click', function (e) {
+      e.preventDefault();
+      const id = t.getAttribute('data-lib-trigger');
+      openModal(getModalFor(id));
+    });
+  });
+
+  closers.forEach(function (c) {
+    c.addEventListener('click', function () {
+      const modal = c.closest('.lib-modal-overlay');
+      closeModal(modal);
+    });
+  });
+
+  document.querySelectorAll('.lib-modal-overlay').forEach(function (overlay) {
+    overlay.addEventListener('click', function (e) {
+      if (e.target === overlay) closeModal(overlay);
+    });
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeAll();
+  });
+})();
+</script>
+
 </div>
 </body>
 </html>
