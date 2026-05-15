@@ -164,7 +164,16 @@ hr { border: 0; border-top: 1px solid var(--rule); }
 .app-brand {
   font-family: var(--f-display); font-size: 22px; font-weight: 400;
   letter-spacing: -0.01em; color: var(--ink) !important; flex-shrink: 0;
+  display: inline-flex; align-items: center; gap: 8px;
+  text-decoration: none;
 }
+/* App-icon mark sits left of the wordmark. 28px matches the visual weight
+   of the 22px display type with its internal padding. */
+.app-brand-logo {
+  width: 28px; height: 28px;
+  display: block; flex-shrink: 0;
+}
+.app-brand-wordmark { display: inline-flex; align-items: baseline; line-height: 1; }
 .app-brand .accent { color: var(--terra); }
 .app-page-title {
   font-family: var(--f-display); font-weight: 400; font-size: 20px;
